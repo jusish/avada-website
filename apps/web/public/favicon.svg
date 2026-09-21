@@ -1,11 +1,12 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="none">
-  <rect width="100" height="100" rx="24" fill="#0F172A"/>
-  <path d="M50 20L75 75H25L50 20Z" fill="url(#grad)" stroke="#38BDF8" stroke-width="4" stroke-linejoin="round"/>
-  <circle cx="50" cy="55" r="10" fill="#38BDF8"/>
-  <defs>
-    <linearGradient id="grad" x1="25" y1="20" x2="75" y2="75" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#2563EB"/>
-      <stop offset="1" stop-color="#38BDF8"/>
-    </linearGradient>
-  </defs>
-</svg>
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" width="119" height="111"><svg width="119" height="111" viewBox="0 0 119 111" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g clip-path="url(#clip0_2001_27)">
+<path d="M0.358685 108.689C-0.139981 107.789 -0.119987 106.765 0.424013 105.884L23.3227 68.852C23.8414 68.016 24.6907 67.544 25.6747 67.544C33.6067 67.5307 69.2507 67.4853 81.1413 67.492C82.0347 67.492 82.8 67.1093 83.344 66.4026C83.8814 65.6973 84.0507 64.8547 83.8173 63.9987L73.404 25.6133H72.7827L62.3307 43.5813C61.8187 44.4559 60.9507 44.956 59.9334 44.956H43.0667C42.036 44.956 41.1547 44.4373 40.6493 43.5359C40.1507 42.6359 40.1707 41.6119 40.7147 40.7373L65.0974 1.31467C65.616 0.47334 66.464 -2.36265e-05 67.4494 -2.36265e-05H84.012C85.2427 -2.36265e-05 86.292 0.777283 86.6547 1.95595L118.697 106.532C118.963 107.4 118.813 108.256 118.276 108.988C117.732 109.713 116.955 110.108 116.047 110.108H98.1507C96.8933 110.108 95.824 109.305 95.4867 108.087L89.8947 88.1813C89.5587 86.9693 88.4894 86.16 87.232 86.1666L39.0173 86.2053C38.012 86.2053 37.1507 86.6973 36.6387 87.5587L24.0747 108.755C23.5627 109.616 22.7014 110.108 21.6907 110.108H2.77601C1.74535 110.108 0.864019 109.591 0.358685 108.689Z" fill="#00C896"></path>
+</g>
+<defs>
+<clipPath id="SvgjsClipPath1005">
+<rect width="118.825" height="110.108" fill="white"></rect>
+</clipPath>
+</defs>
+</svg><style>@media (prefers-color-scheme: light) { :root { filter: none; } }
+@media (prefers-color-scheme: dark) { :root { filter: none; } }
+</style></svg>

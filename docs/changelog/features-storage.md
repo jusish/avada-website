@@ -13,6 +13,7 @@ This document is the **single source of truth** for every feature implemented in
 5. [FEAT-005: Marketing Website & CMS Admin Dashboard](#feat-005-marketing-website--cms-admin-dashboard)
 6. [FEAT-006: Docker Containerization Ecosystem](#feat-006-docker-containerization-ecosystem)
 7. [FEAT-007: AI Agent Standard & Documentation Architecture](#feat-007-ai-agent-standard--documentation-architecture)
+8. [FEAT-008: AvadaPay Brand Alignment, Adobe XD Hero, Solution Pages & shadcn Select](#feat-008-avadapay-brand-alignment-adobe-xd-hero-solution-pages--shadcn-select)
 
 ---
 
@@ -140,3 +141,32 @@ This document is the **single source of truth** for every feature implemented in
   - [`docs/rules/backend-rules.md`](../rules/backend-rules.md)
   - [`docs/changelog/features-storage.md`](./features-storage.md)
   - [`docs/changelog/CHANGELOG.md`](./CHANGELOG.md)
+
+---
+
+## FEAT-008: AvadaPay Brand Alignment, Adobe XD Hero, Solution Pages & shadcn Select
+- **ID**: `FEAT-008`
+- **Status**: Completed
+- **Created**: 2026-09-21
+- **Description**: Rebranded website to authentic AvadaPay identity matching `avadapay.com` and Adobe XD design specs. Extracted official vector logos, implemented primary `#3BBA93`, built ambient card payment hero with metrics and sub-banner, added dedicated solution pages (`Payment Processing`, `POS`, `Bulk SMS`, `Country Hubs`), relocated CMS link to footer, and migrated native CMS selects to shadcn Select component.
+- **Files Involved**:
+  - [`apps/web/public/logo.svg`](../../apps/web/public/logo.svg)
+  - [`apps/web/public/favicon.svg`](../../apps/web/public/favicon.svg)
+  - [`apps/web/src/assets/hero-bg.jpg`](../../apps/web/src/assets/hero-bg.jpg)
+  - [`apps/web/src/components/ui/select.tsx`](../../apps/web/src/components/ui/select.tsx)
+  - [`apps/web/src/components/Navbar.tsx`](../../apps/web/src/components/Navbar.tsx)
+  - [`apps/web/src/components/Footer.tsx`](../../apps/web/src/components/Footer.tsx)
+  - [`apps/web/src/pages/public/HomePage.tsx`](../../apps/web/src/pages/public/HomePage.tsx)
+  - [`apps/web/src/pages/public/PaymentProcessingPage.tsx`](../../apps/web/src/pages/public/PaymentProcessingPage.tsx)
+  - [`apps/web/src/pages/public/PosPage.tsx`](../../apps/web/src/pages/public/PosPage.tsx)
+  - [`apps/web/src/pages/public/BulkSmsPage.tsx`](../../apps/web/src/pages/public/BulkSmsPage.tsx)
+  - [`apps/web/src/pages/public/CountryPage.tsx`](../../apps/web/src/pages/public/CountryPage.tsx)
+  - [`apps/web/src/pages/admin/AdminContentPage.tsx`](../../apps/web/src/pages/admin/AdminContentPage.tsx)
+  - [`apps/web/src/App.tsx`](../../apps/web/src/App.tsx)
+  - [`apps/web/tailwind.config.js`](../../apps/web/tailwind.config.js)
+  - [`apps/web/src/index.css`](../../apps/web/src/index.css)
+- **Implementation Details**:
+  - Hero section mirrors Adobe XD specifications: card-swipe ambient photography, headline highlighting "built for African markets", 3 key metrics (`99.9% uptime`, `17+ African markets`, `Mobile money + card + POS`), and translucent bottom description strip.
+  - Header features turquoise `#3BBA93` capsule navbar and dedicated Country Selector dropdown routing to individual country pages for Kenya 🇰🇪, Rwanda 🇷🇼, and Tanzania 🇹🇿.
+  - Native HTML `<select>` elements in CMS Admin replaced with full Radix-backed shadcn `Select` components.
+

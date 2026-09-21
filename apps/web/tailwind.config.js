@@ -15,6 +15,19 @@ export default {
     },
     extend: {
       colors: {
+        avadagreen: {
+          DEFAULT: "#3BBA93",
+          50: "#EDF9F5",
+          100: "#D6F1E8",
+          200: "#B0E3D3",
+          300: "#89D5BE",
+          400: "#63C7A8",
+          500: "#3BBA93",
+          600: "#2FA07E",
+          700: "#247E64",
+          800: "#1A5C4A",
+          900: "#103B2F",
+        },
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
@@ -53,20 +66,6 @@ export default {
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
-      },
-      keyframes: {
-        "accordion-down": {
-          from: { height: "0" },
-          to: { height: "var(--radix-accordion-content-height)" },
-        },
-        "accordion-up": {
-          from: { height: "var(--radix-accordion-content-height)" },
-          to: { height: "0" },
-        },
-      },
-      animation: {
-        "accordion-down": "accordion-down 0.2s ease-out",
-        "accordion-up": "accordion-up 0.2s ease-out",
       },
     },
   },

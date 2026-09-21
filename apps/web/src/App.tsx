@@ -7,8 +7,10 @@ import { AdminSidebar } from '@/components/AdminSidebar';
 
 // Public Pages
 import { HomePage } from '@/pages/public/HomePage';
-import { AboutPage } from '@/pages/public/AboutPage';
-import { ServicesPage } from '@/pages/public/ServicesPage';
+import { PaymentProcessingPage } from '@/pages/public/PaymentProcessingPage';
+import { PosPage } from '@/pages/public/PosPage';
+import { BulkSmsPage } from '@/pages/public/BulkSmsPage';
+import { CountryPage } from '@/pages/public/CountryPage';
 import { ContactPage } from '@/pages/public/ContactPage';
 
 // Admin CMS Pages
@@ -37,7 +39,7 @@ const AdminProtectedLayout: React.FC = () => {
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#3BBA93]"></div>
       </div>
     );
   }
@@ -60,11 +62,13 @@ export const App: React.FC = () => {
   return (
     <AuthProvider>
       <Routes>
-        {/* Public Marketing Routes */}
+        {/* Public Routes */}
         <Route element={<PublicLayout />}>
           <Route path="/" element={<HomePage />} />
-          <Route path="/services" element={<ServicesPage />} />
-          <Route path="/about" element={<AboutPage />} />
+          <Route path="/payment-processing" element={<PaymentProcessingPage />} />
+          <Route path="/pos" element={<PosPage />} />
+          <Route path="/bulk-sms" element={<BulkSmsPage />} />
+          <Route path="/countries/:countrySlug" element={<CountryPage />} />
           <Route path="/contact" element={<ContactPage />} />
         </Route>
 

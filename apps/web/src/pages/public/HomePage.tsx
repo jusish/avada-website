@@ -1,17 +1,18 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import {
+  Smartphone,
+  Store,
+  MessageSquare,
   ArrowRight,
-  Zap,
-  ShieldCheck,
-  Cpu,
-  Sparkles,
+  Globe2,
   ChevronRight,
 } from 'lucide-react';
 import { ContentItem } from '@avada/shared';
+import { COUNTRIES } from '@/components/Navbar';
 
 export const HomePage: React.FC = () => {
   const [newsItems, setNewsItems] = useState<ContentItem[]>([]);
@@ -33,150 +34,202 @@ export const HomePage: React.FC = () => {
 
   return (
     <div className="flex flex-col min-h-screen">
-      {/* Hero Section */}
-      <section className="relative overflow-hidden pt-20 pb-24 lg:pt-32 lg:pb-36 bg-gradient-to-b from-background via-background to-muted/20">
-        <div className="absolute inset-0 -z-10 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)]"></div>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <div className="inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-full border border-primary/20 bg-primary/5 text-primary text-xs font-semibold mb-8 animate-pulse">
-            <Sparkles className="w-3.5 h-3.5" />
-            <span>Next-Generation Global Financial Architecture</span>
-          </div>
+      {/* 
+        Hero Section (Recreated from Adobe XD Design Screenshot)
+      */}
+      <section className="relative min-h-[90vh] flex flex-col justify-between overflow-hidden pt-28 sm:pt-36 pb-0">
+        {/* Ambient Card Payment Photography Background */}
+        <div
+          className="absolute inset-0 -z-20 bg-cover bg-center bg-no-repeat transition-all duration-700 transform scale-105"
+          style={{ backgroundImage: `url('/hero-bg.jpg')` }}
+        />
+        {/* Dark High-Contrast Vignette Gradient Overlay */}
+        <div className="absolute inset-0 -z-10 bg-gradient-to-b from-black/70 via-black/55 to-[#0B132B]" />
 
-          <h1 className="text-4xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight text-foreground max-w-4xl mx-auto leading-tight">
-            Financial Technology Engineered for{' '}
-            <span className="bg-clip-text text-transparent bg-gradient-to-r from-blue-600 via-indigo-600 to-cyan-500">
-              Unstoppable Growth
+        {/* Main Hero Typography Content */}
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center my-auto">
+          <h1 className="text-4xl sm:text-6xl md:text-7xl lg:text-[76px] font-extrabold tracking-tight text-white leading-[1.15] max-w-5xl mx-auto">
+            Payments and customer communication,{' '}
+            <span className="text-[#3BBA93] block sm:inline">
+              built for African markets.
             </span>
           </h1>
 
-          <p className="mt-6 text-lg sm:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-            Avada unifies global payouts, high-velocity settlement, and multi-currency operations into a single API platform built for modern scale.
-          </p>
-
-          <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Link to="/contact">
-              <Button size="lg" variant="gradient" className="space-x-2 shadow-lg shadow-blue-500/25">
-                <span>Start Integration</span>
-                <ArrowRight className="w-4 h-4" />
-              </Button>
-            </Link>
-            <Link to="/services">
-              <Button size="lg" variant="outline" className="space-x-2">
-                <span>Explore Solutions</span>
-              </Button>
-            </Link>
+          {/* Key 3 Metrics Row */}
+          <div className="mt-12 flex flex-wrap items-center justify-center gap-6 sm:gap-14 text-white text-base sm:text-lg font-semibold tracking-wide">
+            <div className="flex items-center space-x-2">
+              <span className="w-2 h-2 rounded-full bg-[#3BBA93]" />
+              <span>99.9% uptime</span>
+            </div>
+            <div className="flex items-center space-x-2">
+              <span className="w-2 h-2 rounded-full bg-[#3BBA93]" />
+              <span>17+ African markets</span>
+            </div>
+            <div className="flex items-center space-x-2">
+              <span className="w-2 h-2 rounded-full bg-[#3BBA93]" />
+              <span>Mobile money + card + POS</span>
+            </div>
           </div>
+        </div>
 
-          {/* Key Metrics Counter Strip */}
-          <div className="mt-16 pt-12 border-t border-border/50 grid grid-cols-2 sm:grid-cols-4 gap-6 max-w-4xl mx-auto text-left">
-            <div className="p-4 rounded-xl bg-card border border-border/60 shadow-sm">
-              <p className="text-3xl font-extrabold text-foreground">99.99%</p>
-              <p className="text-xs text-muted-foreground font-medium mt-1">Platform Uptime SLA</p>
-            </div>
-            <div className="p-4 rounded-xl bg-card border border-border/60 shadow-sm">
-              <p className="text-3xl font-extrabold text-foreground">140+</p>
-              <p className="text-xs text-muted-foreground font-medium mt-1">Countries Supported</p>
-            </div>
-            <div className="p-4 rounded-xl bg-card border border-border/60 shadow-sm">
-              <p className="text-3xl font-extrabold text-foreground">&lt; 250ms</p>
-              <p className="text-xs text-muted-foreground font-medium mt-1">API Execution Latency</p>
-            </div>
-            <div className="p-4 rounded-xl bg-card border border-border/60 shadow-sm">
-              <p className="text-3xl font-extrabold text-foreground">$12B+</p>
-              <p className="text-xs text-muted-foreground font-medium mt-1">Annual Volume Projected</p>
-            </div>
+        {/* Dark Sub-Banner Strip at the bottom of the hero */}
+        <div className="w-full bg-[#0B132B]/90 backdrop-blur-md border-t border-white/10 py-6 sm:py-8 mt-16">
+          <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <p className="text-sm sm:text-base text-gray-300 font-normal leading-relaxed">
+              AvadaPay is a pan-African payment gateway and SMS aggregator. Accept mobile money and card payments, run POS, send bulk payouts, and reach customers by SMS, through one connected platform live in 17+ markets.
+            </p>
           </div>
         </div>
       </section>
 
-      {/* Core Features Grid */}
-      <section className="py-20 bg-muted/20 border-y border-border/50">
+      {/* Solutions Section */}
+      <section className="py-20 bg-background">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center max-w-2xl mx-auto mb-16">
-            <Badge variant="secondary" className="mb-3">
-              Infrastructure
+          <div className="text-center max-w-3xl mx-auto mb-16">
+            <Badge className="bg-[#3BBA93]/10 text-[#3BBA93] border-[#3BBA93]/30 hover:bg-[#3BBA93]/20 mb-3">
+              Core Capabilities
             </Badge>
             <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-foreground">
-              Everything You Need to Power Global Commerce
+              Built for High-Growth African Businesses
             </h2>
-            <p className="text-muted-foreground mt-4 text-base">
-              A comprehensive suite of developer-first financial primitives configured to work together seamlessly.
+            <p className="text-muted-foreground mt-3 text-base">
+              A unified technology stack to process revenue and communicate reliably with your customers.
             </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <Card className="hover:border-primary/50 transition-all hover:shadow-lg">
+            {/* Payment Processing Card */}
+            <Card className="flex flex-col justify-between hover:border-[#3BBA93]/50 transition-all hover:shadow-xl group">
               <CardHeader>
-                <div className="w-12 h-12 rounded-xl bg-blue-500/10 text-primary flex items-center justify-center mb-4">
-                  <Zap className="w-6 h-6" />
+                <div className="w-12 h-12 rounded-xl bg-[#3BBA93]/10 text-[#3BBA93] flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                  <Smartphone className="w-6 h-6" />
                 </div>
-                <CardTitle>Instant Global Payouts</CardTitle>
-                <CardDescription>
-                  Deliver funds directly to local bank accounts, digital wallets, and cards in real time across 140+ countries.
+                <CardTitle className="text-xl">Payment Processing</CardTitle>
+                <CardDescription className="text-sm mt-2 leading-relaxed">
+                  Accept payments via M-Pesa, MTN MoMo, Airtel Money, and cards. Automated STK push, online checkouts, and bulk disbursement transfers.
                 </CardDescription>
               </CardHeader>
-              <CardContent>
-                <p className="text-sm text-muted-foreground">
-                  Automated routing picks the cheapest and fastest local payment rails to ensure optimal delivery.
-                </p>
+              <CardContent className="pt-0">
+                <Link to="/payment-processing">
+                  <Button variant="ghost" size="sm" className="space-x-1 p-0 text-[#3BBA93] hover:text-[#32a481]">
+                    <span>Explore Payment Rails</span>
+                    <ArrowRight className="w-4 h-4" />
+                  </Button>
+                </Link>
               </CardContent>
             </Card>
 
-            <Card className="hover:border-primary/50 transition-all hover:shadow-lg">
+            {/* POS Terminals Card */}
+            <Card className="flex flex-col justify-between hover:border-[#3BBA93]/50 transition-all hover:shadow-xl group">
               <CardHeader>
-                <div className="w-12 h-12 rounded-xl bg-indigo-500/10 text-indigo-600 flex items-center justify-center mb-4">
-                  <ShieldCheck className="w-6 h-6" />
+                <div className="w-12 h-12 rounded-xl bg-blue-500/10 text-blue-500 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                  <Store className="w-6 h-6" />
                 </div>
-                <CardTitle>Automated Compliance & AML</CardTitle>
-                <CardDescription>
-                  Integrated biometric KYC, real-time sanctions screening, and AI-driven transaction risk assessment.
+                <CardTitle className="text-xl">Smart POS Terminals</CardTitle>
+                <CardDescription className="text-sm mt-2 leading-relaxed">
+                  Android-based smart POS hardware for in-store checkout and agency banking. Accepts chip & PIN, contactless NFC, and mobile money QR codes.
                 </CardDescription>
               </CardHeader>
-              <CardContent>
-                <p className="text-sm text-muted-foreground">
-                  Stay fully compliant with regional financial authorities without adding friction to genuine users.
-                </p>
+              <CardContent className="pt-0">
+                <Link to="/pos">
+                  <Button variant="ghost" size="sm" className="space-x-1 p-0 text-[#3BBA93] hover:text-[#32a481]">
+                    <span>Discover POS Solutions</span>
+                    <ArrowRight className="w-4 h-4" />
+                  </Button>
+                </Link>
               </CardContent>
             </Card>
 
-            <Card className="hover:border-primary/50 transition-all hover:shadow-lg">
+            {/* Bulk SMS Card */}
+            <Card className="flex flex-col justify-between hover:border-[#3BBA93]/50 transition-all hover:shadow-xl group">
               <CardHeader>
-                <div className="w-12 h-12 rounded-xl bg-cyan-500/10 text-cyan-600 flex items-center justify-center mb-4">
-                  <Cpu className="w-6 h-6" />
+                <div className="w-12 h-12 rounded-xl bg-indigo-500/10 text-indigo-500 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                  <MessageSquare className="w-6 h-6" />
                 </div>
-                <CardTitle>Developer-First API</CardTitle>
-                <CardDescription>
-                  Idempotent REST endpoints, webhook subscriptions, and robust SDKs with sandbox verification environments.
+                <CardTitle className="text-xl">Bulk SMS & OTPs</CardTitle>
+                <CardDescription className="text-sm mt-2 leading-relaxed">
+                  Direct carrier connections across Africa ensuring &lt; 3-second OTP delivery, branded sender IDs, and transactional alert broadcasts.
                 </CardDescription>
               </CardHeader>
-              <CardContent>
-                <p className="text-sm text-muted-foreground">
-                  Go from onboarding to your first live test transaction in under thirty minutes.
-                </p>
+              <CardContent className="pt-0">
+                <Link to="/bulk-sms">
+                  <Button variant="ghost" size="sm" className="space-x-1 p-0 text-[#3BBA93] hover:text-[#32a481]">
+                    <span>View SMS Delivery Rails</span>
+                    <ArrowRight className="w-4 h-4" />
+                  </Button>
+                </Link>
               </CardContent>
             </Card>
           </div>
         </div>
       </section>
 
-      {/* Live Content from CMS Showcase */}
+      {/* Country Markets Presence Showcase */}
+      <section className="py-20 bg-muted/30 border-y border-border">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex flex-col md:flex-row md:items-end justify-between mb-12">
+            <div>
+              <Badge className="bg-[#3BBA93]/10 text-[#3BBA93] border-[#3BBA93]/30 mb-2">
+                Regional Hubs
+              </Badge>
+              <h2 className="text-3xl font-bold tracking-tight text-foreground">
+                Dedicated Country Operations
+              </h2>
+              <p className="text-muted-foreground mt-2">
+                Select your market to explore localized currencies, telco connections, and regulatory compliance.
+              </p>
+            </div>
+            <div className="mt-4 md:mt-0 flex items-center space-x-2 text-xs font-semibold text-muted-foreground">
+              <Globe2 className="w-4 h-4 text-[#3BBA93]" />
+              <span>Full East & Central African Coverage</span>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {COUNTRIES.map((c) => (
+              <Link key={c.code} to={c.path}>
+                <Card className="hover:border-[#3BBA93] hover:shadow-lg transition-all h-full p-6 flex flex-col justify-between">
+                  <div>
+                    <div className="flex items-center justify-between mb-4">
+                      <span className="text-4xl">{c.flag}</span>
+                      <Badge variant="outline" className="text-xs font-medium text-[#3BBA93] border-[#3BBA93]/30">
+                        Active Market
+                      </Badge>
+                    </div>
+                    <h3 className="text-xl font-bold text-foreground">AvadaPay {c.name}</h3>
+                    <p className="text-xs text-muted-foreground mt-2">
+                      Click to view {c.name} telco integrations, local currency settlement, and in-country support office.
+                    </p>
+                  </div>
+                  <div className="pt-6 flex items-center text-xs font-semibold text-[#3BBA93]">
+                    <span>Explore {c.name} Gateway</span>
+                    <ChevronRight className="w-4 h-4 ml-1" />
+                  </div>
+                </Card>
+              </Link>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Live Content Feed from CMS */}
       <section className="py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-12">
             <div>
-              <Badge variant="outline" className="mb-2 border-primary/30 text-primary">
-                From Our CMS Feed
+              <Badge variant="outline" className="mb-2 border-[#3BBA93]/30 text-[#3BBA93]">
+                AvadaPay Press & Announcements
               </Badge>
               <h2 className="text-3xl font-bold tracking-tight text-foreground">
-                Latest Updates & Insights
+                Latest Market Insights
               </h2>
               <p className="text-muted-foreground mt-2">
-                Live articles and company announcements served directly via the Avada CMS engine.
+                Live articles and updates served directly via the AvadaPay PostgreSQL CMS backend.
               </p>
             </div>
-            <Link to="/admin" className="mt-4 sm:mt-0">
-              <Button variant="ghost" size="sm" className="space-x-1 text-primary">
-                <span>Manage via CMS</span>
+            <Link to="/contact" className="mt-4 sm:mt-0">
+              <Button variant="ghost" size="sm" className="space-x-1 text-[#3BBA93]">
+                <span>Subscribe for Updates</span>
                 <ChevronRight className="w-4 h-4" />
               </Button>
             </Link>
@@ -198,7 +251,7 @@ export const HomePage: React.FC = () => {
                 <Card key={item.id} className="flex flex-col justify-between hover:shadow-md transition-shadow">
                   <CardHeader>
                     <div className="flex items-center justify-between mb-2">
-                      <Badge variant="secondary" className="capitalize text-[11px]">
+                      <Badge variant="secondary" className="capitalize text-[11px] text-[#3BBA93] bg-[#3BBA93]/10">
                         {item.category}
                       </Badge>
                       <span className="text-[11px] text-muted-foreground">
@@ -212,7 +265,7 @@ export const HomePage: React.FC = () => {
                   </CardHeader>
                   <CardContent className="pt-0">
                     <p className="text-xs text-muted-foreground">
-                      By {item.author?.name || 'Avada Team'}
+                      Published by {item.author?.name || 'AvadaPay Editorial'}
                     </p>
                   </CardContent>
                 </Card>
@@ -222,19 +275,19 @@ export const HomePage: React.FC = () => {
         </div>
       </section>
 
-      {/* CTA Callout */}
-      <section className="py-16 bg-gradient-to-tr from-blue-900 to-indigo-950 text-white relative overflow-hidden">
+      {/* CTA Section */}
+      <section className="py-20 bg-[#0B132B] text-white relative overflow-hidden">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
-          <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight">
-            Ready to Transform Your Payment Systems?
+          <h2 className="text-3xl sm:text-5xl font-extrabold tracking-tight">
+            Scale Your Pan-African Payments Today
           </h2>
-          <p className="mt-4 text-blue-200 max-w-xl mx-auto text-base">
-            Join international businesses scaling their financial operations on the Avada platform.
+          <p className="mt-4 text-gray-300 max-w-xl mx-auto text-base">
+            Integrate in minutes, accept multi-carrier mobile money, deploy POS terminals, and reach customers seamlessly.
           </p>
           <div className="mt-8 flex justify-center space-x-4">
             <Link to="/contact">
-              <Button size="lg" className="bg-white text-blue-950 hover:bg-blue-50 font-semibold shadow-xl">
-                Schedule a Demo
+              <Button size="lg" className="bg-[#3BBA93] hover:bg-[#32a481] text-white font-semibold shadow-xl shadow-[#3BBA93]/20">
+                Contact Our Payments Team
               </Button>
             </Link>
           </div>

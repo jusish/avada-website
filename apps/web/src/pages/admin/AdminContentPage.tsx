@@ -13,6 +13,13 @@ import {
   TableCell,
 } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { Plus, Trash2, AlertCircle, RefreshCw, X } from 'lucide-react';
 import { ContentItem } from '@avada/shared';
 
@@ -246,30 +253,30 @@ export const AdminContentPage: React.FC = () => {
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-1.5">
                   <Label htmlFor="category" className="text-xs">Category</Label>
-                  <select
-                    id="category"
-                    value={category}
-                    onChange={(e) => setCategory(e.target.value)}
-                    className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
-                  >
-                    <option value="announcements">Announcements</option>
-                    <option value="products">Products</option>
-                    <option value="security">Security</option>
-                    <option value="insights">Insights</option>
-                  </select>
+                  <Select value={category} onValueChange={(val) => setCategory(val)}>
+                    <SelectTrigger id="category">
+                      <SelectValue placeholder="Select category" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="announcements">Announcements</SelectItem>
+                      <SelectItem value="products">Products</SelectItem>
+                      <SelectItem value="security">Security</SelectItem>
+                      <SelectItem value="insights">Insights</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
 
                 <div className="space-y-1.5">
                   <Label htmlFor="status" className="text-xs">Publishing Status</Label>
-                  <select
-                    id="status"
-                    value={status}
-                    onChange={(e) => setStatus(e.target.value as any)}
-                    className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
-                  >
-                    <option value="PUBLISHED">Published (Live)</option>
-                    <option value="DRAFT">Draft</option>
-                  </select>
+                  <Select value={status} onValueChange={(val) => setStatus(val as 'PUBLISHED' | 'DRAFT')}>
+                    <SelectTrigger id="status">
+                      <SelectValue placeholder="Select status" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="PUBLISHED">Published (Live)</SelectItem>
+                      <SelectItem value="DRAFT">Draft</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
               </div>
 
