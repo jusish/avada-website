@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.3.0] - 2026-09-21
+
+### Added & Fixed
+- **Vector Country Flags Component (`CountryFlag`)**: Replaced non-rendering Unicode country emojis with dedicated, high-resolution SVG vector flags for Kenya 🇰🇪, Rwanda 🇷🇼, and Tanzania 🇹🇿.
+- **Cross-Platform Flag Consistency**: Solved Windows / Chromium platform font limitation where flag emojis were rendered as regional letters ("KE", "RW", "TZ") or missing glyphs.
+- **Integrated Flag Placements**: Embedded `<CountryFlag>` across the sticky Navbar dropdown, mobile drawer, Footer market links, Home page Country Hubs, dedicated Country overview pages, and Contact page regional office directory.
+
 ## [1.2.1] - 2026-09-21
 
 ### Fixed

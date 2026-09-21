@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { Mail, Phone, MapPin, CheckCircle2 } from 'lucide-react';
+import { CountryFlag } from '@/components/CountryFlag';
 
 export const ContactPage: React.FC = () => {
   const [submitted, setSubmitted] = useState(false);
@@ -67,16 +68,25 @@ export const ContactPage: React.FC = () => {
               </div>
               <div className="space-y-3 text-xs">
                 <div>
-                  <span className="font-semibold text-foreground">🇰🇪 Nairobi Hub:</span>
-                  <p className="text-muted-foreground">Westlands, Nairobi, Kenya</p>
+                  <div className="flex items-center space-x-1.5 font-semibold text-foreground">
+                    <CountryFlag country="kenya" className="w-4 h-2.5" />
+                    <span>Nairobi Hub:</span>
+                  </div>
+                  <p className="text-muted-foreground mt-0.5">Westlands, Nairobi, Kenya</p>
                 </div>
                 <div>
-                  <span className="font-semibold text-foreground">🇷🇼 Kigali Hub:</span>
-                  <p className="text-muted-foreground">Kigali Innovation City, Kigali, Rwanda</p>
+                  <div className="flex items-center space-x-1.5 font-semibold text-foreground">
+                    <CountryFlag country="rwanda" className="w-4 h-2.5" />
+                    <span>Kigali Hub:</span>
+                  </div>
+                  <p className="text-muted-foreground mt-0.5">Kigali Innovation City, Kigali, Rwanda</p>
                 </div>
                 <div>
-                  <span className="font-semibold text-foreground">🇹🇿 Dar es Salaam Hub:</span>
-                  <p className="text-muted-foreground">Peninsula Commercial Hub, Masaki, Tanzania</p>
+                  <div className="flex items-center space-x-1.5 font-semibold text-foreground">
+                    <CountryFlag country="tanzania" className="w-4 h-2.5" />
+                    <span>Dar es Salaam Hub:</span>
+                  </div>
+                  <p className="text-muted-foreground mt-0.5">Peninsula Commercial Hub, Masaki, Tanzania</p>
                 </div>
               </div>
             </Card>

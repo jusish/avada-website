@@ -16,6 +16,7 @@ This document is the **single source of truth** for every feature implemented in
 8. [FEAT-008: AvadaPay Brand Alignment, Adobe XD Hero, Solution Pages & shadcn Select](#feat-008-avadapay-brand-alignment-adobe-xd-hero-solution-pages--shadcn-select)
 9. [FEAT-009: Navbar Polish, Consistent #2A292D Backgrounds, Hero 23% Opacity Sub-banner & Solutions Alignment](#feat-009-navbar-polish-consistent-2a292d-backgrounds-hero-23-opacity-sub-banner--solutions-alignment)
 10. [FEAT-010: Home Hero Background Image Visibility & Positive Z-Index Layering](#feat-010-home-hero-background-image-visibility--positive-z-index-layering)
+11. [FEAT-011: Cross-Platform Vector Country Flags Component](#feat-011-cross-platform-vector-country-flags-component)
 
 ---
 
@@ -207,6 +208,26 @@ This document is the **single source of truth** for every feature implemented in
   - Image placed inside an `absolute inset-0 z-0` wrapper with balanced `from-black/60 via-black/35 to-black/70` gradient overlay.
   - All interactive and textual content wrapped inside `relative z-10`.
   - Verified clean compilation with `pnpm --filter @avada/web build`.
+
+---
+
+## FEAT-011: Cross-Platform Vector Country Flags Component
+- **ID**: `FEAT-011`
+- **Status**: Completed
+- **Created**: 2026-09-21
+- **Description**: Replaced all Unicode country emoji flags (which fail to render as flags on Windows browsers and instead display as raw regional indicators "KE", "RW", "TZ" or broken glyphs) with a dedicated, lightweight, zero-dependency SVG vector flag component suite (`CountryFlag`, `FlagKenya`, `FlagRwanda`, `FlagTanzania`).
+- **Files Involved**:
+  - [`apps/web/src/components/CountryFlag.tsx`](../../apps/web/src/components/CountryFlag.tsx)
+  - [`apps/web/src/components/Navbar.tsx`](../../apps/web/src/components/Navbar.tsx)
+  - [`apps/web/src/components/Footer.tsx`](../../apps/web/src/components/Footer.tsx)
+  - [`apps/web/src/pages/public/CountryPage.tsx`](../../apps/web/src/pages/public/CountryPage.tsx)
+  - [`apps/web/src/pages/public/HomePage.tsx`](../../apps/web/src/pages/public/HomePage.tsx)
+  - [`apps/web/src/pages/public/ContactPage.tsx`](../../apps/web/src/pages/public/ContactPage.tsx)
+- **Implementation Details**:
+  - Handcrafted authentic, compliant 3:2 SVG vector renderings for Kenya (black/white/red/white/green with Maasai shield & crossed spears), Rwanda (sky blue with 24-ray sun, yellow, green), and Tanzania (green/blue fields with diagonal yellow-bordered black band).
+  - Integrated into Navbar dropdown trigger, desktop dropdown items, mobile navigation drawer, Footer market links, Home page Country Hub cards, Country market detail hero & office cards, and Contact page regional office directory.
+  - Rendered with `rounded-[2px]`, subtle borders, and shadows to prevent white flag components from blending into light backgrounds.
+
 
 
 

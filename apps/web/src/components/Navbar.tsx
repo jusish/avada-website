@@ -2,18 +2,19 @@ import React, { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { ChevronDown, Menu, X } from 'lucide-react';
+import { CountryFlag } from '@/components/CountryFlag';
 
 export interface CountryInfo {
   code: string;
   name: string;
-  flag: string;
+  flag?: string;
   path: string;
 }
 
 export const COUNTRIES: CountryInfo[] = [
-  { code: 'kenya', name: 'Kenya', flag: '🇰🇪', path: '/countries/kenya' },
-  { code: 'rwanda', name: 'Rwanda', flag: '🇷🇼', path: '/countries/rwanda' },
-  { code: 'tanzania', name: 'Tanzania', flag: '🇹🇿', path: '/countries/tanzania' },
+  { code: 'kenya', name: 'Kenya', path: '/countries/kenya' },
+  { code: 'rwanda', name: 'Rwanda', path: '/countries/rwanda' },
+  { code: 'tanzania', name: 'Tanzania', path: '/countries/tanzania' },
 ];
 
 export const Navbar: React.FC = () => {
@@ -74,9 +75,10 @@ export const Navbar: React.FC = () => {
             <button
               onClick={() => setCountryDropdownOpen(!countryDropdownOpen)}
               onBlur={() => setTimeout(() => setCountryDropdownOpen(false), 200)}
-              className="flex items-center space-x-1 text-[13px] font-medium text-white/90 hover:text-white transition-colors px-2.5 py-1.5 rounded-lg hover:bg-white/10"
+              className="flex items-center space-x-2 text-[13px] font-medium text-white/90 hover:text-white transition-colors px-2.5 py-1.5 rounded-lg hover:bg-white/10"
             >
-              <span>{currentCountry ? `${currentCountry.flag} ${currentCountry.name}` : 'Countries'}</span>
+              {currentCountry && <CountryFlag country={currentCountry.code} className="w-4 h-2.5" />}
+              <span>{currentCountry ? currentCountry.name : 'Countries'}</span>
               <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-200 ${countryDropdownOpen ? 'rotate-180' : ''}`} />
             </button>
 
@@ -93,7 +95,7 @@ export const Navbar: React.FC = () => {
                       location.pathname === c.path ? 'bg-gray-50 text-[#3BBA93] font-semibold' : 'text-gray-700'
                     }`}
                   >
-                    <span className="text-base">{c.flag}</span>
+                    <CountryFlag country={c.code} className="w-4 h-3" />
                     <span>{c.name}</span>
                   </button>
                 ))}
@@ -156,9 +158,9 @@ export const Navbar: React.FC = () => {
                 key={c.code}
                 to={c.path}
                 onClick={() => setMobileMenuOpen(false)}
-                className="flex items-center space-x-2 px-3 py-2 rounded-lg text-sm font-medium text-white hover:bg-white/10"
+                className="flex items-center space-x-2.5 px-3 py-2 rounded-lg text-sm font-medium text-white hover:bg-white/10"
               >
-                <span>{c.flag}</span>
+                <CountryFlag country={c.code} className="w-5 h-3.5" />
                 <span>{c.name}</span>
               </Link>
             ))}

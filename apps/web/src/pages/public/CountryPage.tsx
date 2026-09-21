@@ -9,10 +9,12 @@ import {
   ShieldCheck,
   Zap,
 } from 'lucide-react';
+import { CountryFlag } from '@/components/CountryFlag';
 
 interface CountryDetail {
+  code: string;
   name: string;
-  flag: string;
+  flag?: string;
   capital: string;
   currency: string;
   regulator: string;
@@ -26,8 +28,8 @@ interface CountryDetail {
 
 const COUNTRY_DATA: Record<string, CountryDetail> = {
   kenya: {
+    code: 'kenya',
     name: 'Kenya',
-    flag: '🇰🇪',
     capital: 'Nairobi',
     currency: 'KES (Kenyan Shilling)',
     regulator: 'Central Bank of Kenya (CBK) & CAK',
@@ -50,8 +52,8 @@ const COUNTRY_DATA: Record<string, CountryDetail> = {
     ],
   },
   rwanda: {
+    code: 'rwanda',
     name: 'Rwanda',
-    flag: '🇷🇼',
     capital: 'Kigali',
     currency: 'RWF (Rwandan Franc)',
     regulator: 'National Bank of Rwanda (NBR) & RURA',
@@ -74,8 +76,8 @@ const COUNTRY_DATA: Record<string, CountryDetail> = {
     ],
   },
   tanzania: {
+    code: 'tanzania',
     name: 'Tanzania',
-    flag: '🇹🇿',
     capital: 'Dar es Salaam',
     currency: 'TZS (Tanzanian Shilling)',
     regulator: 'Bank of Tanzania (BOT) & TCRA',
@@ -113,8 +115,8 @@ export const CountryPage: React.FC = () => {
       {/* Top Hero Banner */}
       <section className="relative overflow-hidden pt-16 pb-16 lg:pt-20 lg:pb-24 bg-[#2A292D] text-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center space-x-3 mb-6">
-            <span className="text-4xl">{data.flag}</span>
+          <div className="flex items-center space-x-3.5 mb-6">
+            <CountryFlag country={data.code} className="w-12 h-8 rounded-sm shadow-md" />
             <Badge className="bg-[#3BBA93] text-white hover:bg-[#3BBA93]/90 font-medium">
               AvadaPay Market Overview
             </Badge>
@@ -217,8 +219,8 @@ export const CountryPage: React.FC = () => {
 
             {/* In-country Office Contact Box */}
             <Card className="p-8 border-[#3BBA93]/20 shadow-md">
-              <div className="flex items-center space-x-3 mb-6">
-                <span className="text-3xl">{data.flag}</span>
+              <div className="flex items-center space-x-3.5 mb-6">
+                <CountryFlag country={data.code} className="w-10 h-6.5 rounded-sm shadow-sm" />
                 <div>
                   <h3 className="text-lg font-bold text-foreground">AvadaPay {data.name} Office</h3>
                   <p className="text-xs text-muted-foreground">Local support & account management</p>

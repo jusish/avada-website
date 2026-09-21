@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 import { ContentItem } from '@avada/shared';
 import { COUNTRIES } from '@/components/Navbar';
+import { CountryFlag } from '@/components/CountryFlag';
 import heroBg from '@/assets/hero-bg.jpg';
 
 export const HomePage: React.FC = () => {
@@ -226,7 +227,7 @@ export const HomePage: React.FC = () => {
                 <Card className="hover:border-[#3BBA93] hover:shadow-lg transition-all h-full p-6 flex flex-col justify-between bg-white border-gray-200">
                   <div>
                     <div className="flex items-center justify-between mb-4">
-                      <span className="text-4xl">{c.flag}</span>
+                      <CountryFlag country={c.code} className="w-11 h-7.5 rounded-sm shadow-sm" />
                       <Badge variant="outline" className="text-[11px] font-medium text-[#3BBA93] border-[#3BBA93]/30">
                         Direct Telco Rails
                       </Badge>

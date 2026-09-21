@@ -2,6 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { ShieldCheck, Mail, Globe2, Shield } from 'lucide-react';
 import { COUNTRIES } from './Navbar';
+import { CountryFlag } from './CountryFlag';
 
 export const Footer: React.FC = () => {
   return (
@@ -67,7 +68,7 @@ export const Footer: React.FC = () => {
                     to={c.path}
                     className="flex items-center space-x-2 text-gray-400 hover:text-[#3BBA93] transition-colors"
                   >
-                    <span>{c.flag}</span>
+                    <CountryFlag country={c.code} className="w-4 h-3" />
                     <span>{c.name}</span>
                   </Link>
                 </li>
