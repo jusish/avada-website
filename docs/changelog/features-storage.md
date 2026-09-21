@@ -19,6 +19,7 @@ This document is the **single source of truth** for every feature implemented in
 11. [FEAT-011: Cross-Platform Vector Country Flags Component](#feat-011-cross-platform-vector-country-flags-component)
 12. [FEAT-012: SPA Route Navigation Scroll Restoration (ScrollToTop)](#feat-012-spa-route-navigation-scroll-restoration-scrolltotop)
 13. [FEAT-013: Production README, Zero-Warning ESLint & GitHub Actions CI/CD Pipeline](#feat-013-production-readme-zero-warning-eslint--github-actions-cicd-pipeline)
+14. [FEAT-014: Monorepo Type-Check Resolution for Shared Package in CI](#feat-014-monorepo-type-check-resolution-for-shared-package-in-ci)
 
 ---
 
@@ -271,6 +272,25 @@ This document is the **single source of truth** for every feature implemented in
   - Root `package.json` specifies `"type": "module"` and defines top-level scripts `pnpm lint`, `pnpm type-check`, and `pnpm build`.
   - All workspaces feature dedicated `type-check` scripts (`tsc --noEmit` and `tsc -b`).
   - GitHub Actions workflow runs `checks` job on `pull_request` and `push` to `main`, and `docker-build-push` job targeting `ghcr.io/jusish/avada-website/api` and `ghcr.io/jusish/avada-website/web` guarded by `if: github.event_name == 'push' && github.ref == 'refs/heads/main'`.
+
+---
+
+## FEAT-014: Monorepo Type-Check Resolution for Shared Package in CI
+- **ID**: `FEAT-014`
+- **Status**: Completed
+- **Created**: 2026-09-21
+- **Description**: Resolved an issue where running `pnpm type-check` on a fresh CI clone failed because `@avada/shared` had not yet produced `./dist/index.d.ts`. Configured direct source path mapping in `apps/web/tsconfig.json` and Vite alias in `apps/web/vite.config.js`, added package.json `exports` definitions, ensured `type-check` script builds `@avada/shared` before running workspace checks, and added a dedicated `Build Shared Package` step in `.github/workflows/ci.yml`.
+- **Files Involved**:
+  - [`apps/web/tsconfig.json`](../../apps/web/tsconfig.json)
+  - [`apps/web/vite.config.js`](../../apps/web/vite.config.js)
+  - [`packages/shared/package.json`](../../packages/shared/package.json)
+  - [`package.json`](../../package.json)
+  - [`.github/workflows/ci.yml`](../../.github/workflows/ci.yml)
+- **Implementation Details**:
+  - `apps/web/tsconfig.json` maps `"@avada/shared": ["../../packages/shared/src/index.ts"]`.
+  - `package.json` updates `"type-check"` to `"pnpm --filter @avada/shared build && pnpm --recursive --filter \"@avada/*\" type-check"`.
+  - `.github/workflows/ci.yml` introduces `run: pnpm --filter @avada/shared build` directly following `pnpm install`.
+
 
 
 

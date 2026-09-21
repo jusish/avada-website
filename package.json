@@ -12,7 +12,7 @@
     "build:web": "pnpm --filter @avada/web build",
     "build:api": "pnpm --filter @avada/api build",
     "lint": "eslint .",
-    "type-check": "pnpm --recursive --filter \"@avada/*\" type-check",
+    "type-check": "pnpm --filter @avada/shared build && pnpm --recursive --filter \"@avada/*\" type-check",
     "db:push": "pnpm --filter @avada/api db:push",
     "db:seed": "pnpm --filter @avada/api db:seed",
     "db:studio": "pnpm --filter @avada/api db:studio",

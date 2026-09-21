@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.4.1] - 2026-09-21
+
+### Fixed
+- **Monorepo Type-Check Resolution in CI**: Resolved GitHub Actions failure where `pnpm type-check` ran on fresh clones before `@avada/shared` had built its declaration files. Added path mapping in `apps/web/tsconfig.json`, configured `packages/shared` package.json `exports`, updated root `type-check` script to build `@avada/shared` first, and added `Build Shared Package` step in `ci.yml`.
+
 ## [1.4.0] - 2026-09-21
 
 ### Added

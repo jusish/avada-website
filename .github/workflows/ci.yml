@@ -37,6 +37,9 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Build Shared Package
+        run: pnpm --filter @avada/shared build
+
       - name: Generate Prisma Client
         run: pnpm --filter @avada/api prisma:generate
 
