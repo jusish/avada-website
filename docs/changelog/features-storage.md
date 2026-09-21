@@ -20,6 +20,7 @@ This document is the **single source of truth** for every feature implemented in
 12. [FEAT-012: SPA Route Navigation Scroll Restoration (ScrollToTop)](#feat-012-spa-route-navigation-scroll-restoration-scrolltotop)
 13. [FEAT-013: Production README, Zero-Warning ESLint & GitHub Actions CI/CD Pipeline](#feat-013-production-readme-zero-warning-eslint--github-actions-cicd-pipeline)
 14. [FEAT-014: Monorepo Type-Check Resolution for Shared Package in CI](#feat-014-monorepo-type-check-resolution-for-shared-package-in-ci)
+15. [FEAT-015: Docker Multi-Stage Build Fix & .dockerignore Implementation](#feat-015-docker-multi-stage-build-fix--dockerignore-implementation)
 
 ---
 
@@ -290,6 +291,24 @@ This document is the **single source of truth** for every feature implemented in
   - `apps/web/tsconfig.json` maps `"@avada/shared": ["../../packages/shared/src/index.ts"]`.
   - `package.json` updates `"type-check"` to `"pnpm --filter @avada/shared build && pnpm --recursive --filter \"@avada/*\" type-check"`.
   - `.github/workflows/ci.yml` introduces `run: pnpm --filter @avada/shared build` directly following `pnpm install`.
+
+---
+
+## FEAT-015: Docker Multi-Stage Build Fix & .dockerignore Implementation
+- **ID**: `FEAT-015`
+- **Status**: Completed
+- **Created**: 2026-09-21
+- **Description**: Fixed Docker build failure caused by missing `.dockerignore` (which allowed host `node_modules` and symlinks to overwrite container Linux packages) and ephemeral `pnpm dlx prisma generate` (which fetched incompatible Node 22 CLI versions instead of using installed devDependencies). Added `.dockerignore`, upgraded Dockerfiles to `node:22-alpine` with `openssl` and `libc6-compat`, and executed `pnpm run prisma:generate` with full workspace manifests.
+- **Files Involved**:
+  - [`.dockerignore`](../../.dockerignore)
+  - [`docker/Dockerfile.api`](../../docker/Dockerfile.api)
+  - [`docker/Dockerfile.web`](../../docker/Dockerfile.web)
+- **Implementation Details**:
+  - Created `.dockerignore` ignoring `node_modules`, `**/node_modules`, `dist`, `build`, and logs.
+  - Upgraded base image in `Dockerfile.api` and `Dockerfile.web` to `node:22-alpine` with `openssl` and `libc6-compat`.
+  - Replaced `pnpm dlx prisma generate` with `pnpm run prisma:generate`.
+  - Tested and verified clean local builds for both `Dockerfile.api` and `Dockerfile.web` with exit code 0.
+
 
 
 

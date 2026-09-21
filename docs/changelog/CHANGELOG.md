@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.4.2] - 2026-09-21
+
+### Fixed
+- **Docker Multi-Stage Build & Prisma Generation**: Created `.dockerignore` to prevent host `node_modules` and build artifacts from leaking into Linux container layers. Upgraded base images to `node:22-alpine` with `openssl` and `libc6-compat`, replaced ephemeral `pnpm dlx prisma` with local `pnpm run prisma:generate`, and copied complete workspace manifests to ensure clean pnpm lockfile resolution for both API and Web Docker images.
+
 ## [1.4.1] - 2026-09-21
 
 ### Fixed

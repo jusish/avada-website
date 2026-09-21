@@ -1,5 +1,5 @@
 # Dockerfile for Frontend (Vite + Nginx)
-FROM node:20-alpine AS base
+FROM node:22-alpine AS base
 RUN npm install -g pnpm@10.30.3
 WORKDIR /app
 
@@ -7,8 +7,9 @@ WORKDIR /app
 FROM base AS dependencies
 COPY pnpm-lock.yaml* pnpm-workspace.yaml package.json ./
 COPY packages/shared/package.json ./packages/shared/
+COPY apps/api/package.json ./apps/api/
 COPY apps/web/package.json ./apps/web/
-RUN pnpm install --frozen-lockfile --filter @avada/shared --filter @avada/web...
+RUN pnpm install --frozen-lockfile
 
 # Build stage
 FROM dependencies AS build
