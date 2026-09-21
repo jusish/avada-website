@@ -15,6 +15,7 @@ This document is the **single source of truth** for every feature implemented in
 7. [FEAT-007: AI Agent Standard & Documentation Architecture](#feat-007-ai-agent-standard--documentation-architecture)
 8. [FEAT-008: AvadaPay Brand Alignment, Adobe XD Hero, Solution Pages & shadcn Select](#feat-008-avadapay-brand-alignment-adobe-xd-hero-solution-pages--shadcn-select)
 9. [FEAT-009: Navbar Polish, Consistent #2A292D Backgrounds, Hero 23% Opacity Sub-banner & Solutions Alignment](#feat-009-navbar-polish-consistent-2a292d-backgrounds-hero-23-opacity-sub-banner--solutions-alignment)
+10. [FEAT-010: Home Hero Background Image Visibility & Positive Z-Index Layering](#feat-010-home-hero-background-image-visibility--positive-z-index-layering)
 
 ---
 
@@ -190,5 +191,22 @@ This document is the **single source of truth** for every feature implemented in
   - Navbar uses `#2A292D` sticky background, keeping the country selector text and flag dropdown permanently clear and legible.
   - Home hero sub-banner formatted as `bg-black/[0.23] backdrop-blur-sm border-t border-white/10`.
   - Payment Processing, POS, and Bulk SMS pages updated with exact copy, 2-column layouts, green banners, and product breakdown grids from the user's screenshots.
+
+---
+
+## FEAT-010: Home Hero Background Image Visibility & Positive Z-Index Layering
+- **ID**: `FEAT-010`
+- **Status**: Completed
+- **Created**: 2026-09-21
+- **Description**: Resolved an issue where negative z-indexes (`-z-20`, `-z-10`) in `HomePage.tsx` caused the hero ambient card payment photography background to render underneath the body stacking context (`bg-background`). Transitioned background image rendering to direct ESM import (`heroBg`), positive z-indexing (`z-0` image and overlay, `z-10` content and sub-banner), and added `vite-env.d.ts` for Vite client image declarations.
+- **Files Involved**:
+  - [`apps/web/src/pages/public/HomePage.tsx`](../../apps/web/src/pages/public/HomePage.tsx)
+  - [`apps/web/src/vite-env.d.ts`](../../apps/web/src/vite-env.d.ts)
+- **Implementation Details**:
+  - Direct import `import heroBg from '@/assets/hero-bg.jpg'` guarantees asset hashing and bundling by Vite.
+  - Image placed inside an `absolute inset-0 z-0` wrapper with balanced `from-black/60 via-black/35 to-black/70` gradient overlay.
+  - All interactive and textual content wrapped inside `relative z-10`.
+  - Verified clean compilation with `pnpm --filter @avada/web build`.
+
 
 

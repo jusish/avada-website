@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 import { ContentItem } from '@avada/shared';
 import { COUNTRIES } from '@/components/Navbar';
+import heroBg from '@/assets/hero-bg.jpg';
 
 export const HomePage: React.FC = () => {
   const [newsItems, setNewsItems] = useState<ContentItem[]>([]);
@@ -41,15 +42,18 @@ export const HomePage: React.FC = () => {
       */}
       <section className="relative min-h-[85vh] flex flex-col justify-between overflow-hidden pt-20 sm:pt-28 pb-0">
         {/* Ambient Card Payment Photography Background */}
-        <div
-          className="absolute inset-0 -z-20 bg-cover bg-center bg-no-repeat"
-          style={{ backgroundImage: `url('/hero-bg.jpg')` }}
-        />
-        {/* Dark High-Contrast Overlay */}
-        <div className="absolute inset-0 -z-10 bg-gradient-to-b from-black/75 via-black/60 to-black/85" />
+        <div className="absolute inset-0 z-0">
+          <img
+            src={heroBg}
+            alt="AvadaPay Hero Background"
+            className="w-full h-full object-cover object-center"
+          />
+          {/* Dark High-Contrast Overlay */}
+          <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/35 to-black/70" />
+        </div>
 
         {/* Main Hero Typography */}
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center my-auto">
+        <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center my-auto">
           <h1 className="text-4xl sm:text-6xl md:text-7xl font-extrabold tracking-tight text-white leading-[1.12] max-w-5xl mx-auto">
             Payments and customer communication,{' '}
             <span className="text-[#3BBA93] block sm:inline">
@@ -75,7 +79,7 @@ export const HomePage: React.FC = () => {
         </div>
 
         {/* Sub-Banner Strip: Black with 23% opacity as specified in design */}
-        <div className="w-full bg-black/[0.23] backdrop-blur-sm border-t border-white/10 py-5 sm:py-6 mt-12">
+        <div className="relative z-10 w-full bg-black/[0.23] backdrop-blur-sm border-t border-white/10 py-5 sm:py-6 mt-12">
           <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
             <p className="text-xs sm:text-sm md:text-base text-gray-200 font-normal leading-relaxed">
               AvadaPay is a pan-African payment gateway and SMS aggregator. Accept mobile money and card payments, run POS, send bulk payouts, and reach customers by SMS, through one connected platform live in 17+ markets.
