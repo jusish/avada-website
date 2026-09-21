@@ -1,0 +1,48 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum UserRole {
+  ADMIN
+  EDITOR
+}
+
+enum ContentStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+model User {
+  id           String        @id @default(uuid())
+  email        String        @unique
+  passwordHash String
+  name         String
+  role         UserRole      @default(ADMIN)
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  contentItems ContentItem[]
+
+  @@map("users")
+}
+
+model ContentItem {
+  id        String        @id @default(uuid())
+  slug      String        @unique
+  title     String
+  excerpt   String
+  body      String        @db.Text
+  category  String        @default("general")
+  status    ContentStatus @default(PUBLISHED)
+  authorId  String
+  author    User          @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+
+  @@map("content_items")
+}

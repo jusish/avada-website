@@ -1,0 +1,32 @@
+{
+  "name": "avada-website-monorepo",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Avada Website and Content Management System Monorepo",
+  "scripts": {
+    "dev": "pnpm --parallel --filter \"@avada/*\" dev",
+    "dev:web": "pnpm --filter @avada/web dev",
+    "dev:api": "pnpm --filter @avada/api dev",
+    "build": "pnpm --recursive --filter \"@avada/*\" build",
+    "build:web": "pnpm --filter @avada/web build",
+    "build:api": "pnpm --filter @avada/api build",
+    "db:push": "pnpm --filter @avada/api db:push",
+    "db:seed": "pnpm --filter @avada/api db:seed",
+    "db:studio": "pnpm --filter @avada/api db:studio",
+    "docker:up": "docker compose up -d",
+    "docker:down": "docker compose down",
+    "docker:logs": "docker compose logs -f"
+  },
+  "keywords": [
+    "avada",
+    "vite",
+    "react",
+    "shadcn",
+    "express",
+    "prisma",
+    "monorepo"
+  ],
+  "author": "Avada",
+  "license": "UNLICENSED",
+  "packageManager": "pnpm@10.30.3"
+}

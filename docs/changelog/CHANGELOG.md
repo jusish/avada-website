@@ -1,0 +1,24 @@
+# Changelog
+
+All notable changes to the Avada Website and CMS project will be documented in this file.
+
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+---
+
+## [1.0.0] - 2026-09-21
+
+### Added
+- **Monorepo Architecture**: Setup `pnpm` workspaces for `apps/web`, `apps/api`, and `packages/shared`.
+- **Frontend Core**: Configured Vite + React 19 + TypeScript with Tailwind CSS and `shadcn/ui` component library.
+- **Frontend Pages & Routing**:
+  - React Router v6 navigation.
+  - Public marketing website (`/`, `/about`, `/services`, `/contact`).
+  - CMS Admin dashboard (`/admin/login`, `/admin/dashboard`, `/admin/content`).
+- **Backend Core**: Configured Node.js + Express + TypeScript with port `5005`.
+- **Database & ORM**: Configured Prisma ORM with PostgreSQL database schema (`User`, `ContentItem`) and seed script.
+- **CMS Authentication**: Implemented JWT authentication, password hashing with bcrypt, and route guards.
+- **Containerization**: Configured `docker-compose.yml` and multi-stage Dockerfiles for API and Web with custom Nginx proxy.
+- **AI Documentation Ecosystem**: Established `AGENT.md`, `docs/rules/`, `docs/changelog/features-storage.md`, and master documentation index.
+- **Git Repository**: Initialized Git repository with `main` branch and origin remote.
