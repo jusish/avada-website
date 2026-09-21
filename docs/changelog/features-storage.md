@@ -17,6 +17,7 @@ This document is the **single source of truth** for every feature implemented in
 9. [FEAT-009: Navbar Polish, Consistent #2A292D Backgrounds, Hero 23% Opacity Sub-banner & Solutions Alignment](#feat-009-navbar-polish-consistent-2a292d-backgrounds-hero-23-opacity-sub-banner--solutions-alignment)
 10. [FEAT-010: Home Hero Background Image Visibility & Positive Z-Index Layering](#feat-010-home-hero-background-image-visibility--positive-z-index-layering)
 11. [FEAT-011: Cross-Platform Vector Country Flags Component](#feat-011-cross-platform-vector-country-flags-component)
+12. [FEAT-012: SPA Route Navigation Scroll Restoration (ScrollToTop)](#feat-012-spa-route-navigation-scroll-restoration-scrolltotop)
 
 ---
 
@@ -227,6 +228,23 @@ This document is the **single source of truth** for every feature implemented in
   - Handcrafted authentic, compliant 3:2 SVG vector renderings for Kenya (black/white/red/white/green with Maasai shield & crossed spears), Rwanda (sky blue with 24-ray sun, yellow, green), and Tanzania (green/blue fields with diagonal yellow-bordered black band).
   - Integrated into Navbar dropdown trigger, desktop dropdown items, mobile navigation drawer, Footer market links, Home page Country Hub cards, Country market detail hero & office cards, and Contact page regional office directory.
   - Rendered with `rounded-[2px]`, subtle borders, and shadows to prevent white flag components from blending into light backgrounds.
+
+---
+
+## FEAT-012: SPA Route Navigation Scroll Restoration (ScrollToTop)
+- **ID**: `FEAT-012`
+- **Status**: Completed
+- **Created**: 2026-09-21
+- **Description**: Fixed the Single Page Application (React Router) issue where clicking links in the navbar or elsewhere from a scrolled page opened the destination page scrolled down at the exact same scroll position as the originating page. Implemented `ScrollToTop` component listening to location changes and instantly resetting window, documentElement, and body scroll coordinates to `(0, 0)`.
+- **Files Involved**:
+  - [`apps/web/src/components/ScrollToTop.tsx`](../../apps/web/src/components/ScrollToTop.tsx)
+  - [`apps/web/src/App.tsx`](../../apps/web/src/App.tsx)
+- **Implementation Details**:
+  - Subscribes to `useLocation` (`pathname`, `search`, `hash`).
+  - If a hash anchor is provided (e.g. `#section-id`), gracefully scrolls smoothly to the target element.
+  - Otherwise, instantly resets `window.scrollTo({ top: 0, left: 0, behavior: 'instant' })` and sets `documentElement.scrollTop = 0` / `body.scrollTop = 0`.
+  - Embedded inside `AuthProvider` at the top level of `App.tsx` ensuring universal coverage across public and admin routes.
+
 
 
 

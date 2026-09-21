@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.3.1] - 2026-09-21
+
+### Fixed
+- **Navigation Scroll Restoration**: Fixed React Router SPA issue where switching pages from a scrolled position caused destination pages to open pre-scrolled. Implemented `ScrollToTop` component to instantly reset window and document scroll coordinates to the top upon route changes.
+
 ## [1.3.0] - 2026-09-21
 
 ### Added & Fixed

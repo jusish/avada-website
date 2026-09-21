@@ -4,6 +4,7 @@ import { AuthProvider, useAuth } from '@/context/AuthContext';
 import { Navbar } from '@/components/Navbar';
 import { Footer } from '@/components/Footer';
 import { AdminSidebar } from '@/components/AdminSidebar';
+import { ScrollToTop } from '@/components/ScrollToTop';
 
 // Public Pages
 import { HomePage } from '@/pages/public/HomePage';
@@ -61,6 +62,7 @@ const AdminProtectedLayout: React.FC = () => {
 export const App: React.FC = () => {
   return (
     <AuthProvider>
+      <ScrollToTop />
       <Routes>
         {/* Public Routes */}
         <Route element={<PublicLayout />}>
