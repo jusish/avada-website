@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.4.0] - 2026-09-21
+
+### Added
+- **Production-Grade README**: Comprehensive documentation with architecture diagrams, badges, getting started guides, script reference, and Docker workflows.
+- **ESLint 10 & Code Quality**: Configured monorepo-wide ESLint flat configuration (`eslint.config.js`) with TypeScript-ESLint, fixing all warnings for zero-warning code quality.
+- **GitHub Actions CI/CD Pipeline (`ci.yml`)**:
+  - Direct PR & Push Quality Checks: Automated `lint`, `type-check`, and `build`.
+  - GHCR Docker Container Build: Exclusively builds and pushes multi-stage production Docker images to GitHub Container Registry (`ghcr.io/jusish/avada-website/api` and `ghcr.io/jusish/avada-website/web`) on direct push to `main`.
+
 ## [1.3.1] - 2026-09-21
 
 ### Fixed

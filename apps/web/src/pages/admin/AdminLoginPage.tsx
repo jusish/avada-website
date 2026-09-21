@@ -36,8 +36,8 @@ export const AdminLoginPage: React.FC = () => {
 
       login(data.data.token, data.data.user);
       navigate('/admin/dashboard');
-    } catch (err: any) {
-      setError(err.message || 'An unexpected error occurred.');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'An unexpected error occurred.');
     } finally {
       setIsSubmitting(false);
     }

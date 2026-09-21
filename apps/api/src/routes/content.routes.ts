@@ -19,7 +19,7 @@ router.get('/', async (req: Request, res: Response): Promise<void> => {
   try {
     const { category, status } = req.query;
 
-    const where: any = {};
+    const where: Record<string, string> = {};
     if (category && typeof category === 'string') {
       where.category = category;
     }

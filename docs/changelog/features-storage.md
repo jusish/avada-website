@@ -18,6 +18,7 @@ This document is the **single source of truth** for every feature implemented in
 10. [FEAT-010: Home Hero Background Image Visibility & Positive Z-Index Layering](#feat-010-home-hero-background-image-visibility--positive-z-index-layering)
 11. [FEAT-011: Cross-Platform Vector Country Flags Component](#feat-011-cross-platform-vector-country-flags-component)
 12. [FEAT-012: SPA Route Navigation Scroll Restoration (ScrollToTop)](#feat-012-spa-route-navigation-scroll-restoration-scrolltotop)
+13. [FEAT-013: Production README, Zero-Warning ESLint & GitHub Actions CI/CD Pipeline](#feat-013-production-readme-zero-warning-eslint--github-actions-cicd-pipeline)
 
 ---
 
@@ -242,8 +243,35 @@ This document is the **single source of truth** for every feature implemented in
 - **Implementation Details**:
   - Subscribes to `useLocation` (`pathname`, `search`, `hash`).
   - If a hash anchor is provided (e.g. `#section-id`), gracefully scrolls smoothly to the target element.
-  - Otherwise, instantly resets `window.scrollTo({ top: 0, left: 0, behavior: 'instant' })` and sets `documentElement.scrollTop = 0` / `body.scrollTop = 0`.
   - Embedded inside `AuthProvider` at the top level of `App.tsx` ensuring universal coverage across public and admin routes.
+
+---
+
+## FEAT-013: Production README, Zero-Warning ESLint & GitHub Actions CI/CD Pipeline
+- **ID**: `FEAT-013`
+- **Status**: Completed
+- **Created**: 2026-09-21
+- **Description**: Authored a production-grade repository `README.md` with badges, architecture blueprints, getting started guide, script table, and CI/CD workflow explanation. Configured ESLint 10 with TypeScript-ESLint, clean ESM flat config, and zero-warning codebase compliance. Implemented `.github/workflows/ci.yml` running lint, type-check, and build on all PRs and pushes to main, with automated multi-stage Docker image builds pushed to GitHub Container Registry (`ghcr.io`) strictly on direct pushes to `main`.
+- **Files Involved**:
+  - [`README.md`](../../README.md)
+  - [`.github/workflows/ci.yml`](../../.github/workflows/ci.yml)
+  - [`eslint.config.js`](../../eslint.config.js)
+  - [`package.json`](../../package.json)
+  - [`packages/shared/package.json`](../../packages/shared/package.json)
+  - [`apps/api/package.json`](../../apps/api/package.json)
+  - [`apps/web/package.json`](../../apps/web/package.json)
+  - [`apps/web/vite.config.js`](../../apps/web/vite.config.js)
+  - [`apps/web/src/components/ui/input.tsx`](../../apps/web/src/components/ui/input.tsx)
+  - [`packages/shared/src/index.ts`](../../packages/shared/src/index.ts)
+  - [`apps/api/src/middleware/auth.ts`](../../apps/api/src/middleware/auth.ts)
+  - [`apps/api/src/routes/content.routes.ts`](../../apps/api/src/routes/content.routes.ts)
+  - [`apps/web/src/pages/admin/AdminContentPage.tsx`](../../apps/web/src/pages/admin/AdminContentPage.tsx)
+  - [`apps/web/src/pages/admin/AdminLoginPage.tsx`](../../apps/web/src/pages/admin/AdminLoginPage.tsx)
+- **Implementation Details**:
+  - Root `package.json` specifies `"type": "module"` and defines top-level scripts `pnpm lint`, `pnpm type-check`, and `pnpm build`.
+  - All workspaces feature dedicated `type-check` scripts (`tsc --noEmit` and `tsc -b`).
+  - GitHub Actions workflow runs `checks` job on `pull_request` and `push` to `main`, and `docker-build-push` job targeting `ghcr.io/jusish/avada-website/api` and `ghcr.io/jusish/avada-website/web` guarded by `if: github.event_name == 'push' && github.ref == 'refs/heads/main'`.
+
 
 
 

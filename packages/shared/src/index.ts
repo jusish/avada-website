@@ -53,9 +53,9 @@ export interface CreateContentPayload {
   status?: ContentStatus;
 }
 
-export interface UpdateContentPayload extends Partial<CreateContentPayload> {}
+export type UpdateContentPayload = Partial<CreateContentPayload>;
 
-export interface ApiResponse<T = any> {
+export interface ApiResponse<T = unknown> {
   success: boolean;
   data?: T;
   message?: string;

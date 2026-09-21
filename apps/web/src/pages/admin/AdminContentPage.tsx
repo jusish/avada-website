@@ -49,8 +49,8 @@ export const AdminContentPage: React.FC = () => {
       } else {
         throw new Error(data.error || 'Failed to retrieve content');
       }
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to retrieve content');
     } finally {
       setLoading(false);
     }
@@ -92,8 +92,8 @@ export const AdminContentPage: React.FC = () => {
       setExcerpt('');
       setBody('');
       fetchItems();
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to save content item');
     } finally {
       setSaving(false);
     }
@@ -117,8 +117,8 @@ export const AdminContentPage: React.FC = () => {
       }
 
       setItems(items.filter((item) => item.id !== id));
-    } catch (err: any) {
-      alert(`Delete error: ${err.message}`);
+    } catch (err) {
+      alert(`Delete error: ${err instanceof Error ? err.message : 'Unknown error'}`);
     }
   };
 

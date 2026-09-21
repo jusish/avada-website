@@ -2,6 +2,7 @@
   "name": "avada-website-monorepo",
   "version": "1.0.0",
   "private": true,
+  "type": "module",
   "description": "Avada Website and Content Management System Monorepo",
   "scripts": {
     "dev": "pnpm --parallel --filter \"@avada/*\" dev",
@@ -10,6 +11,8 @@
     "build": "pnpm --recursive --filter \"@avada/*\" build",
     "build:web": "pnpm --filter @avada/web build",
     "build:api": "pnpm --filter @avada/api build",
+    "lint": "eslint .",
+    "type-check": "pnpm --recursive --filter \"@avada/*\" type-check",
     "db:push": "pnpm --filter @avada/api db:push",
     "db:seed": "pnpm --filter @avada/api db:seed",
     "db:studio": "pnpm --filter @avada/api db:studio",
@@ -28,5 +31,10 @@
   ],
   "author": "Avada",
   "license": "UNLICENSED",
-  "packageManager": "pnpm@10.30.3"
+  "packageManager": "pnpm@10.30.3",
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "eslint": "^10.11.0",
+    "typescript-eslint": "^8.70.0"
+  }
 }
