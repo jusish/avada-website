@@ -15,19 +15,23 @@ export const ContactPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen pt-24 pb-20 bg-background text-foreground">
-      <div className="py-12 sm:py-16 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center max-w-3xl mx-auto mb-16">
-          <Badge className="bg-[#3BBA93]/10 text-[#3BBA93] border-[#3BBA93]/30 mb-3">
+    <div className="min-h-screen bg-background text-foreground">
+      {/* Top Header Banner */}
+      <section className="bg-[#2A292D] text-white pt-16 pb-16 lg:pt-20 lg:pb-20">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <Badge className="bg-[#3BBA93] text-white border-transparent mb-3 font-medium">
             Contact AvadaPay
           </Badge>
-          <h1 className="text-4xl sm:text-5xl font-extrabold tracking-tight text-foreground">
+          <h1 className="text-4xl sm:text-5xl font-extrabold tracking-tight leading-tight">
             Let’s Power Your African Operations
           </h1>
-          <p className="mt-4 text-lg text-muted-foreground leading-relaxed">
+          <p className="mt-4 text-base sm:text-lg text-gray-300 leading-relaxed max-w-2xl mx-auto">
             Our payments engineering and merchant onboarding teams across Nairobi, Kigali, and Dar es Salaam are ready to support your integration.
           </p>
         </div>
+      </section>
+
+      <div className="py-16 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
           {/* Contact Details */}

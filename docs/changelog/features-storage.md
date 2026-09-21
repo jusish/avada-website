@@ -14,6 +14,7 @@ This document is the **single source of truth** for every feature implemented in
 6. [FEAT-006: Docker Containerization Ecosystem](#feat-006-docker-containerization-ecosystem)
 7. [FEAT-007: AI Agent Standard & Documentation Architecture](#feat-007-ai-agent-standard--documentation-architecture)
 8. [FEAT-008: AvadaPay Brand Alignment, Adobe XD Hero, Solution Pages & shadcn Select](#feat-008-avadapay-brand-alignment-adobe-xd-hero-solution-pages--shadcn-select)
+9. [FEAT-009: Navbar Polish, Consistent #2A292D Backgrounds, Hero 23% Opacity Sub-banner & Solutions Alignment](#feat-009-navbar-polish-consistent-2a292d-backgrounds-hero-23-opacity-sub-banner--solutions-alignment)
 
 ---
 
@@ -169,4 +170,25 @@ This document is the **single source of truth** for every feature implemented in
   - Hero section mirrors Adobe XD specifications: card-swipe ambient photography, headline highlighting "built for African markets", 3 key metrics (`99.9% uptime`, `17+ African markets`, `Mobile money + card + POS`), and translucent bottom description strip.
   - Header features turquoise `#3BBA93` capsule navbar and dedicated Country Selector dropdown routing to individual country pages for Kenya 🇰🇪, Rwanda 🇷🇼, and Tanzania 🇹🇿.
   - Native HTML `<select>` elements in CMS Admin replaced with full Radix-backed shadcn `Select` components.
+
+---
+
+## FEAT-009: Navbar Polish, Consistent #2A292D Backgrounds, Hero 23% Opacity Sub-banner & Solutions Alignment
+- **ID**: `FEAT-009`
+- **Status**: Completed
+- **Created**: 2026-09-21
+- **Description**: Refined the global navbar to a compact height (`h-16`), eliminated white navbar backgrounds on non-home pages by applying the authentic `#2A292D` background across all heroes and the sticky header, ensuring full visibility of the country selector across all views. Updated the home page hero sub-banner to exactly 23% opacity (`bg-black/[0.23]`). Aligned the layout, typography, and sections of `HomePage`, `PaymentProcessingPage`, `PosPage`, and `BulkSmsPage` directly with the user's full Adobe XD screenshots.
+- **Files Involved**:
+  - [`apps/web/src/components/Navbar.tsx`](../../apps/web/src/components/Navbar.tsx)
+  - [`apps/web/src/pages/public/HomePage.tsx`](../../apps/web/src/pages/public/HomePage.tsx)
+  - [`apps/web/src/pages/public/PaymentProcessingPage.tsx`](../../apps/web/src/pages/public/PaymentProcessingPage.tsx)
+  - [`apps/web/src/pages/public/PosPage.tsx`](../../apps/web/src/pages/public/PosPage.tsx)
+  - [`apps/web/src/pages/public/BulkSmsPage.tsx`](../../apps/web/src/pages/public/BulkSmsPage.tsx)
+  - [`apps/web/src/pages/public/CountryPage.tsx`](../../apps/web/src/pages/public/CountryPage.tsx)
+  - [`apps/web/src/pages/public/ContactPage.tsx`](../../apps/web/src/pages/public/ContactPage.tsx)
+- **Implementation Details**:
+  - Navbar uses `#2A292D` sticky background, keeping the country selector text and flag dropdown permanently clear and legible.
+  - Home hero sub-banner formatted as `bg-black/[0.23] backdrop-blur-sm border-t border-white/10`.
+  - Payment Processing, POS, and Bulk SMS pages updated with exact copy, 2-column layouts, green banners, and product breakdown grids from the user's screenshots.
+
 

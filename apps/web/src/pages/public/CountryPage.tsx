@@ -109,9 +109,9 @@ export const CountryPage: React.FC = () => {
   const data = COUNTRY_DATA[countrySlug.toLowerCase()];
 
   return (
-    <div className="min-h-screen pt-24 pb-20 bg-background text-foreground">
+    <div className="min-h-screen bg-background text-foreground">
       {/* Top Hero Banner */}
-      <section className="relative overflow-hidden py-16 lg:py-24 bg-[#0B132B] text-white">
+      <section className="relative overflow-hidden pt-16 pb-16 lg:pt-20 lg:pb-24 bg-[#2A292D] text-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center space-x-3 mb-6">
             <span className="text-4xl">{data.flag}</span>

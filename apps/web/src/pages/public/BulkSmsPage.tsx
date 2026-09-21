@@ -1,168 +1,156 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import {
-  Globe2,
-  CheckCircle2,
-  ArrowRight,
-  Clock,
-  Radio,
+  Lock,
+  Calendar,
+  Megaphone,
+  Bell,
+  RefreshCw,
+  Send,
 } from 'lucide-react';
 
 export const BulkSmsPage: React.FC = () => {
+  const messageTypes = [
+    {
+      title: 'Transactional SMS',
+      icon: RefreshCw,
+      desc: 'Payment confirmations, order status, delivery updates, account changes. Real-time, route-prioritized, with delivery reports.',
+      highlight: false,
+    },
+    {
+      title: 'OTPs & two-factor',
+      icon: Lock,
+      desc: 'Account verification, password resets, transaction confirmations. Sub-second routing on most networks.',
+      highlight: true,
+    },
+    {
+      title: 'Reminders',
+      icon: Calendar,
+      desc: 'Loan repayments, school fees, subscription renewals, appointment confirmations.',
+      highlight: false,
+    },
+    {
+      title: 'Marketing campaigns',
+      icon: Megaphone,
+      desc: 'Promotions, product launches, customer re-engagement, seasonal offers. High-throughput delivery with smart queuing.',
+      highlight: false,
+    },
+    {
+      title: 'Service notifications',
+      icon: Bell,
+      desc: 'Outages, policy updates, KYC requests, and any urgent broadcast your users must see immediately.',
+      highlight: false,
+    },
+    {
+      title: 'Payments + SMS',
+      icon: Send,
+      desc: 'Trigger an SMS the moment a payment succeeds or fails. One vendor, one unified customer journey.',
+      highlight: false,
+    },
+  ];
+
   return (
-    <div className="min-h-screen pt-24 pb-20 bg-background text-foreground">
-      {/* Hero Header */}
-      <section className="relative overflow-hidden py-16 lg:py-24 bg-[#0B132B] text-white">
+    <div className="min-h-screen bg-background text-foreground">
+      {/* 
+        Hero Section (Pixel-Close to Adobe XD Screenshot media_1789990984313.png)
+        Background: #2A292D
+      */}
+      <section className="bg-[#2A292D] text-white pt-16 pb-20 lg:pt-20 lg:pb-28">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <Badge className="bg-[#3BBA93] text-white hover:bg-[#3BBA93]/90 font-medium mb-4">
-            Telecommunication & SMS Aggregation
-          </Badge>
-          <h1 className="text-4xl sm:text-6xl font-extrabold tracking-tight max-w-4xl leading-tight">
-            Enterprise Bulk SMS & OTPs Across{' '}
-            <span className="text-[#3BBA93]">17+ African Markets</span>
-          </h1>
-          <p className="mt-6 text-lg sm:text-xl text-gray-300 max-w-3xl leading-relaxed">
-            Direct SS7 & SMPP telco connections ensuring &lt; 3-second OTP delivery, branded alphanumeric sender IDs, and real-time delivery receipts across the continent.
-          </p>
-          <div className="mt-8 flex flex-wrap gap-4">
-            <Link to="/contact">
-              <Button size="lg" className="bg-[#3BBA93] hover:bg-[#32a481] text-white font-semibold shadow-lg shadow-[#3BBA93]/20">
-                Register Sender ID
-              </Button>
-            </Link>
-            <Link to="/contact">
-              <Button size="lg" variant="outline" className="border-white/20 text-white hover:bg-white/10">
-                View SMS Rates
-              </Button>
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      {/* SMS Solutions Grid */}
-      <section className="py-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center max-w-3xl mx-auto mb-16">
-          <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-foreground">
-            Critical Communication Channels for Fast-Moving Businesses
-          </h2>
-          <p className="text-muted-foreground mt-3 text-base">
-            Optimized for banks, fintechs, delivery fleets, and enterprise customer service.
-          </p>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          <Card className="hover:border-[#3BBA93]/40 transition-all hover:shadow-lg">
-            <CardHeader>
-              <div className="w-12 h-12 rounded-xl bg-[#3BBA93]/10 text-[#3BBA93] flex items-center justify-center mb-4">
-                <Clock className="w-6 h-6" />
-              </div>
-              <CardTitle>Ultra-Fast OTPs & 2FA</CardTitle>
-              <CardDescription>
-                Sub-3-Second Global Delivery
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-muted-foreground leading-relaxed">
-                Prioritized routing queues guarantee lightning-fast verification codes for signups, password resets, and transaction confirmations.
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+            {/* Left Content */}
+            <div className="lg:col-span-7 space-y-6">
+              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight leading-[1.12]">
+                SMS that reaches{' '}
+                <span className="text-[#3BBA93]">every African customer</span>,{' '}
+                <span className="block sm:inline">every time.</span>
+              </h1>
+              <p className="text-base sm:text-lg text-gray-300 max-w-xl leading-relaxed">
+                Send OTPs, transaction alerts, reminders, and marketing campaigns across every major mobile network in Africa, through one platform, one API, one set of delivery reports with AvadaPay
               </p>
-            </CardContent>
-          </Card>
-
-          <Card className="hover:border-[#3BBA93]/40 transition-all hover:shadow-lg">
-            <CardHeader>
-              <div className="w-12 h-12 rounded-xl bg-blue-500/10 text-blue-500 flex items-center justify-center mb-4">
-                <Radio className="w-6 h-6" />
-              </div>
-              <CardTitle>Custom Alphanumeric Sender IDs</CardTitle>
-              <CardDescription>
-                Brand Trust on Every Message
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-muted-foreground leading-relaxed">
-                Send messages displaying your exact company name (e.g. "AVADAPAY") rather than random numerical phone numbers.
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card className="hover:border-[#3BBA93]/40 transition-all hover:shadow-lg">
-            <CardHeader>
-              <div className="w-12 h-12 rounded-xl bg-indigo-500/10 text-indigo-500 flex items-center justify-center mb-4">
-                <Globe2 className="w-6 h-6" />
-              </div>
-              <CardTitle>Multi-Network Smart Routing</CardTitle>
-              <CardDescription>
-                Automatic Telco Failover
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-muted-foreground leading-relaxed">
-                If a telco base station suffers congestion, our algorithmic gateway re-routes your packets via alternate carrier links instantly.
-              </p>
-            </CardContent>
-          </Card>
-        </div>
-      </section>
-
-      {/* Integration Banner */}
-      <section className="py-16 bg-muted/20 border-y border-border">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-            <div>
-              <h2 className="text-3xl font-bold tracking-tight text-foreground">
-                High-Volume Campaign Broadcasts & Webhooks
-              </h2>
-              <p className="text-muted-foreground mt-4 leading-relaxed">
-                Broadcast customer updates, product drops, or payment reminders to hundreds of thousands of recipients simultaneously with comprehensive delivery tracking.
-              </p>
-
-              <div className="mt-6 space-y-3 text-sm">
-                <div className="flex items-center space-x-3">
-                  <CheckCircle2 className="w-5 h-5 text-[#3BBA93]" />
-                  <span>Real-time DLR (Delivery Receipts) via webhooks</span>
-                </div>
-                <div className="flex items-center space-x-3">
-                  <CheckCircle2 className="w-5 h-5 text-[#3BBA93]" />
-                  <span>Opt-out management and regional regulatory compliance</span>
-                </div>
-                <div className="flex items-center space-x-3">
-                  <CheckCircle2 className="w-5 h-5 text-[#3BBA93]" />
-                  <span>Unicode and emoji support for multi-language text</span>
-                </div>
-              </div>
-
-              <div className="mt-8">
+              <div className="pt-2">
                 <Link to="/contact">
-                  <Button className="bg-[#3BBA93] hover:bg-[#32a481] text-white space-x-2">
-                    <span>Contact Our SMS Specialists</span>
-                    <ArrowRight className="w-4 h-4" />
+                  <Button
+                    className="bg-[#3BBA93] hover:bg-[#32a481] text-white font-semibold rounded-lg px-6 h-10 text-sm shadow-md shadow-[#3BBA93]/20"
+                  >
+                    Contact Us
                   </Button>
                 </Link>
               </div>
             </div>
 
-            <div className="bg-[#0B132B] rounded-xl p-6 text-gray-200 font-mono text-xs shadow-2xl border border-white/10 overflow-x-auto">
-              <div className="flex items-center space-x-2 pb-4 border-b border-white/10 mb-4">
-                <span className="w-3 h-3 rounded-full bg-red-500 inline-block" />
-                <span className="w-3 h-3 rounded-full bg-amber-500 inline-block" />
-                <span className="w-3 h-3 rounded-full bg-emerald-500 inline-block" />
-                <span className="text-gray-400 text-[11px] ml-2 font-sans">POST /v1/sms/send</span>
+            {/* Right Graphic Preview Box */}
+            <div className="lg:col-span-5 flex justify-center">
+              <div className="w-full max-w-md h-72 sm:h-80 rounded-2xl bg-[#1E1D20] border border-white/10 p-6 shadow-2xl flex flex-col justify-between">
+                <div className="flex items-center justify-between border-b border-white/10 pb-4">
+                  <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider">SMS Gateway Dispatch</span>
+                  <span className="inline-flex items-center text-[10px] text-[#3BBA93] font-mono bg-[#3BBA93]/10 px-2 py-0.5 rounded">
+                    Latency &lt; 2.1s
+                  </span>
+                </div>
+                <div className="space-y-3 font-mono text-xs">
+                  <div className="p-3 rounded-lg bg-white/5 border border-white/5 space-y-1">
+                    <div className="flex justify-between text-[11px] text-[#3BBA93]">
+                      <span>From: AVADAPAY</span>
+                      <span>Delivered</span>
+                    </div>
+                    <p className="text-gray-200">Your verification OTP is 849201. Do not share this code.</p>
+                  </div>
+                  <div className="p-3 rounded-lg bg-white/5 border border-white/5 space-y-1">
+                    <div className="flex justify-between text-[11px] text-[#3BBA93]">
+                      <span>From: AVADAPAY</span>
+                      <span>Delivered</span>
+                    </div>
+                    <p className="text-gray-200">Payment of KES 2,500 to Merchant confirmed.</p>
+                  </div>
+                </div>
+                <div className="pt-3 border-t border-white/10 text-[11px] text-gray-400 flex items-center justify-between">
+                  <span>Telco Coverage: Safaricom, MTN, Airtel, Vodacom</span>
+                  <span className="w-2 h-2 rounded-full bg-[#3BBA93]" />
+                </div>
               </div>
-              <pre className="leading-relaxed">
-{`curl -X POST https://api.avadapay.com/v1/sms/send \\
-  -H "Authorization: Bearer sec_live_..." \\
-  -H "Content-Type: application/json" \\
-  -d '{
-    "sender_id": "AvadaPay",
-    "recipients": ["+254712345678", "+250788123456"],
-    "message": "Your verification code is 849201. Valid for 5 minutes.",
-    "type": "otp"
-  }'`}
-              </pre>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* 
+        Section: "Every message your business needs to send" (from media_1789990984313.png)
+      */}
+      <section className="py-20 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center max-w-3xl mx-auto mb-16">
+            <h2 className="text-3xl sm:text-4xl font-extrabold text-gray-900 tracking-tight">
+              <span className="text-[#3BBA93]">Every message your</span> business needs to send
+            </h2>
+            <p className="text-gray-500 mt-3 text-base">
+              High-throughput routing engineered for mission-critical enterprise notifications.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 border border-gray-100 rounded-2xl overflow-hidden shadow-sm">
+            {messageTypes.map((item) => (
+              <div
+                key={item.title}
+                className={`p-8 border-b md:border-b-0 md:border-r border-gray-100 flex flex-col justify-between ${
+                  item.highlight ? 'bg-[#3BBA93]/10' : 'bg-white'
+                } hover:bg-[#3BBA93]/5 transition-colors`}
+              >
+                <div>
+                  <div className="w-10 h-10 rounded-lg bg-[#3BBA93]/10 text-[#3BBA93] flex items-center justify-center mb-6">
+                    <item.icon className="w-5 h-5" />
+                  </div>
+                  <h3 className="text-base font-bold text-gray-900">{item.title}</h3>
+                  <p className="text-xs sm:text-sm text-gray-600 mt-2.5 leading-relaxed">
+                    {item.desc}
+                  </p>
+                </div>
+                <div className="mt-8 pt-4 border-t border-gray-200/60 flex items-center text-xs font-semibold text-[#3BBA93]">
+                  <span>High-Deliverability Route</span>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       </section>
