@@ -130,6 +130,7 @@ jobs:
           host: ${{ secrets.VPS_IP }}
           username: ${{ secrets.VPS_USERNAME }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
+          password: ${{ secrets.VPS_PASSWORD }}
           timeout: 1200s
           command_timeout: 20m
           script: |
