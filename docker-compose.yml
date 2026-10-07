@@ -4,13 +4,11 @@ services:
   postgres:
     image: postgres:16-alpine
     container_name: avada-postgres
-    restart: unless-stopped
+    restart: always
     environment:
       POSTGRES_USER: ${POSTGRES_USER:-postgres}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
       POSTGRES_DB: ${POSTGRES_DB:-avada_db}
-    ports:
-      - "${POSTGRES_PORT:-5435}:5432"
     volumes:
       - avada_pgdata:/var/lib/postgresql/data
     healthcheck:
@@ -18,13 +16,16 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
+    networks:
+      - default
 
   api:
+    image: ghcr.io/${GITHUB_REPOSITORY_OWNER:-jusish}/avada-website/api:${API_TAG:-latest}
     build:
       context: .
       dockerfile: docker/Dockerfile.api
     container_name: avada-api
-    restart: unless-stopped
+    restart: always
     depends_on:
       postgres:
         condition: service_healthy
@@ -33,19 +34,32 @@ services:
       NODE_ENV: production
       DATABASE_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@postgres:5432/${POSTGRES_DB:-avada_db}?schema=public
       JWT_SECRET: ${JWT_SECRET:-avada_super_secure_jwt_secret_key_2026_change_in_production}
-    ports:
-      - "5005:5005"
+    networks:
+      - default
 
   web:
+    image: ghcr.io/${GITHUB_REPOSITORY_OWNER:-jusish}/avada-website/web:${WEB_TAG:-latest}
     build:
       context: .
       dockerfile: docker/Dockerfile.web
     container_name: avada-web
-    restart: unless-stopped
+    restart: always
     depends_on:
       - api
-    ports:
-      - "5173:80"
+    environment:
+      - VIRTUAL_HOST=avadapay.rw,www.avadapay.rw
+      - LETSENCRYPT_HOST=avadapay.rw,www.avadapay.rw
+      - LETSENCRYPT_EMAIL=avada.rwanda@avadapay.com
+    networks:
+      - default
+      - proxy
 
 volumes:
   avada_pgdata:
+
+networks:
+  default:
+  proxy:
+    name: avadaops_default
+    external: true
+

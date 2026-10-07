@@ -1,10 +1,11 @@
-name: CI & Container Registry
+name: CI/CD & Deployment
 
 on:
   push:
     branches: [ main ]
   pull_request:
     branches: [ main ]
+  workflow_dispatch:
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -54,12 +55,12 @@ jobs:
 
   # -------------------------------------------------------------
   # Job 2: Build & Push Docker Images to GHCR
-  # (Strictly runs ONLY on direct push to main, NOT on PRs)
+  # (Strictly runs ONLY on direct push to main or manual dispatch)
   # -------------------------------------------------------------
   docker-build-push:
     name: Build & Push to GHCR (${{ matrix.name }})
     needs: [checks]
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -109,3 +110,71 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+
+  # -------------------------------------------------------------
+  # Job 3: Automated SSH Deployment to VPS
+  # -------------------------------------------------------------
+  deploy:
+    name: Deploy to VPS
+    needs: [docker-build-push]
+    if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: read
+
+    steps:
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.VPS_IP }}
+          username: ${{ secrets.VPS_USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          timeout: 1200s
+          command_timeout: 20m
+          script: |
+            set -e
+
+            echo "--- Navigating to Deployment Directory ---"
+            mkdir -p ~/avada-website
+            cd ~/avada-website
+
+            # Authenticate Git with temporary GitHub Action token to pull latest compose
+            if [ ! -d ".git" ]; then
+              git init
+              git remote add origin https://${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
+            else
+              git remote set-url origin https://${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
+            fi
+            git fetch origin main
+            git reset --hard origin/main
+
+            # Export tags for the compose file
+            export API_TAG=latest
+            export WEB_TAG=latest
+            export GITHUB_REPOSITORY_OWNER=$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')
+
+            echo "--- Authenticating with GHCR ---"
+            echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+
+            echo "--- Pulling New Images ---"
+            docker compose pull api web
+
+            echo "--- Ensuring Database & Environment ---"
+            if [ ! -f ".env" ]; then
+              cp .env.example .env 2>/dev/null || true
+            fi
+            docker compose up -d postgres
+
+            echo "--- Running Database Schema Push & Seed ---"
+            docker compose run --rm --entrypoint "npx prisma db push --accept-data-loss" api
+            docker compose run --rm --entrypoint "npx tsx prisma/seed.ts" api
+
+            echo "--- Starting Application ---"
+            docker compose up -d --remove-orphans
+
+            echo "✅ Deployment Successful! Services are up."
+
+            echo "--- Cleaning Up Old Docker Images ---"
+            docker image prune -a --force --filter "until=24h"
+

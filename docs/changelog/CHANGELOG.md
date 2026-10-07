@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.8.0] - 2026-10-07
+
+### Added
+- **Automated CI/CD SSH Deployment Workflow (`.github/workflows/ci.yml`)**: Added automated production deployment job using `appleboy/ssh-action` triggered on pushes to `main` and via `workflow_dispatch`. Authenticates with GHCR, pulls updated container images, provisions PostgreSQL database, executes Prisma database schema pushes and seeding, starts containers, and performs automated Docker image pruning.
+- **Production Multi-Tenant Container Orchestration (`docker-compose.yml`)**: Configured production services connected to the shared `avadaops_default` network alongside the existing `nginxproxy/nginx-proxy` and `nginxproxy/acme-companion` stack. Configured `VIRTUAL_HOST` and `LETSENCRYPT_HOST` for `avadapay.rw` and `www.avadapay.rw`.
+
+### Changed
+- **Nginx API Reverse Proxy Routing (`docker/nginx.conf`)**: Corrected `/api` proxy rule to forward the full URI path to Express backend without stripping endpoint routes, ensuring all health and content endpoints (`/api/health`, `/api/content`, `/api/auth`) route properly.
+
+---
+
 ## [1.7.0] - 2026-10-07
 
 ### Added
