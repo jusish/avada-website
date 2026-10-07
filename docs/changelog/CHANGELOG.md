@@ -7,6 +7,42 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.7.0] - 2026-10-07
+
+### Added
+- **Kenya Country Page (`/countries/kenya`)**: Built to design screenshots (`KE-1.png` - `KE-7.png`). Features hero ("Payments bila stress for Kenyan businesses") with live CBK-compliant stream preview, Nairobi skyline banner (`/media/nairobi-skyline.jpg`), 6-pill payment badge grid (M-Pesa, Airtel Money, STK Push/Paybill/Till, card payments, payment links, APIs), dual feature cards with photography (batch payouts to agents/suppliers and bulk SMS communications), 6-industry accordion (Microfinance, E-commerce, Gaming, Schools, Services, Retail), 4 benefit cards, Nairobi office card with Westpark Towers map (`/media/nairobi-map.jpg`) and meeting scheduler, and unified CTA banner.
+- **Rwanda Country Page (`/countries/rwanda`)**: Built to design screenshots (`RW-1.png` - `RW-8.png`). Features hero ("A smarter way to handle business payments in Rwanda") with live NBR/RURA stream preview, Kigali Convention Centre night banner (`/media/kigali-skyline.jpg`), alternating vertical timeline ("From payment to confirmation, without the guesswork") with concentric teal nodes, 6-pillar white card grid on `#3BBA93` teal background (Mobile money, Cards, POS, Bulk SMS, APIs, Payouts), system integration showcase, 4 "Why AvadaPay in Rwanda" cards, Kigali office hub card with meeting booking, and dedicated Rwanda CTA banner.
+- **Tanzania Country Page (`/countries/tanzania`)**: Built to design screenshots (`TZ-1.png` - `TZ-7.png`). Features hero ("Malipo rahisi kwa biashara Tanzania") with BOT/TCRA live stream preview, coastal Dar es Salaam banner (`/media/tanzania-coast.jpg`), multi-telco logos strip (`/media/tz-telecom-logos.png`) across Airtel, Halopesa, Vodacom, and Tigo Money, 3 numbered feature cards (networks, batch payouts, SMS notifications), real-time visibility table container with live multi-telco transaction monitoring, 4 "Why Tanzanian businesses choose AvadaPay" cards, Dar es Salaam office hub card, and "Simplify payments across Tanzania" CTA.
+
+### Changed
+- **Home Page Hero Background**: Swapped out bright background for luxury dark moody ambiance asset (`apps/web/src/assets/hero-bg.jpg`) with soft bokeh and dark gradient overlays to ensure razor-sharp typography contrast.
+- **Navbar Country Indicator**: Navbar country button now displays the active country name with its official vector flag when visiting country routes (`Kenya 🇰🇪`, `Rwanda 🇷🇼`, `Tanzania 🇹🇿`), falling back to dropdown chevron on generic routes.
+- **Unified Dynamic Footer CTAs**: Added route-specific footer CTA entries in `Footer.tsx` for `/countries/kenya`, `/countries/rwanda`, and `/countries/tanzania`.
+
+## [1.6.0] - 2026-10-07
+
+### Added
+- **POS Solutions Page (`/pos`)**: Built exactly to design screenshots (`POS-1.png` - `POS-9.png`). Features hero with live POS terminal graphic and payment methods strip (`Debit cards`, `Credit cards`, `QR Payments`, `Mobile money`, `Cash`), three payment modes (Soft POS, Smart POS, Enterprise Payment APIs), 6-industry accordion (Retail, Hospitality, Healthcare, Education, Transportation, Government & NGOs), centralized dashboard architecture schematic with connected monitoring/access/BI pillars, PCI-DSS security ticker banner, report reader photo banner, go-live timeline matrix (24-48h, 3-7d, project-based), and flexible pricing tiers.
+- **Bulk SMS Platform Page (`/bulk-sms`)**: Built to design screenshots (`BS-1.png` - `BS-7.png`). Features SMS gateway live dispatch console, 6-card message categories grid (Transactional, OTPs & 2FA, Reminders, Marketing campaigns, Service notifications, Payments + SMS), 5 visual reason cards (Multi-network coverage, Volume pricing, Delivery reports, Tied to payments, Easy to integrate), 7-sector use cases accordion, and a fully interactive SMS pricing calculator with country selection (Kenya, DRC, Tanzania, Rwanda, Uganda), dynamic volume slider, tiered rate badges, and live monthly spend estimation.
+- **Contact Page (`/contact`)**: Built to design screenshots (`Co-1.png` - `Co-3.png`). Features clean light layout matching brand specifications, headphone iconography, Radix UI Select dropdowns for inquiry type and African countries, auto-query parameter hydration (`?inquiry=...` & `?country=...`), interactive submission confirmation, and a dedicated Technical/API Integration support banner.
+
+### Changed
+- **Home Page Hero Blurred Bokeh**: Softened the hero background with deep bokeh blur (`blur-[9px]`, scale, and dark moody gradient overlay) matching the design mockups so foreground text stands out with high contrast.
+- **Home Page Under-Hero 3-Item Marquee**: Replaced single text marquee with 3 discrete, branded moving items (`[Cloud] One platform.`, `[Paper Plane] Payments and`, `[Chat Bubble] SMS across Africa.`) strictly following `UnderH-1.png` through `UnderH-3.png`.
+- **POS Security Ticker Marquee**: Replaced wrapping flex layout with seamless continuous horizontal marquee for security features (`PCI-compliant infrastructure`, `Device authentication`, `Role-based access controls`, `Fraud monitoring`, `Encrypted communications`), preventing unwanted line-wrapping on all screen sizes.
+- **Home Page Fintech Sizing & Proportions**: Refactored typography, marquee scale, and spacing from oversized dimensions down to clean, professional modern fintech proportions. Scaled vector flags to realistic sizes (48-56px), streamlined hero text, and balanced card padding.
+- **Dynamic Footer Call-to-Action**: Tailored footer CTA headlines and action buttons contextually across `/`, `/payment-processing`, `/pos`, `/bulk-sms`, and suppressed the redundant CTA on `/contact`.
+
+## [1.5.0] - 2026-10-07
+
+### Changed
+- **Home page rebuilt pixel-close to design screenshots (`public/images/H-1..H-9.png`)**: hero with overlay navbar, scrolling "Payments and SMS platform." marquee, "Four ways" green section, "Why teams build" cards, industries accordion, circle-flag strip, Dubai map + country office rows, partner logo marquees.
+- **Footer** now includes the dark CTA band, Useful links / Contact / legal columns and social icons (CMS Portal link kept, subtle).
+- **Navbar** is transparent/absolute on `/`, solid sticky elsewhere. Typography switched to Mulish.
+
+### Added
+- `components/home/CircleFlags.tsx`, `components/home/PartnerLogos.tsx` (wordmark placeholders until official logos are supplied).
+
 ## [1.4.2] - 2026-09-21
 
 ### Fixed

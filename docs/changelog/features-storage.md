@@ -21,6 +21,11 @@ This document is the **single source of truth** for every feature implemented in
 13. [FEAT-013: Production README, Zero-Warning ESLint & GitHub Actions CI/CD Pipeline](#feat-013-production-readme-zero-warning-eslint--github-actions-cicd-pipeline)
 14. [FEAT-014: Monorepo Type-Check Resolution for Shared Package in CI](#feat-014-monorepo-type-check-resolution-for-shared-package-in-ci)
 15. [FEAT-015: Docker Multi-Stage Build Fix & .dockerignore Implementation](#feat-015-docker-multi-stage-build-fix--dockerignore-implementation)
+16. [FEAT-016: Modern Fintech Sizing & Proportions for Home Page](#feat-016-modern-fintech-sizing--proportions-for-home-page)
+17. [FEAT-017: Comprehensive Pan-African POS Solutions Page (PosPage)](#feat-017-comprehensive-pan-african-pos-solutions-page-pospage)
+18. [FEAT-018: High-Throughput Bulk SMS Platform Page with Interactive Cost Calculator (BulkSmsPage)](#feat-018-high-throughput-bulk-sms-platform-page-with-interactive-cost-calculator-bulksmspage)
+19. [FEAT-019: Dedicated Contact & Technical Inquiry Page (ContactPage)](#feat-019-dedicated-contact--technical-inquiry-page-contactpage)
+20. [FEAT-020: Pixel-Perfect Dedicated Country Pages (Kenya, Rwanda, and Tanzania)](#feat-020-pixel-perfect-dedicated-country-pages-kenya-rwanda-and-tanzania)
 
 ---
 
@@ -314,5 +319,120 @@ This document is the **single source of truth** for every feature implemented in
 
 
 
+
+
+
+---
+
+## FEAT-016: Modern Fintech Sizing & Proportions for Home Page
+- **ID**: `FEAT-016`
+- **Status**: Completed
+- **Created**: 2026-10-07
+- **Description**: Refactored the Home page typography and spacing to realistic, sleek fintech proportions. Reduced oversized marquee typography (from 112px down to 36-44px), scaled vector flags (from 90px to 48-56px), streamlined hero text, and balanced padding across all sections.
+- **Files Involved**:
+  - [`apps/web/src/pages/public/HomePage.tsx`](../../apps/web/src/pages/public/HomePage.tsx)
+  - [`apps/web/src/components/home/CircleFlags.tsx`](../../apps/web/src/components/home/CircleFlags.tsx)
+- **Implementation Details**:
+  - Scaled paper plane icon and marquee text for smooth responsive display across mobile and desktop.
+  - Normalized card paddings (`p-6 sm:p-7`) and button heights (`h-9` to `h-11`).
+  - Preserved all screenshot layout elements (Hero, Marquee, Four Ways, Why Teams Build, Industries Accordion, Flags, Dubai HQ Map + Country offices, Partner marquees).
+
+---
+
+## FEAT-017: Comprehensive Pan-African POS Solutions Page (PosPage)
+- **ID**: `FEAT-017`
+- **Status**: Completed
+- **Created**: 2026-10-07
+- **Description**: Engineered the complete AvadaPay POS platform page strictly adhering to design screenshots `POS-1.png` through `POS-9.png`.
+- **Files Involved**:
+  - [`apps/web/src/pages/public/PosPage.tsx`](../../apps/web/src/pages/public/PosPage.tsx)
+  - [`apps/web/src/components/Footer.tsx`](../../apps/web/src/components/Footer.tsx)
+- **Implementation Details**:
+  - **Hero & Payment Rails Sub-Strip**: High-converting hero with live POS terminal graphic, 4G dual-SIM status, KES amount preview, and horizontal divided strip for `Debit cards`, `Credit cards`, `QR Payments`, `Mobile money`, and `In person (cash) payments`.
+  - **Three Payment Modes**: Photo cards for Soft POS (NFC phone app), Smart POS (dedicated Android terminal with thermal printer), and Enterprise Payment APIs (ERP/cash register integration).
+  - **Industries Accordion**: 6 African industry use cases (Retail, Hospitality, Healthcare, Education, Transportation, Government & NGOs).
+  - **Dashboard Ecosystem Schematic**: Visual architecture diagram demonstrating central AvadaPay engine routing between gross sales analytics, ERP checkout triggers, PCI-DSS encryption, and API responses.
+  - **Connected Pillars**: Real-time monitoring, User & access management, and Business intelligence connected by dotted line indicators.
+  - **Security Ticker Banner**: Full-width mint-green banner highlighting PCI-DSS compliance, device authentication, RBAC, fraud monitoring, and encrypted communications.
+  - **Photo Banner**: Merchant reviewing financial report (`/media/report_reader.jpg`).
+  - **Go-Live Timeline & Pricing Matrix**: 3-column structured comparisons for SoftPOS (24-48h), Smart POS (3-7 days), and Enterprise (project-based), with inquiry action triggers.
+
+---
+
+## FEAT-018: High-Throughput Bulk SMS Platform Page with Interactive Cost Calculator (BulkSmsPage)
+- **ID**: `FEAT-018`
+- **Status**: Completed
+- **Created**: 2026-10-07
+- **Description**: Developed the AvadaPay Bulk SMS platform page matching design screenshots `BS-1.png` through `BS-7.png`, featuring a live SMS gateway simulator and an interactive SMS cost calculator.
+- **Files Involved**:
+  - [`apps/web/src/pages/public/BulkSmsPage.tsx`](../../apps/web/src/pages/public/BulkSmsPage.tsx)
+  - [`apps/web/src/components/Footer.tsx`](../../apps/web/src/components/Footer.tsx)
+- **Implementation Details**:
+  - **Hero**: Sub-2s latency SMS gateway terminal simulation showing delivered OTP and payment notification receipts.
+  - **Message Types Grid**: 6 categories divided into clean border cells (Transactional SMS, OTPs & 2FA with mint highlight, Reminders, Marketing campaigns, Service notifications, Payments + SMS).
+  - **Why Teams Use AvadaPay SMS**: 5 photo cards with real imagery (`bs_network.jpg`, `bs_volume.jpg`, `bs_reports.jpg`, `nfc_payment.jpg`, `bs_integrate.jpg`).
+  - **Industry Use Cases Accordion**: 7 sectors (Banking & fintech, Lending & SACCOs, E-commerce, Education, Healthcare, Retail, Government & NGOs).
+  - **Interactive Pricing Calculator**: Dynamic country switcher with vector flags (Kenya, DRC, Tanzania, Rwanda, Uganda), volume presets and range slider (10k to 2M+), live per-message rate calculation with enterprise volume discounts, estimated monthly spend breakdown, and direct checkout link.
+
+---
+
+## FEAT-019: Dedicated Contact & Technical Inquiry Page (ContactPage)
+- **ID**: `FEAT-019`
+- **Status**: Completed
+- **Created**: 2026-10-07
+- **Description**: Rebuilt the Contact page strictly following design screenshots `Co-1.png` through `Co-3.png`.
+- **Files Involved**:
+  - [`apps/web/src/pages/public/ContactPage.tsx`](../../apps/web/src/pages/public/ContactPage.tsx)
+  - [`apps/web/src/components/Navbar.tsx`](../../apps/web/src/components/Navbar.tsx)
+  - [`apps/web/src/components/Footer.tsx`](../../apps/web/src/components/Footer.tsx)
+- **Implementation Details**:
+  - Clean light background matching the official design specs, with a green headphone icon header.
+  - Polished contact form featuring green focus borders (`border-[#3BBA93]`), full name, company, role, country dropdown, inquiry type dropdown, message textarea, and submission feedback state.
+  - Accessible Radix UI `Select` components replacing native selects per styling guidelines.
+  - Automatic query param parsing (`?inquiry=...` and `?country=...`) allowing seamless deep-linking from product buttons.
+  - Dedicated "Need API or Integration Support?" section with a technical inquiry action trigger.
+  - Seamless navigation and footer integration with light navbar styling and contextual CTA suppression.
+
+---
+
+## FEAT-020: Pixel-Perfect Dedicated Country Pages (Kenya, Rwanda, and Tanzania)
+- **ID**: `FEAT-020`
+- **Status**: Completed
+- **Created**: 2026-10-07
+- **Description**: Implemented individual, highly authentic country landing pages for Kenya, Rwanda, and Tanzania matching the exact user design screenshots (`KE-1.png` - `KE-7.png`, `RW-1.png` - `RW-8.png`, and `TZ-1.png` - `TZ-7.png`).
+- **Files Involved**:
+  - [`apps/web/src/pages/public/CountryPage.tsx`](../../apps/web/src/pages/public/CountryPage.tsx)
+  - [`apps/web/src/pages/public/KenyaPage.tsx`](../../apps/web/src/pages/public/KenyaPage.tsx)
+  - [`apps/web/src/pages/public/RwandaPage.tsx`](../../apps/web/src/pages/public/RwandaPage.tsx)
+  - [`apps/web/src/pages/public/TanzaniaPage.tsx`](../../apps/web/src/pages/public/TanzaniaPage.tsx)
+  - [`apps/web/src/components/Navbar.tsx`](../../apps/web/src/components/Navbar.tsx)
+  - [`apps/web/src/components/Footer.tsx`](../../apps/web/src/components/Footer.tsx)
+- **Implementation Details**:
+  - **Dynamic Routing**: Re-architected `CountryPage.tsx` to route dynamically between dedicated components (`KenyaPage`, `RwandaPage`, `TanzaniaPage`), preserving deep-link URLs (`/countries/kenya`, `/countries/rwanda`, `/countries/tanzania`).
+  - **Kenya Page (`KE-1` - `KE-7`)**:
+    - Hero with CBK-compliant real-time payment feed and framed panel.
+    - "Built for how Kenya actually pays" section with high-res Nairobi city skyline aerial photography (`/media/nairobi-skyline.jpg`).
+    - 6-pill payment badge grid for M-Pesa & Airtel Money, STK Push/Paybill/Till numbers, cards, links, APIs, and real-time confirmation.
+    - Dual feature cards with photography: batch payouts (`/media/kenya-pay-agents.jpg`) and bulk SMS communications (`/media/kenya-sms-comm.jpg`).
+    - 6-industry interactive accordion (Microfinance, E-commerce, Gaming & betting, Schools, Services, Retail).
+    - 4 benefit cards (Instant confirmation, Local team/office, Volume pricing, Fast onboarding).
+    - Nairobi office card with Westpark Towers, Westlands map (`/media/nairobi-map.jpg`) and meeting booking trigger.
+  - **Rwanda Page (`RW-1` - `RW-8`)**:
+    - Hero with NBR/RURA-compliant live payment feed and framed panel.
+    - "Built for Rwanda's cashless push" section with illuminated Kigali Convention Centre night aerial photography (`/media/kigali-skyline.jpg`).
+    - Alternating vertical timeline ("From payment to confirmation, without the guesswork") featuring concentric circular teal nodes.
+    - 6-pillar white card grid on `#3BBA93` teal background (Mobile money, Cards, POS, Bulk SMS, APIs, Payouts).
+    - System integration section and 4 "Why AvadaPay in Rwanda" cards.
+    - Kigali regional hub office card with meeting booking trigger.
+  - **Tanzania Page (`TZ-1` - `TZ-7`)**:
+    - Hero with BOT/TCRA live stream preview and framed panel.
+    - "One Platform for all your payment needs" section with turquoise coastal Dar es Salaam aerial banner (`/media/tanzania-coast.jpg`).
+    - Multi-telco logos row featuring Airtel, Halopesa, Vodacom, and Tigo Money (`/media/tz-telecom-logos.png`).
+    - 3 numbered feature cards for network coverage, batch payouts, and customer SMS updates.
+    - Real-time visibility table container with live multi-telco transaction stream across Vodacom M-Pesa, Tigo Pesa, Airtel Money, and HaloPesa.
+    - 4 "Why Tanzanian businesses choose AvadaPay" cards.
+    - Dar es Salaam office hub card with meeting booking trigger.
+  - **Navbar Flag Indicators**: Added active country flag display in the top navigation bar when viewing country routes.
+  - **Footer Contextual CTAs**: Registered tailored headline and button CTAs for each country in `Footer.tsx`.
 
 

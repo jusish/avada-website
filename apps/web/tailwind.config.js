@@ -14,6 +14,24 @@ export default {
       },
     },
     extend: {
+      fontFamily: {
+        sans: ["Mulish", "Inter", "ui-sans-serif", "system-ui", "sans-serif"],
+      },
+      keyframes: {
+        marquee: {
+          "0%": { transform: "translateX(0)" },
+          "100%": { transform: "translateX(-50%)" },
+        },
+        "marquee-reverse": {
+          "0%": { transform: "translateX(-50%)" },
+          "100%": { transform: "translateX(0)" },
+        },
+      },
+      animation: {
+        marquee: "marquee 40s linear infinite",
+        "marquee-slow": "marquee 60s linear infinite",
+        "marquee-reverse": "marquee-reverse 60s linear infinite",
+      },
       colors: {
         avadagreen: {
           DEFAULT: "#3BBA93",

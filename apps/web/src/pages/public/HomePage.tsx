@@ -1,69 +1,158 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import {
-  Smartphone,
-  Store,
-  MessageSquare,
-  ArrowRight,
-  Globe2,
-  ChevronRight,
-  Send,
-  CreditCard,
-} from 'lucide-react';
-import { ContentItem } from '@avada/shared';
-import { COUNTRIES } from '@/components/Navbar';
-import { CountryFlag } from '@/components/CountryFlag';
+import { ArrowRight, ChevronUp } from 'lucide-react';
+import { CIRCLE_FLAGS } from '@/components/home/CircleFlags';
+import { ROW_ONE, ROW_TWO } from '@/components/home/PartnerLogos';
+import { Marquee } from '@/components/Marquee';
 import heroBg from '@/assets/hero-bg.jpg';
 
-export const HomePage: React.FC = () => {
-  const [newsItems, setNewsItems] = useState<ContentItem[]>([]);
-  const [loadingNews, setLoadingNews] = useState(true);
+const GREEN = '#3BBA93';
 
-  useEffect(() => {
-    fetch('/api/content')
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.success && Array.isArray(data.data)) {
-          setNewsItems(data.data.slice(0, 3));
-        }
-      })
-      .catch((err) => {
-        console.error('Failed to load news items:', err);
-      })
-      .finally(() => setLoadingNews(false));
-  }, []);
+/* ---------- Typography & Icon Helpers ---------- */
+
+const PaperPlane: React.FC<{ className?: string }> = ({ className = 'w-9 sm:w-12 h-auto' }) => (
+  <svg viewBox="0 0 130 100" className={className} aria-hidden="true">
+    <polygon points="0,45 128,0 72,98 58,60" fill={GREEN} />
+    <polygon points="58,60 128,0 66,76" fill="#2C9B78" />
+    <polygon points="58,60 72,98 66,76" fill="#9BDEC9" />
+  </svg>
+);
+
+const CloudPlatformIcon: React.FC<{ className?: string }> = ({ className = 'w-9 sm:w-12 h-auto' }) => (
+  <svg viewBox="0 0 68 46" className={className} aria-hidden="true">
+    <path
+      d="M18 42 C9.2 42 2 34.8 2 26 C2 18 8 11.2 15.8 10.2 C19.6 4 26.4 0 34 0 C44.5 0 53.4 7.2 55.6 17.2 C57 16.5 58.5 16 60 16 C64.4 16 68 19.6 68 24 C68 27.6 65.5 30.7 62 31.6 C61.9 37.5 57 42 51 42 Z"
+      fill={GREEN}
+    />
+    <rect x="20" y="21.5" width="28" height="3.8" rx="1.9" fill="#248767" />
+    <rect x="20" y="29.5" width="18" height="3.8" rx="1.9" fill="#248767" />
+  </svg>
+);
+
+const ChatBubbleIcon: React.FC<{ className?: string }> = ({ className = 'w-9 sm:w-12 h-auto' }) => (
+  <svg viewBox="0 0 60 48" className={className} aria-hidden="true">
+    <rect x="0" y="0" width="60" height="40" rx="9" fill={GREEN} />
+    <polygon points="8,38 8,48 18,38" fill={GREEN} />
+    <circle cx="18" cy="20" r="3.2" fill="#248767" />
+    <circle cx="30" cy="20" r="3.2" fill="#248767" />
+    <circle cx="42" cy="20" r="3.2" fill="#248767" />
+  </svg>
+);
+
+const UNDER_HERO_ITEMS = [
+  { Icon: CloudPlatformIcon, text: 'One platform.' },
+  { Icon: PaperPlane, text: 'Payments and' },
+  { Icon: ChatBubbleIcon, text: 'SMS across Africa.' },
+];
+
+const TwoToneHeading: React.FC<{ green: string; dark: string; className?: string }> = ({
+  green,
+  dark,
+  className = '',
+}) => (
+  <h2
+    className={`text-center font-extrabold tracking-tight leading-[1.18] text-2xl sm:text-3xl md:text-4xl text-[#2A292D] ${className}`}
+  >
+    <span className="text-[#3BBA93]">{green}</span>
+    <br />
+    <span className="text-[#2A292D]">{dark}</span>
+  </h2>
+);
+
+/* ---------- Data ---------- */
+
+const WAYS = [
+  {
+    n: 1,
+    title: 'Payment Processing',
+    body: 'Accept mobile money and card payments from customers across 17+ African markets through a single API.',
+    link: '/payment-processing',
+  },
+  {
+    n: 2,
+    title: 'POS Solutions',
+    body: 'Accept payments in-store, on the move, or in the field, through SoftPOS on any Android phone or a dedicated POS terminal.',
+    link: '/pos',
+  },
+  {
+    n: 3,
+    title: 'Bulk SMS',
+    body: 'Send OTPs, transaction alerts, reminders, and marketing campaigns across every major African network from one dashboard.',
+    link: '/bulk-sms',
+  },
+  {
+    n: 4,
+    title: 'Bulk Payouts',
+    body: 'Pay agents, suppliers, employees, merchants and customers in batches, with status tracking and reconciliation built in.',
+    link: '/payment-processing',
+  },
+];
+
+const WHY = [
+  { title: ['One API,', '17+ markets'], to: '/payment-processing' },
+  { title: ['99.9% uptime'], to: '/payment-processing' },
+  { title: ['Mobile-', 'money-first'], to: '/payment-processing' },
+  { title: ['Payouts you', 'can rely on'], to: '/payment-processing' },
+];
+
+const INDUSTRIES = [
+  {
+    title: 'One API, 17+ markets',
+    body: 'A single integration gives you mobile money, card and bank rails across every market we operate in, with one contract, one dashboard and one reconciliation file.',
+  },
+  {
+    title: 'Retail & supermarkets',
+    body: 'Accept cards and mobile money at the till with SoftPOS or dedicated terminals, and settle to your account next day.',
+  },
+  {
+    title: 'Microfinance, SACCOs & lenders',
+    body: 'Disburse loans and collect repayments directly through mobile wallets, with SMS reminders tied to every transaction.',
+  },
+  {
+    title: 'Hospitality, travel & ticketing',
+    body: 'Take online and in-person payments from local and international guests, and confirm bookings instantly by SMS.',
+  },
+  {
+    title: 'Schools & institutions',
+    body: 'Collect fees through M-Pesa, MoMo and Airtel Money with automatic receipts and parent notifications.',
+  },
+  {
+    title: 'Gaming & betting',
+    body: 'Fast deposits and instant payouts to mobile wallets, built to handle peak-time volumes.',
+  },
+];
+
+const OFFICES = [
+  { country: 'Kenya', address: '8th Floor Westpark Towers, Westlands, Nairobi', to: '/countries/kenya' },
+  { country: 'Tanzania', address: 'Dar es Salaam, Tanzania', to: '/countries/tanzania' },
+  { country: 'Rwanda', address: 'Kigali, Rwanda', to: '/countries/rwanda' },
+  { country: 'DRC', address: 'SILIKIN VILLAGE, Local A012, Bâtiment Phase 3', to: '/contact' },
+];
+
+export const HomePage: React.FC = () => {
+  const [openIndex, setOpenIndex] = useState<number | null>(null);
 
   return (
-    <div className="flex flex-col min-h-screen bg-background text-foreground">
-      {/* 
-        Hero Section (Pixel-Close to Adobe XD Screenshot)
-      */}
-      <section className="relative min-h-[85vh] flex flex-col justify-between overflow-hidden pt-20 sm:pt-28 pb-0">
-        {/* Ambient Card Payment Photography Background */}
-        <div className="absolute inset-0 z-0">
+    <div className="flex flex-col bg-white text-[#2A292D] font-sans overflow-x-hidden">
+      {/* 1 — HERO SECTION */}
+      <section className="relative isolate flex flex-col min-h-[75vh] md:min-h-[82vh] text-white overflow-hidden">
+        {/* Softly blurred background image with balanced ambient dark overlay */}
+        <div className="absolute inset-0 z-0 overflow-hidden">
           <img
             src={heroBg}
             alt="AvadaPay Hero Background"
-            className="w-full h-full object-cover object-center"
+            className="w-full h-full object-cover object-center scale-105 filter blur-[3.5px]"
           />
-          {/* Dark High-Contrast Overlay */}
-          <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/35 to-black/70" />
+          <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-black/75" />
         </div>
 
-        {/* Main Hero Typography */}
-        <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center my-auto">
-          <h1 className="text-4xl sm:text-6xl md:text-7xl font-extrabold tracking-tight text-white leading-[1.12] max-w-5xl mx-auto">
-            Payments and customer communication,{' '}
-            <span className="text-[#3BBA93] block sm:inline">
-              built for African markets.
-            </span>
+        <div className="relative z-10 flex-1 flex flex-col items-center justify-center text-center px-4 pt-28 sm:pt-36 pb-12 max-w-5xl mx-auto">
+          <h1 className="font-extrabold tracking-tight leading-[1.12] text-3xl sm:text-5xl lg:text-[56px] max-w-4xl text-white">
+            Payments and customer<br className="hidden sm:inline" /> communication,{' '}
+            <span className="text-[#3BBA93]">built for<br className="hidden sm:inline" /> African markets.</span>
           </h1>
 
-          {/* 3 Key Metrics */}
-          <div className="mt-10 sm:mt-14 flex flex-wrap items-center justify-center gap-8 sm:gap-14 text-white text-base sm:text-lg font-semibold tracking-wide">
+          <div className="mt-8 sm:mt-12 flex flex-wrap items-center justify-center gap-6 sm:gap-12 text-sm sm:text-base font-semibold text-white/95">
             <div className="flex items-center space-x-2">
               <span className="w-2 h-2 rounded-full bg-[#3BBA93]" />
               <span>99.9% uptime</span>
@@ -79,256 +168,247 @@ export const HomePage: React.FC = () => {
           </div>
         </div>
 
-        {/* Sub-Banner Strip: Black with 23% opacity as specified in design */}
-        <div className="relative z-10 w-full bg-black/[0.23] backdrop-blur-sm border-t border-white/10 py-5 sm:py-6 mt-12">
-          <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <p className="text-xs sm:text-sm md:text-base text-gray-200 font-normal leading-relaxed">
-              AvadaPay is a pan-African payment gateway and SMS aggregator. Accept mobile money and card payments, run POS, send bulk payouts, and reach customers by SMS, through one connected platform live in 17+ markets.
+        {/* Sub-Banner Strip */}
+        <div className="relative z-10 bg-black/40 backdrop-blur-sm border-t border-white/10 py-4 sm:py-5">
+          <div className="max-w-4xl mx-auto px-6 text-center">
+            <p className="text-xs sm:text-sm text-gray-200 font-normal leading-relaxed">
+              AvadaPay is a pan-African payment gateway and SMS aggregator. Accept mobile money and
+              card payments, run POS, send bulk payouts, and reach customers by SMS, through one
+              connected platform live in 17+ markets.
             </p>
           </div>
         </div>
       </section>
 
-      {/* Ticker / Hook Section from Screenshot */}
-      <section className="py-16 sm:py-20 bg-white">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-8">
-          {/* Header Graphic */}
-          <div className="flex items-center justify-center space-x-3 text-3xl sm:text-5xl font-black text-gray-900 tracking-tight">
-            <span>platform.</span>
-            <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-[#3BBA93]/10 flex items-center justify-center text-[#3BBA93]">
-              <Send className="w-6 h-6 sm:w-7 sm:h-7 -rotate-12 fill-current" />
-            </div>
-            <span className="text-[#3BBA93]">Payments and SMS</span>
+      {/* 2 — INTRO SECTION & 3-ITEM MARQUEE */}
+      <section className="bg-white pt-12 sm:pt-16 pb-14 sm:pb-20">
+        <Marquee animation="animate-marquee-slow">
+          <div className="flex items-center">
+            {UNDER_HERO_ITEMS.map((item, idx) => (
+              <div key={idx} className="flex items-center gap-3.5 sm:gap-4.5 pr-12 sm:pr-20 shrink-0">
+                <item.Icon className="w-8 sm:w-11 h-auto shrink-0" />
+                <span className="whitespace-nowrap font-extrabold tracking-tight text-[#2A292D] text-2xl sm:text-4xl md:text-[42px] leading-none">
+                  {item.text}
+                </span>
+              </div>
+            ))}
           </div>
+        </Marquee>
 
-          <div className="max-w-3xl mx-auto space-y-4 text-base sm:text-lg text-gray-600 leading-relaxed">
-            <p>
-              African businesses don't operate in a single payment world. Customers pay through M-Pesa in Nairobi, Orange Money in Kinshasa, Tigo Pesa in Dar es Salaam, and cards almost everywhere. AvadaPay connects you to all of it through one integration.
-            </p>
-            <p>
-              Collect payments, send payouts to agents and customers, accept in-person payments through POS, and communicate every transaction through SMS, without stitching together five different providers per country.
-            </p>
+        <div className="max-w-3xl mx-auto px-6 mt-10 sm:mt-14 text-center text-sm sm:text-base md:text-[17px] leading-relaxed text-gray-600 space-y-5">
+          <p>
+            African businesses don’t operate in a single payment world. Customers pay through
+            M-Pesa in Nairobi, Orange Money in Kinshasa, Tigo Pesa in Dar es Salaam, and cards
+            almost everywhere. AvadaPay connects you to all of it through one integration.
+          </p>
+          <p>
+            Collect payments, send payouts to agents and customers, accept in-person payments
+            through POS, and communicate every transaction through SMS, without stitching
+            together five different providers per country.
+          </p>
+        </div>
+      </section>
+
+      {/* 3 — FOUR WAYS SECTION */}
+      <section className="bg-[#3BBA93] py-16 sm:py-20 px-4 text-white">
+        <div className="max-w-5xl mx-auto">
+          <h2 className="text-center font-extrabold tracking-tight leading-[1.18] text-2xl sm:text-3xl md:text-4xl text-white max-w-2xl mx-auto">
+            Four ways AvadaPay powers your business
+          </h2>
+          <p className="text-white/85 text-center mt-3 text-sm sm:text-base font-normal">
+            Everything required to orchestrate money and communication across Africa.
+          </p>
+
+          <div className="mt-10 sm:mt-12 grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
+            {WAYS.map((w) => (
+              <article
+                key={w.n}
+                className="bg-white rounded-2xl p-6 sm:p-7 shadow-md flex flex-col justify-between text-[#2A292D]"
+              >
+                <div>
+                  <span className="inline-flex items-center justify-center w-10 h-10 rounded-xl bg-[#3BBA93]/15 text-[#3BBA93] text-base font-bold">
+                    {w.n}
+                  </span>
+                  <h3 className="mt-4 text-lg sm:text-xl font-extrabold text-gray-900">{w.title}</h3>
+                  <p className="mt-2 text-xs sm:text-sm leading-relaxed text-gray-600 font-normal">
+                    {w.body}
+                  </p>
+                </div>
+                <Link to={w.link} className="mt-5 inline-flex items-center text-xs font-bold text-[#3BBA93] hover:underline">
+                  <span>Learn more</span>
+                  <ArrowRight className="w-3.5 h-3.5 ml-1" />
+                </Link>
+              </article>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* Green Section: "Four ways AvadaPay powers your business" */}
-      <section className="py-20 bg-[#3BBA93] text-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center max-w-3xl mx-auto mb-16">
-            <h2 className="text-3xl sm:text-4xl font-black tracking-tight">
-              Four ways AvadaPay powers your business
-            </h2>
-            <p className="text-white/80 mt-3 text-base font-medium">
-              Everything required to orchestrate money and communication across Africa.
-            </p>
-          </div>
+      {/* 4 — WHY TEAMS BUILD */}
+      <section className="bg-white pt-16 sm:pt-20 px-4">
+        <div className="max-w-5xl mx-auto">
+          <TwoToneHeading green="Why teams build" dark="on AvadaPay" />
+          <p className="mt-4 mx-auto max-w-2xl text-center text-sm sm:text-base text-gray-600 leading-relaxed font-normal">
+            Go live across Africa in days, not months, with one API, mobile money plus card rails,
+            next-day local-currency payouts, and SMS tied to every transaction.
+          </p>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {/* 1. Online & Mobile Money */}
-            <div className="bg-white rounded-2xl p-6 text-gray-900 shadow-xl flex flex-col justify-between">
-              <div>
-                <div className="w-12 h-12 rounded-xl bg-[#3BBA93]/10 text-[#3BBA93] flex items-center justify-center mb-4">
-                  <Smartphone className="w-6 h-6" />
+          <div className="mt-10 grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
+            {WHY.map((w, i) => (
+              <Link
+                key={i}
+                to={w.to}
+                className="group flex flex-col justify-between rounded-2xl border border-[#3BBA93]/30 bg-white p-6 sm:p-7 shadow-xs hover:border-[#3BBA93] hover:shadow-md transition-all duration-200"
+              >
+                <h3 className="text-xl sm:text-2xl font-extrabold leading-snug text-gray-900">
+                  {w.title.map((line, li) => (
+                    <React.Fragment key={li}>
+                      {li > 0 && <br />}
+                      {line}
+                    </React.Fragment>
+                  ))}
+                </h3>
+                <div className="mt-6 flex items-center justify-between">
+                  <span className="text-xs font-bold text-[#3BBA93] group-hover:underline">Explore solution</span>
+                  <span className="w-10 h-10 rounded-full bg-[#3BBA93] text-white flex items-center justify-center transition-transform duration-200 group-hover:translate-x-1 shadow-sm">
+                    <ArrowRight className="w-5 h-5" strokeWidth={2.5} />
+                  </span>
                 </div>
-                <h3 className="text-lg font-bold">Accept Online Payments</h3>
-                <p className="text-xs text-gray-600 mt-2 leading-relaxed">
-                  Single checkout for M-Pesa, MTN MoMo, Airtel Money, and cards with instant webhook confirmations.
-                </p>
-              </div>
-              <Link to="/payment-processing" className="mt-6">
-                <span className="text-xs font-bold text-[#3BBA93] flex items-center hover:underline">
-                  Payment Processing <ArrowRight className="w-3.5 h-3.5 ml-1" />
-                </span>
-              </Link>
-            </div>
-
-            {/* 2. Smart POS */}
-            <div className="bg-white rounded-2xl p-6 text-gray-900 shadow-xl flex flex-col justify-between">
-              <div>
-                <div className="w-12 h-12 rounded-xl bg-blue-500/10 text-blue-600 flex items-center justify-center mb-4">
-                  <Store className="w-6 h-6" />
-                </div>
-                <h3 className="text-lg font-bold">Smart POS Terminals</h3>
-                <p className="text-xs text-gray-600 mt-2 leading-relaxed">
-                  Android POS hardware for in-store retail, supermarket checkouts, and agency banking cash collections.
-                </p>
-              </div>
-              <Link to="/pos" className="mt-6">
-                <span className="text-xs font-bold text-[#3BBA93] flex items-center hover:underline">
-                  Explore POS Hardware <ArrowRight className="w-3.5 h-3.5 ml-1" />
-                </span>
-              </Link>
-            </div>
-
-            {/* 3. Bulk Payouts */}
-            <div className="bg-white rounded-2xl p-6 text-gray-900 shadow-xl flex flex-col justify-between">
-              <div>
-                <div className="w-12 h-12 rounded-xl bg-indigo-500/10 text-indigo-600 flex items-center justify-center mb-4">
-                  <CreditCard className="w-6 h-6" />
-                </div>
-                <h3 className="text-lg font-bold">Bulk Wallet Payouts</h3>
-                <p className="text-xs text-gray-600 mt-2 leading-relaxed">
-                  Disburse supplier payments, commissions, and payroll directly into mobile wallets in seconds.
-                </p>
-              </div>
-              <Link to="/payment-processing" className="mt-6">
-                <span className="text-xs font-bold text-[#3BBA93] flex items-center hover:underline">
-                  Disbursement API <ArrowRight className="w-3.5 h-3.5 ml-1" />
-                </span>
-              </Link>
-            </div>
-
-            {/* 4. Bulk SMS */}
-            <div className="bg-white rounded-2xl p-6 text-gray-900 shadow-xl flex flex-col justify-between">
-              <div>
-                <div className="w-12 h-12 rounded-xl bg-emerald-500/10 text-emerald-600 flex items-center justify-center mb-4">
-                  <MessageSquare className="w-6 h-6" />
-                </div>
-                <h3 className="text-lg font-bold">Bulk SMS & OTPs</h3>
-                <p className="text-xs text-gray-600 mt-2 leading-relaxed">
-                  Sub-3-second OTP verification and marketing SMS broadcasts across all regional mobile telcos.
-                </p>
-              </div>
-              <Link to="/bulk-sms" className="mt-6">
-                <span className="text-xs font-bold text-[#3BBA93] flex items-center hover:underline">
-                  SMS Gateway <ArrowRight className="w-3.5 h-3.5 ml-1" />
-                </span>
-              </Link>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Country Presence Section */}
-      <section className="py-20 bg-gray-50 border-y border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col md:flex-row md:items-end justify-between mb-12">
-            <div>
-              <Badge className="bg-[#3BBA93]/10 text-[#3BBA93] border-[#3BBA93]/30 mb-2 font-medium">
-                Live Regional Operations
-              </Badge>
-              <h2 className="text-3xl font-bold tracking-tight text-gray-900">
-                Explore Dedicated Country Hubs
-              </h2>
-              <p className="text-gray-500 mt-2 text-sm">
-                Each country represents localized currency settlement, telco contracts, and central bank compliance.
-              </p>
-            </div>
-            <div className="mt-4 md:mt-0 flex items-center space-x-2 text-xs font-semibold text-gray-500">
-              <Globe2 className="w-4 h-4 text-[#3BBA93]" />
-              <span>Full East & Central African Infrastructure</span>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {COUNTRIES.map((c) => (
-              <Link key={c.code} to={c.path}>
-                <Card className="hover:border-[#3BBA93] hover:shadow-lg transition-all h-full p-6 flex flex-col justify-between bg-white border-gray-200">
-                  <div>
-                    <div className="flex items-center justify-between mb-4">
-                      <CountryFlag country={c.code} className="w-11 h-7.5 rounded-sm shadow-sm" />
-                      <Badge variant="outline" className="text-[11px] font-medium text-[#3BBA93] border-[#3BBA93]/30">
-                        Direct Telco Rails
-                      </Badge>
-                    </div>
-                    <h3 className="text-xl font-bold text-gray-900">AvadaPay {c.name}</h3>
-                    <p className="text-xs text-gray-500 mt-2 leading-relaxed">
-                      Tap to view {c.name} mobile money integrations, local bank clearing, and in-country support office.
-                    </p>
-                  </div>
-                  <div className="pt-6 flex items-center text-xs font-bold text-[#3BBA93]">
-                    <span>View {c.name} Hub</span>
-                    <ChevronRight className="w-4 h-4 ml-1" />
-                  </div>
-                </Card>
               </Link>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Live CMS Articles Feed */}
-      <section className="py-20 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-12">
-            <div>
-              <Badge variant="outline" className="mb-2 border-[#3BBA93]/30 text-[#3BBA93]">
-                AvadaPay Insights
-              </Badge>
-              <h2 className="text-3xl font-bold tracking-tight text-gray-900">
-                Latest Announcements & Features
-              </h2>
-              <p className="text-gray-500 mt-2 text-sm">
-                Real-time articles published through the AvadaPay PostgreSQL CMS backend.
-              </p>
-            </div>
-            <Link to="/contact" className="mt-4 sm:mt-0">
-              <Button variant="ghost" size="sm" className="space-x-1 text-[#3BBA93]">
-                <span>Contact Integration Team</span>
-                <ChevronRight className="w-4 h-4" />
-              </Button>
-            </Link>
-          </div>
+      {/* 5 — INDUSTRIES ACCORDION */}
+      <section className="bg-white pt-16 sm:pt-20 px-4">
+        <div className="max-w-3xl mx-auto">
+          <TwoToneHeading green="Built for the businesses that" dark="move African economies" />
 
-          {loadingNews ? (
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {[1, 2, 3].map((i) => (
-                <div key={i} className="h-44 rounded-xl bg-gray-100 animate-pulse" />
-              ))}
-            </div>
-          ) : newsItems.length === 0 ? (
-            <div className="text-center py-12 border border-dashed rounded-xl bg-gray-50">
-              <p className="text-sm text-gray-500">No published articles yet.</p>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {newsItems.map((item) => (
-                <Card key={item.id} className="flex flex-col justify-between hover:shadow-md transition-shadow border-gray-200">
-                  <CardHeader>
-                    <div className="flex items-center justify-between mb-2">
-                      <Badge variant="secondary" className="capitalize text-[11px] text-[#3BBA93] bg-[#3BBA93]/10">
-                        {item.category}
-                      </Badge>
-                      <span className="text-[11px] text-gray-400">
-                        {new Date(item.createdAt).toLocaleDateString()}
-                      </span>
+          <div className="mt-8 space-y-3.5">
+            {INDUSTRIES.map((item, i) => {
+              const open = openIndex === i;
+              return (
+                <div
+                  key={item.title}
+                  className="rounded-xl border border-[#3BBA93]/35 bg-white transition-colors hover:border-[#3BBA93] overflow-hidden"
+                >
+                  <button
+                    type="button"
+                    aria-expanded={open}
+                    onClick={() => setOpenIndex(open ? null : i)}
+                    className="w-full h-14 sm:h-16 px-6 flex items-center justify-between text-left text-sm sm:text-base font-bold text-gray-900 rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3BBA93]"
+                  >
+                    <span>{item.title}</span>
+                    <ChevronUp
+                      className={`w-4 h-4 text-gray-400 transition-transform duration-200 ${open ? 'rotate-180 text-[#3BBA93]' : ''}`}
+                    />
+                  </button>
+                  <div
+                    className={`grid transition-all duration-200 ease-in-out ${
+                      open ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'
+                    }`}
+                  >
+                    <div className="overflow-hidden">
+                      <p className="px-6 pb-5 text-xs sm:text-sm leading-relaxed text-gray-600 font-normal">
+                        {item.body}
+                      </p>
                     </div>
-                    <CardTitle className="text-base font-bold text-gray-900 leading-snug">{item.title}</CardTitle>
-                    <CardDescription className="line-clamp-2 mt-2 text-xs text-gray-600">
-                      {item.excerpt || item.body}
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent className="pt-0">
-                    <p className="text-[11px] text-gray-400">
-                      Author: {item.author?.name || 'AvadaPay Editorial'}
-                    </p>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
         </div>
       </section>
 
-      {/* CTA Footer Section */}
-      <section className="py-20 bg-[#2A292D] text-white relative overflow-hidden">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
-          <h2 className="text-3xl sm:text-5xl font-extrabold tracking-tight">
-            Scale Your Pan-African Payments Today
-          </h2>
-          <p className="mt-4 text-gray-300 max-w-xl mx-auto text-base">
-            Integrate in minutes, accept multi-carrier mobile money, deploy POS terminals, and reach customers seamlessly.
-          </p>
-          <div className="mt-8 flex justify-center space-x-4">
-            <Link to="/contact">
-              <Button size="lg" className="bg-[#3BBA93] hover:bg-[#32a481] text-white font-semibold shadow-xl shadow-[#3BBA93]/20">
-                Contact Our Payments Team
-              </Button>
-            </Link>
+      {/* 6 — FLAGS + OFFICES */}
+      <section className="bg-white pt-14 sm:pt-16 pb-16 sm:pb-20">
+        <div className="relative">
+          {/* Subtle Carousel Tab Lead */}
+          <div className="absolute left-0 top-1/2 -translate-y-1/2 z-10 h-16 w-16 sm:w-20 rounded-r-2xl bg-[#E3F5EE] flex items-center justify-center pl-1 sm:pl-2 shadow-xs">
+            <span className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-[#3BBA93] text-white shadow-xs">
+              <ArrowRight className="w-5 h-5" strokeWidth={2.5} />
+            </span>
           </div>
+          <Marquee animation="animate-marquee">
+            <div className="flex items-center gap-6 sm:gap-10 pl-24 pr-8 py-3">
+              {[...CIRCLE_FLAGS, ...CIRCLE_FLAGS].map((Flag, i) => (
+                <Flag key={i} />
+              ))}
+            </div>
+          </Marquee>
+        </div>
+
+        {/* Dubai Map */}
+        <div className="mt-12 max-w-4xl mx-auto px-4">
+          <div className="overflow-hidden rounded-2xl bg-gray-100 h-60 sm:h-72 border border-gray-200 shadow-xs">
+            <iframe
+              title="AvadaPay headquarters — SORP Business Centre, Dubai"
+              src="https://www.google.com/maps?q=SORP+Business+Centre+Tameem+House+Barsha+Heights+Dubai&output=embed"
+              className="w-full h-full border-0"
+              loading="lazy"
+              referrerPolicy="no-referrer-when-downgrade"
+              allowFullScreen
+            />
+          </div>
+          <div className="mt-4 px-2">
+            <p className="font-extrabold text-base sm:text-lg text-gray-900">Dubai, UAE (Headquarters)</p>
+            <p className="mt-1 text-xs sm:text-sm text-gray-600 leading-relaxed max-w-lg">
+              25th floor, SORP Business Centre Tameem House, Barsha Heights, Dubai, United Arab
+              Emirates (UAE)
+            </p>
+          </div>
+        </div>
+
+        {/* Country Offices */}
+        <div className="mt-8 max-w-4xl mx-auto px-4 space-y-3">
+          {OFFICES.map((o) => (
+            <div
+              key={o.country}
+              className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 rounded-xl border border-[#3BBA93]/30 bg-white px-6 py-4 shadow-xs hover:border-[#3BBA93] transition-colors"
+            >
+              <p className="text-xs sm:text-sm text-gray-800 leading-snug">
+                <span className="font-bold text-gray-900 mr-3">{o.country}</span>
+                <span className="text-gray-600">{o.address}</span>
+              </p>
+              <Link
+                to={o.to}
+                className="inline-flex shrink-0 items-center justify-center gap-1.5 h-9 px-4 rounded-md bg-[#3BBA93] text-white font-semibold text-xs transition-colors hover:bg-[#32a481] active:scale-[0.98] shadow-xs"
+              >
+                <span>{o.country} services</span>
+                <ArrowRight className="w-3.5 h-3.5" strokeWidth={2.5} />
+              </Link>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* 7 — NETWORKS & PARTNERS */}
+      <section className="bg-white pb-16 sm:pb-20 px-0">
+        <TwoToneHeading
+          green="The networks and"
+          dark="partners we plug into"
+        />
+        <div className="mt-8 space-y-4">
+          <Marquee animation="animate-marquee-slow">
+            {[...ROW_ONE, ...ROW_ONE].map((logo, i) => (
+              <div key={i} className="px-8 sm:px-12 h-12 flex items-center">
+                {logo}
+              </div>
+            ))}
+          </Marquee>
+          <Marquee animation="animate-marquee-reverse">
+            {[...ROW_TWO, ...ROW_TWO].map((logo, i) => (
+              <div key={i} className="px-8 sm:px-12 h-12 flex items-center">
+                {logo}
+              </div>
+            ))}
+          </Marquee>
         </div>
       </section>
     </div>
   );
 };
+
+export default HomePage;

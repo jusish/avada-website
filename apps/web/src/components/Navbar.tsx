@@ -23,6 +23,9 @@ export const Navbar: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
 
+  const variant: 'overlay' | 'light' | 'dark' =
+    location.pathname === '/' ? 'overlay' : location.pathname === '/contact' ? 'light' : 'dark';
+  const onLight = variant === 'light';
   const currentCountry = COUNTRIES.find((c) => location.pathname === c.path);
 
   const mainLinks = [
@@ -37,8 +40,16 @@ export const Navbar: React.FC = () => {
   };
 
   return (
-    <header className="sticky top-0 z-50 w-full bg-[#2A292D] border-b border-white/5 transition-colors">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+    <header
+      className={`top-0 z-50 w-full transition-colors ${
+        variant === 'overlay'
+          ? 'absolute left-0 right-0 bg-transparent'
+          : variant === 'light'
+            ? 'sticky bg-white'
+            : 'sticky bg-[#2A292D]'
+      }`}
+    >
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
         {/* Left: Official AvadaPay Logo */}
         <Link to="/" className="flex items-center space-x-2 flex-shrink-0">
           <img
@@ -51,17 +62,17 @@ export const Navbar: React.FC = () => {
         {/* Center: Pill Navigation Capsule + Countries Selector */}
         <div className="hidden lg:flex items-center space-x-5">
           {/* Main Services Pill Capsule */}
-          <nav className="flex items-center bg-[#3BBA93] rounded-full px-3.5 py-1.5 shadow-md space-x-1">
+          <nav className="flex items-center bg-[#3BBA93] rounded-full px-5 py-2.5 space-x-2">
             {mainLinks.map((link) => {
               const isActive = location.pathname === link.path;
               return (
                 <Link
                   key={link.path}
                   to={link.path}
-                  className={`px-3.5 py-1 rounded-full text-[13px] font-medium transition-colors ${
+                  className={`px-3.5 py-1 rounded-full text-[13px] font-bold transition-colors ${
                     isActive
-                      ? 'text-[#3BBA93] bg-white font-semibold shadow-xs'
-                      : 'text-white hover:text-white/90 hover:bg-black/10'
+                      ? 'text-white bg-black/10'
+                      : 'text-white hover:bg-black/10'
                   }`}
                 >
                   {link.name}
@@ -75,11 +86,23 @@ export const Navbar: React.FC = () => {
             <button
               onClick={() => setCountryDropdownOpen(!countryDropdownOpen)}
               onBlur={() => setTimeout(() => setCountryDropdownOpen(false), 200)}
-              className="flex items-center space-x-2 text-[13px] font-medium text-white/90 hover:text-white transition-colors px-2.5 py-1.5 rounded-lg hover:bg-white/10"
+              className={`flex items-center space-x-2 text-[13px] font-bold transition-colors px-2.5 py-1.5 rounded-lg ${
+                onLight
+                  ? 'text-[#2A292D] hover:bg-black/5'
+                  : 'text-white/90 hover:text-white hover:bg-white/10'
+              }`}
             >
-              {currentCountry && <CountryFlag country={currentCountry.code} className="w-4 h-2.5" />}
-              <span>{currentCountry ? currentCountry.name : 'Countries'}</span>
-              <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-200 ${countryDropdownOpen ? 'rotate-180' : ''}`} />
+              {currentCountry ? (
+                <span className="flex items-center space-x-2">
+                  <span>{currentCountry.name}</span>
+                  <CountryFlag country={currentCountry.code} className="w-5 h-3.5" />
+                </span>
+              ) : (
+                <span className="flex items-center space-x-1.5">
+                  <span>Countries</span>
+                  <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-200 ${countryDropdownOpen ? 'rotate-180' : ''}`} />
+                </span>
+              )}
             </button>
 
             {countryDropdownOpen && (
@@ -109,7 +132,7 @@ export const Navbar: React.FC = () => {
           <Link to="/contact">
             <Button
               size="sm"
-              className="bg-[#3BBA93] hover:bg-[#32a481] text-white font-semibold rounded-lg px-5 h-9 text-xs shadow-md shadow-[#3BBA93]/20 transition-transform active:scale-95"
+              className="bg-[#3BBA93] hover:bg-[#32a481] text-white font-bold rounded-md px-7 h-11 text-base transition-transform active:scale-95"
             >
               Contact Us
             </Button>
@@ -122,7 +145,7 @@ export const Navbar: React.FC = () => {
             variant="ghost"
             size="icon"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="text-white hover:bg-white/10"
+            className={onLight ? 'text-[#2A292D] hover:bg-black/5' : 'text-white hover:bg-white/10'}
             aria-label="Toggle Menu"
           >
             {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
