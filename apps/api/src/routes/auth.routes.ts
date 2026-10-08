@@ -5,6 +5,7 @@ import { z } from 'zod';
 import { prisma } from '../prisma';
 import { requireAuth, AuthenticatedRequest } from '../middleware/auth';
 import { logAudit } from '../lib/audit';
+import { PermissionMatrix } from '@avada/shared';
 
 const router = Router();
 const JWT_SECRET = process.env.JWT_SECRET || 'avada_fallback_secret_key';
@@ -74,7 +75,7 @@ router.post('/login', async (req: Request, res: Response): Promise<void> => {
           name: user.name,
           roleId: user.roleId || undefined,
           roleName: user.role?.name || 'Administrator',
-          permissions: (user.role?.permissions as any) || {},
+          permissions: (user.role?.permissions as unknown as PermissionMatrix) || ({} as PermissionMatrix),
         },
       } as AuthenticatedRequest,
       action: 'USER_LOGIN',

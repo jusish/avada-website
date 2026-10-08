@@ -90,7 +90,7 @@ export const AdminUsersPage: React.FC = () => {
     setEmail(u.email);
     setPassword(''); // leave blank if not changing
     setRoleId(u.roleId);
-    setStatus(u.status as any || 'ACTIVE');
+    setStatus(u.status || 'ACTIVE');
     setIsModalOpen(true);
   };
 
@@ -103,7 +103,7 @@ export const AdminUsersPage: React.FC = () => {
       const url = editingUser ? `/api/admin/users/${editingUser.id}` : '/api/admin/users';
       const method = editingUser ? 'PUT' : 'POST';
 
-      const body: any = {
+      const body: Record<string, unknown> = {
         name,
         email,
         roleId,

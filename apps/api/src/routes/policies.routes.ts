@@ -1,4 +1,5 @@
 import { Router, Response } from 'express';
+import { Prisma } from '@prisma/client';
 import { z } from 'zod';
 import { prisma } from '../prisma';
 import { requireAuth, AuthenticatedRequest } from '../middleware/auth';
@@ -104,7 +105,7 @@ router.put('/:id', requirePermission('policies', 'edit'), async (req: Authentica
       return;
     }
 
-    const updateData: any = { ...parse.data };
+    const updateData: Prisma.LegalPolicyUpdateInput = { ...parse.data };
     if (parse.data.effectiveDate) {
       updateData.effectiveDate = new Date(parse.data.effectiveDate);
     }

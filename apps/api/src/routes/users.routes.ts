@@ -1,4 +1,5 @@
 import { Router, Response } from 'express';
+import { Prisma } from '@prisma/client';
 import bcrypt from 'bcryptjs';
 import { z } from 'zod';
 import { prisma } from '../prisma';
@@ -132,10 +133,10 @@ router.put('/:id', requirePermission('users', 'edit'), async (req: Authenticated
       return;
     }
 
-    const updateData: any = { ...parse.data };
-    if (parse.data.password) {
-      updateData.passwordHash = await bcrypt.hash(parse.data.password, 10);
-      delete updateData.password;
+    const { password, ...fields } = parse.data;
+    const updateData: Prisma.UserUpdateInput = { ...fields };
+    if (password) {
+      updateData.passwordHash = await bcrypt.hash(password, 10);
     }
 
     const updated = await prisma.user.update({

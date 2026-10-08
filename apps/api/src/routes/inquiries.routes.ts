@@ -1,4 +1,5 @@
 import { Router, Response } from 'express';
+import { Prisma, InquiryStatus } from '@prisma/client';
 import { prisma } from '../prisma';
 import { requireAuth, AuthenticatedRequest } from '../middleware/auth';
 import { requirePermission } from '../middleware/permission';
@@ -12,7 +13,7 @@ router.get('/', requirePermission('inquiries', 'view'), async (req: Authenticate
   try {
     const { country, inquiryType, status, search } = req.query;
 
-    const where: any = {};
+    const where: Prisma.ContactInquiryWhereInput = {};
 
     if (country && typeof country === 'string' && country !== 'all') {
       where.country = { contains: country, mode: 'insensitive' };
@@ -21,7 +22,7 @@ router.get('/', requirePermission('inquiries', 'view'), async (req: Authenticate
       where.inquiryType = inquiryType;
     }
     if (status && typeof status === 'string' && status !== 'all') {
-      where.status = status;
+      where.status = status as InquiryStatus;
     }
     if (search && typeof search === 'string') {
       where.OR = [
@@ -136,9 +137,9 @@ router.patch('/:id/status', requirePermission('inquiries', 'edit'), async (req: 
       return;
     }
 
-    const updateData: any = { status };
+    const updateData: Prisma.ContactInquiryUpdateInput = { status: status as InquiryStatus };
     if (status === 'CONTACTED' || status === 'RESOLVED') {
-      updateData.handledById = req.user!.id;
+      updateData.handledBy = { connect: { id: req.user!.id } };
       updateData.handledAt = new Date();
     }
 

@@ -257,11 +257,12 @@ export const AdminRolesPage: React.FC = () => {
           </div>
         ) : (
           roles.map((role) => {
-            const userCount = (role as any)._count?.users ?? 0;
-            const isSystem = (role as any).isSystem;
+            const roleWithCount = role as Role & { _count?: { users: number } };
+            const userCount = roleWithCount._count?.users ?? 0;
+            const isSystem = role.isSystem;
             const perms = role.permissions || {};
-            const viewCount = Object.values(perms).filter((p: any) => p && (p.view || p.edit)).length;
-            const editCount = Object.values(perms).filter((p: any) => p && p.edit).length;
+            const viewCount = Object.values(perms).filter((p): p is ModulePermission => Boolean(p && (p.view || p.edit))).length;
+            const editCount = Object.values(perms).filter((p): p is ModulePermission => Boolean(p && p.edit)).length;
 
             return (
               <Card

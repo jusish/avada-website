@@ -1,4 +1,5 @@
 import { Router, Response } from 'express';
+import { Prisma } from '@prisma/client';
 import { prisma } from '../prisma';
 import { requireAuth, AuthenticatedRequest } from '../middleware/auth';
 import { requirePermission } from '../middleware/permission';
@@ -11,7 +12,7 @@ router.get('/', requirePermission('audit_logs', 'view'), async (req: Authenticat
   try {
     const { action, entityType, search, limit = '100' } = req.query;
 
-    const where: any = {};
+    const where: Prisma.AuditLogWhereInput = {};
 
     if (action && typeof action === 'string' && action !== 'all') {
       where.action = action;
