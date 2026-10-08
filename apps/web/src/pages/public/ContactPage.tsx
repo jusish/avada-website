@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { Headphones, CheckCircle2 } from 'lucide-react';
+import { Headphones, CheckCircle2, Loader2, AlertCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -11,9 +11,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { useSiteConfig } from '@/context/SiteConfigContext';
 
-const INQUIRY_TYPES = [
-  { value: 'sms', label: 'SMS Pricing' },
+const FALLBACK_INQUIRY_TYPES = [
+  { value: 'sms', label: 'SMS Pricing & Routing' },
   { value: 'payments', label: 'Payment Processing (Collections & Payouts)' },
   { value: 'pos', label: 'POS Terminal Solutions' },
   { value: 'pos_demo', label: 'POS System Demo' },
@@ -22,28 +23,45 @@ const INQUIRY_TYPES = [
   { value: 'general', label: 'General Inquiry' },
 ];
 
-const COUNTRIES = [
-  { value: 'DRC', label: 'Democratic Republic of Congo (DRC)' },
+const FALLBACK_COUNTRIES = [
+  { value: 'Rwanda', label: 'Rwanda' },
   { value: 'Kenya', label: 'Kenya' },
   { value: 'Tanzania', label: 'Tanzania' },
-  { value: 'Rwanda', label: 'Rwanda' },
+  { value: 'DRC', label: 'Democratic Republic of Congo (DRC)' },
   { value: 'Uganda', label: 'Uganda' },
   { value: 'Nigeria', label: 'Nigeria' },
-  { value: 'Ghana', label: 'Ghana' },
   { value: 'South Africa', label: 'South Africa' },
-  { value: 'Zambia', label: 'Zambia' },
   { value: 'Other', label: 'Other' },
 ];
 
 export const ContactPage: React.FC = () => {
   const [searchParams] = useSearchParams();
+  const { countries: dynamicCountries, inquiryTypes: dynamicInquiryTypes } = useSiteConfig();
+
   const [submitted, setSubmitted] = useState<boolean>(false);
-  const [inquiryType, setInquiryType] = useState<string>('sms');
-  const [country, setCountry] = useState<string>('DRC');
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const [inquiryType, setInquiryType] = useState<string>('payments');
+  const [country, setCountry] = useState<string>('Rwanda');
   const [fullName, setFullName] = useState<string>('');
+  const [email, setEmail] = useState<string>('');
+  const [phone, setPhone] = useState<string>('');
   const [orgName, setOrgName] = useState<string>('');
   const [roleTitle, setRoleTitle] = useState<string>('');
   const [message, setMessage] = useState<string>('');
+
+  // Active countries from CMS or fallback
+  const availableCountries =
+    dynamicCountries && dynamicCountries.length > 0
+      ? dynamicCountries.map((c) => ({ value: c.name, label: c.name }))
+      : FALLBACK_COUNTRIES;
+
+  // Active inquiry types from CMS or fallback
+  const availableInquiryTypes =
+    dynamicInquiryTypes && dynamicInquiryTypes.length > 0
+      ? dynamicInquiryTypes.map((t) => ({ value: t.key, label: t.label }))
+      : FALLBACK_INQUIRY_TYPES;
 
   useEffect(() => {
     const inquiryParam = searchParams.get('inquiry');
@@ -55,17 +73,46 @@ export const ContactPage: React.FC = () => {
     }
     const countryParam = searchParams.get('country');
     if (countryParam) {
-      const match = COUNTRIES.find((c) =>
+      const match = availableCountries.find((c) =>
         c.label.toLowerCase().includes(countryParam.toLowerCase()) ||
         c.value.toLowerCase().includes(countryParam.toLowerCase())
       );
       if (match) setCountry(match.value);
     }
-  }, [searchParams]);
+  }, [searchParams, availableCountries]);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setSubmitted(true);
+    setError(null);
+    setIsSubmitting(true);
+
+    try {
+      const res = await fetch('/api/public/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          fullName,
+          email,
+          phone,
+          orgName,
+          roleTitle,
+          country,
+          inquiryType,
+          message,
+        }),
+      });
+
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        throw new Error(data.error || 'Failed to submit inquiry. Please check your entries.');
+      }
+
+      setSubmitted(true);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'An error occurred. Please try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleTechInquiryClick = () => {
@@ -103,12 +150,20 @@ export const ContactPage: React.FC = () => {
               <CheckCircle2 className="w-14 h-14 text-[#3BBA93] mx-auto animate-bounce" />
               <h3 className="text-2xl font-extrabold text-[#2A292D]">Thank you!</h3>
               <p className="text-base font-semibold text-[#2A292D]/85 max-w-md mx-auto">
-                Your message has been sent to the AvadaPay team. A product specialist will follow
-                up within 24 business hours.
+                Your message has been sent directly to the AvadaPay team. An enterprise specialist
+                will review your request and follow up within one business day.
               </p>
               <div className="pt-4">
                 <Button
-                  onClick={() => setSubmitted(false)}
+                  onClick={() => {
+                    setSubmitted(false);
+                    setFullName('');
+                    setEmail('');
+                    setPhone('');
+                    setOrgName('');
+                    setRoleTitle('');
+                    setMessage('');
+                  }}
                   variant="outline"
                   className="border-[#3BBA93] text-[#3BBA93] hover:bg-[#3BBA93] hover:text-white font-bold rounded-xl"
                 >
@@ -118,10 +173,17 @@ export const ContactPage: React.FC = () => {
             </div>
           ) : (
             <form onSubmit={handleSubmit} className="space-y-6">
+              {error && (
+                <div className="p-4 rounded-xl bg-red-50 border border-red-200 text-red-600 text-sm flex items-center space-x-2">
+                  <AlertCircle className="w-5 h-5 flex-shrink-0" />
+                  <span>{error}</span>
+                </div>
+              )}
+
               {/* Full Name */}
               <div className="space-y-2">
                 <Label htmlFor="fullName" className="text-sm font-bold text-[#2A292D]">
-                  Full Name
+                  Full Name *
                 </Label>
                 <Input
                   id="fullName"
@@ -134,42 +196,73 @@ export const ContactPage: React.FC = () => {
                 />
               </div>
 
-              {/* Organization name */}
-              <div className="space-y-2">
-                <Label htmlFor="orgName" className="text-sm font-bold text-[#2A292D]">
-                  Organization name
-                </Label>
-                <Input
-                  id="orgName"
-                  type="text"
-                  required
-                  value={orgName}
-                  onChange={(e) => setOrgName(e.target.value)}
-                  placeholder="Your company"
-                  className="h-12 rounded-xl border-2 border-[#3BBA93] bg-white text-base px-4 focus-visible:ring-1 focus-visible:ring-[#3BBA93] focus-visible:border-[#3BBA93]"
-                />
+              {/* Work Email & Phone Row */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="email" className="text-sm font-bold text-[#2A292D]">
+                    Business Email *
+                  </Label>
+                  <Input
+                    id="email"
+                    type="email"
+                    required
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="name@company.com"
+                    className="h-12 rounded-xl border-2 border-[#3BBA93] bg-white text-base px-4 focus-visible:ring-1 focus-visible:ring-[#3BBA93] focus-visible:border-[#3BBA93]"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="phone" className="text-sm font-bold text-[#2A292D]">
+                    Phone / WhatsApp
+                  </Label>
+                  <Input
+                    id="phone"
+                    type="tel"
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
+                    placeholder="+250 788 000 000"
+                    className="h-12 rounded-xl border-2 border-[#3BBA93] bg-white text-base px-4 focus-visible:ring-1 focus-visible:ring-[#3BBA93] focus-visible:border-[#3BBA93]"
+                  />
+                </div>
               </div>
 
-              {/* Role/Title */}
-              <div className="space-y-2">
-                <Label htmlFor="roleTitle" className="text-sm font-bold text-[#2A292D]">
-                  Role/Title
-                </Label>
-                <Input
-                  id="roleTitle"
-                  type="text"
-                  required
-                  value={roleTitle}
-                  onChange={(e) => setRoleTitle(e.target.value)}
-                  placeholder="Enter your role or job title"
-                  className="h-12 rounded-xl border-2 border-[#3BBA93] bg-white text-base px-4 focus-visible:ring-1 focus-visible:ring-[#3BBA93] focus-visible:border-[#3BBA93]"
-                />
+              {/* Organization name & Role */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="orgName" className="text-sm font-bold text-[#2A292D]">
+                    Organization Name
+                  </Label>
+                  <Input
+                    id="orgName"
+                    type="text"
+                    value={orgName}
+                    onChange={(e) => setOrgName(e.target.value)}
+                    placeholder="Your company"
+                    className="h-12 rounded-xl border-2 border-[#3BBA93] bg-white text-base px-4 focus-visible:ring-1 focus-visible:ring-[#3BBA93] focus-visible:border-[#3BBA93]"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="roleTitle" className="text-sm font-bold text-[#2A292D]">
+                    Role / Job Title
+                  </Label>
+                  <Input
+                    id="roleTitle"
+                    type="text"
+                    value={roleTitle}
+                    onChange={(e) => setRoleTitle(e.target.value)}
+                    placeholder="e.g. Finance Director / CTO"
+                    className="h-12 rounded-xl border-2 border-[#3BBA93] bg-white text-base px-4 focus-visible:ring-1 focus-visible:ring-[#3BBA93] focus-visible:border-[#3BBA93]"
+                  />
+                </div>
               </div>
 
               {/* Country */}
               <div className="space-y-2">
                 <Label htmlFor="country" className="text-sm font-bold text-[#2A292D]">
-                  Country
+                  Operational Country *
                 </Label>
                 <Select value={country} onValueChange={setCountry}>
                   <SelectTrigger
@@ -178,8 +271,8 @@ export const ContactPage: React.FC = () => {
                   >
                     <SelectValue placeholder="Select Country" />
                   </SelectTrigger>
-                  <SelectContent className="bg-white rounded-xl shadow-xl border border-gray-100">
-                    {COUNTRIES.map((c) => (
+                  <SelectContent className="bg-white rounded-xl shadow-xl border border-gray-100 max-h-60 overflow-y-auto">
+                    {availableCountries.map((c) => (
                       <SelectItem key={c.value} value={c.value} className="text-sm font-semibold">
                         {c.label}
                       </SelectItem>
@@ -191,7 +284,7 @@ export const ContactPage: React.FC = () => {
               {/* Type of Inquiry */}
               <div className="space-y-2">
                 <Label htmlFor="inquiryType" className="text-sm font-bold text-[#2A292D]">
-                  Type of Inquiry
+                  Type of Inquiry *
                 </Label>
                 <Select value={inquiryType} onValueChange={setInquiryType}>
                   <SelectTrigger
@@ -200,8 +293,8 @@ export const ContactPage: React.FC = () => {
                   >
                     <SelectValue placeholder="Select Inquiry Type" />
                   </SelectTrigger>
-                  <SelectContent className="bg-white rounded-xl shadow-xl border border-gray-100">
-                    {INQUIRY_TYPES.map((t) => (
+                  <SelectContent className="bg-white rounded-xl shadow-xl border border-gray-100 max-h-60 overflow-y-auto">
+                    {availableInquiryTypes.map((t) => (
                       <SelectItem key={t.value} value={t.value} className="text-sm font-semibold">
                         {t.label}
                       </SelectItem>
@@ -213,7 +306,7 @@ export const ContactPage: React.FC = () => {
               {/* Message */}
               <div className="space-y-2">
                 <Label htmlFor="message" className="text-sm font-bold text-[#2A292D]">
-                  Message
+                  Message *
                 </Label>
                 <textarea
                   id="message"
@@ -221,7 +314,7 @@ export const ContactPage: React.FC = () => {
                   rows={5}
                   value={message}
                   onChange={(e) => setMessage(e.target.value)}
-                  placeholder="How can we help you"
+                  placeholder="Tell us about your business, transaction volumes, and integration goals..."
                   className="w-full rounded-xl border-2 border-[#3BBA93] bg-white p-4 text-base focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#3BBA93] focus-visible:border-[#3BBA93]"
                 />
               </div>
@@ -230,9 +323,17 @@ export const ContactPage: React.FC = () => {
               <div className="pt-2">
                 <Button
                   type="submit"
-                  className="w-full bg-[#3BBA93] hover:bg-[#32a481] text-white font-extrabold h-12 rounded-xl text-base shadow-md shadow-[#3BBA93]/20"
+                  disabled={isSubmitting}
+                  className="w-full bg-[#3BBA93] hover:bg-[#32a481] text-white font-extrabold h-12 rounded-xl text-base shadow-md shadow-[#3BBA93]/20 flex items-center justify-center space-x-2"
                 >
-                  Submit
+                  {isSubmitting ? (
+                    <>
+                      <Loader2 className="w-5 h-5 animate-spin" />
+                      <span>Sending inquiry...</span>
+                    </>
+                  ) : (
+                    <span>Submit Inquiry</span>
+                  )}
                 </Button>
               </div>
             </form>
@@ -240,23 +341,20 @@ export const ContactPage: React.FC = () => {
         </div>
       </section>
 
-      {/* 3 — NEED API OR INTEGRATION SUPPORT? */}
-      <section className="pt-24 sm:pt-28 px-4 text-center max-w-3xl mx-auto">
-        <h2 className="text-3xl sm:text-4xl font-black text-[#2A292D] tracking-tight">
-          <span className="text-[#3BBA93]">Need API</span> or Integration
-          <br />
-          Support?
-        </h2>
-
-        <p className="mt-4 text-base sm:text-lg font-semibold text-[#2A292D]/85 leading-relaxed max-w-2xl mx-auto">
-          Tell us where your business operates and what you need to collect, send,
-          automate, or integrate. Our team will help you identify the right setup.
-        </p>
-
-        <div className="mt-8">
+      {/* 3 — CONTACTS & DEVELOPER INTEGRATIONS */}
+      <section className="mt-16 sm:mt-24 px-4 max-w-4xl mx-auto">
+        <div className="rounded-3xl bg-[#2A292D] text-white p-8 sm:p-12 shadow-2xl flex flex-col md:flex-row items-center justify-between gap-8">
+          <div>
+            <h3 className="text-2xl sm:text-3xl font-black text-white">
+              Need Direct Technical Docs?
+            </h3>
+            <p className="mt-3 text-sm sm:text-base font-semibold text-white/80 max-w-lg leading-relaxed">
+              Explore API specifications for Collections, Disbursements, STK Push callbacks, and SMS webhooks.
+            </p>
+          </div>
           <Button
             onClick={handleTechInquiryClick}
-            className="bg-[#3BBA93] hover:bg-[#32a481] text-white font-extrabold px-8 h-12 rounded-xl text-base shadow-md shadow-[#3BBA93]/20"
+            className="bg-[#3BBA93] hover:bg-[#32a481] text-white font-black px-8 h-12 rounded-xl text-sm flex-shrink-0"
           >
             Technical Inquiry
           </Button>
@@ -265,5 +363,3 @@ export const ContactPage: React.FC = () => {
     </div>
   );
 };
-
-export default ContactPage;

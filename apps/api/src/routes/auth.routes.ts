@@ -4,13 +4,14 @@ import jwt from 'jsonwebtoken';
 import { z } from 'zod';
 import { prisma } from '../prisma';
 import { requireAuth, AuthenticatedRequest } from '../middleware/auth';
+import { logAudit } from '../lib/audit';
 
 const router = Router();
 const JWT_SECRET = process.env.JWT_SECRET || 'avada_fallback_secret_key';
 
 const loginSchema = z.object({
   email: z.string().email('Invalid email address'),
-  password: z.string().min(6, 'Password must be at least 6 characters'),
+  password: z.string().min(1, 'Password is required'),
 });
 
 router.post('/login', async (req: Request, res: Response): Promise<void> => {
@@ -29,12 +30,21 @@ router.post('/login', async (req: Request, res: Response): Promise<void> => {
 
     const user = await prisma.user.findUnique({
       where: { email: email.toLowerCase() },
+      include: { role: true },
     });
 
     if (!user) {
       res.status(401).json({
         success: false,
         error: 'Invalid email or password',
+      });
+      return;
+    }
+
+    if (user.status === 'SUSPENDED') {
+      res.status(403).json({
+        success: false,
+        error: 'Your account has been suspended. Please contact the administrator.',
       });
       return;
     }
@@ -49,10 +59,29 @@ router.post('/login', async (req: Request, res: Response): Promise<void> => {
     }
 
     const token = jwt.sign(
-      { id: user.id, email: user.email, role: user.role },
+      { id: user.id, email: user.email },
       JWT_SECRET,
       { expiresIn: '7d' }
     );
+
+    // Audit log login
+    await logAudit({
+      req: {
+        ...req,
+        user: {
+          id: user.id,
+          email: user.email,
+          name: user.name,
+          roleId: user.roleId || undefined,
+          roleName: user.role?.name || 'Administrator',
+          permissions: (user.role?.permissions as any) || {},
+        },
+      } as AuthenticatedRequest,
+      action: 'USER_LOGIN',
+      entityType: 'User',
+      entityId: user.id,
+      details: { email: user.email, role: user.role?.name },
+    });
 
     res.json({
       success: true,
@@ -62,7 +91,9 @@ router.post('/login', async (req: Request, res: Response): Promise<void> => {
           id: user.id,
           email: user.email,
           name: user.name,
+          roleId: user.roleId,
           role: user.role,
+          status: user.status,
         },
       },
     });
@@ -84,14 +115,7 @@ router.get('/me', requireAuth, async (req: AuthenticatedRequest, res: Response):
 
     const user = await prisma.user.findUnique({
       where: { id: req.user.id },
-      select: {
-        id: true,
-        email: true,
-        name: true,
-        role: true,
-        createdAt: true,
-        updatedAt: true,
-      },
+      include: { role: true },
     });
 
     if (!user) {
@@ -101,7 +125,16 @@ router.get('/me', requireAuth, async (req: AuthenticatedRequest, res: Response):
 
     res.json({
       success: true,
-      data: { user },
+      data: {
+        user: {
+          id: user.id,
+          email: user.email,
+          name: user.name,
+          roleId: user.roleId,
+          role: user.role,
+          status: user.status,
+        },
+      },
     });
   } catch (error) {
     console.error('Fetch me error:', error);

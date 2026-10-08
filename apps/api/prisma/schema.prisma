@@ -7,28 +7,168 @@ generator client {
   provider = "prisma-client-js"
 }
 
-enum UserRole {
-  ADMIN
-  EDITOR
-}
-
 enum ContentStatus {
   DRAFT
   PUBLISHED
   ARCHIVED
 }
 
+enum InquiryStatus {
+  UNREAD
+  READ
+  CONTACTED
+  RESOLVED
+}
+
+enum UserStatus {
+  ACTIVE
+  INVITED
+  SUSPENDED
+}
+
+model Role {
+  id          String   @id @default(uuid())
+  name        String   @unique // e.g. "Super Admin", "Content Editor", "Customer Support"
+  description String   @default("")
+  permissions Json     // Record<CmsModule, { view: boolean, edit: boolean }>
+  isSystem    Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  users       User[]
+
+  @@map("roles")
+}
+
 model User {
-  id           String        @id @default(uuid())
-  email        String        @unique
-  passwordHash String
-  name         String
-  role         UserRole      @default(ADMIN)
-  createdAt    DateTime      @default(now())
-  updatedAt    DateTime      @updatedAt
-  contentItems ContentItem[]
+  id               String           @id @default(uuid())
+  email            String           @unique
+  passwordHash     String
+  name             String
+  roleId           String?
+  role             Role?            @relation(fields: [roleId], references: [id], onDelete: SetNull)
+  status           UserStatus       @default(ACTIVE)
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+  contentItems     ContentItem[]
+  handledInquiries ContactInquiry[] @relation("HandledBy")
+  auditLogs        AuditLog[]
 
   @@map("users")
+}
+
+model Country {
+  id             String   @id @default(uuid())
+  code           String   @unique // ISO-2 e.g. "ke", "rw", "tz", "ug"
+  slug           String   @unique // e.g. "kenya", "rwanda", "uganda"
+  name           String   // e.g. "Kenya"
+  currencyCode   String   @default("USD")
+  headline       String
+  tagline        String   @default("")
+  description    String   @db.Text
+  telcoPartners  Json     // Array of partner names e.g. ["MTN", "Airtel"]
+  paymentRails   Json     // Array of rails e.g. ["Mobile Money", "Cards"]
+  pricingSummary String?  @db.Text
+  officeAddress  String?
+  officePhone    String?
+  officeEmail    String?
+  mapEmbedUrl    String?  @db.Text
+  active         Boolean  @default(true)
+  displayOrder   Int      @default(0)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@map("countries")
+}
+
+model InquiryType {
+  id           String   @id @default(uuid())
+  key          String   @unique // e.g. "sms", "payments", "pos", "api"
+  label        String   // e.g. "SMS Pricing & Aggregator"
+  description  String?
+  active       Boolean  @default(true)
+  displayOrder Int      @default(0)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@map("inquiry_types")
+}
+
+model ContactInquiry {
+  id          String        @id @default(uuid())
+  fullName    String
+  email       String
+  phone       String?
+  orgName     String?
+  roleTitle   String?
+  country     String
+  inquiryType String
+  message     String        @db.Text
+  status      InquiryStatus @default(UNREAD)
+  handledById String?
+  handledBy   User?         @relation("HandledBy", fields: [handledById], references: [id], onDelete: SetNull)
+  handledAt   DateTime?
+  adminNotes  String?       @db.Text
+  ipAddress   String?
+  userAgent   String?
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  @@map("contact_inquiries")
+}
+
+model SiteSetting {
+  id          String   @id @default(uuid())
+  key         String   @unique // e.g. "site_config", "general_contacts", "social_links"
+  value       Json
+  description String?
+  updatedAt   DateTime @updatedAt
+
+  @@map("site_settings")
+}
+
+model LegalPolicy {
+  id            String        @id @default(uuid())
+  slug          String        @unique // "terms", "privacy", "cookies"
+  title         String
+  summary       String?
+  content       String        @db.Text
+  version       String        @default("1.0")
+  status        ContentStatus @default(PUBLISHED)
+  effectiveDate DateTime      @default(now())
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  @@map("legal_policies")
+}
+
+model AuditLog {
+  id         String   @id @default(uuid())
+  userId     String?
+  user       User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  userEmail  String
+  action     String   // e.g. "CREATE_COUNTRY", "DISABLE_COUNTRY", "INQUIRY_STATUS_CHANGE"
+  entityType String   // e.g. "Country", "Inquiry", "SiteSetting", "LegalPolicy", "User", "Role"
+  entityId   String?
+  details    Json?    // Before/after payload diff
+  ipAddress  String?
+  userAgent  String?
+  createdAt  DateTime @default(now())
+
+  @@map("audit_logs")
+}
+
+model SiteTelemetry {
+  id           String   @id @default(uuid())
+  path         String
+  country      String?
+  referrer     String?
+  isSuspicious Boolean  @default(false)
+  flagReason   String?
+  responseTime Int?     // in ms
+  statusCode   Int?
+  createdAt    DateTime @default(now())
+
+  @@map("site_telemetries")
 }
 
 model ContentItem {

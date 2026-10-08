@@ -3,6 +3,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { ChevronDown, Menu, X } from 'lucide-react';
 import { CountryFlag } from '@/components/CountryFlag';
+import { useSiteConfig } from '@/context/SiteConfigContext';
 
 export interface CountryInfo {
   code: string;
@@ -18,15 +19,25 @@ export const COUNTRIES: CountryInfo[] = [
 ];
 
 export const Navbar: React.FC = () => {
+  const { countries: dynamicCountries } = useSiteConfig();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [countryDropdownOpen, setCountryDropdownOpen] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
 
+  const activeCountries: CountryInfo[] =
+    dynamicCountries && dynamicCountries.length > 0
+      ? dynamicCountries.map((c) => ({
+          code: c.code,
+          name: c.name,
+          path: `/countries/${c.slug}`,
+        }))
+      : COUNTRIES;
+
   const variant: 'overlay' | 'light' | 'dark' =
     location.pathname === '/' ? 'overlay' : location.pathname === '/contact' ? 'light' : 'dark';
   const onLight = variant === 'light';
-  const currentCountry = COUNTRIES.find((c) => location.pathname === c.path);
+  const currentCountry = activeCountries.find((c) => location.pathname === c.path);
 
   const mainLinks = [
     { name: 'Payment Processing', path: '/payment-processing' },
@@ -107,10 +118,7 @@ export const Navbar: React.FC = () => {
 
             {countryDropdownOpen && (
               <div className="absolute right-0 mt-2 w-44 rounded-xl bg-white shadow-2xl border border-gray-100 py-1.5 z-50 animate-in fade-in-0 zoom-in-95">
-                <div className="px-3 py-1 text-[10px] font-bold text-gray-400 uppercase tracking-wider">
-                  Select Country
-                </div>
-                {COUNTRIES.map((c) => (
+                {activeCountries.map((c) => (
                   <button
                     key={c.code}
                     onMouseDown={() => handleCountrySelect(c.path)}
@@ -176,7 +184,7 @@ export const Navbar: React.FC = () => {
             <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider px-3">
               Markets & Countries
             </p>
-            {COUNTRIES.map((c) => (
+            {activeCountries.map((c) => (
               <Link
                 key={c.code}
                 to={c.path}

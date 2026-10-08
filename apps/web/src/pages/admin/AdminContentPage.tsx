@@ -299,7 +299,7 @@ export const AdminContentPage: React.FC = () => {
                   value={body}
                   onChange={(e) => setBody(e.target.value)}
                   placeholder="Write the full article text here..."
-                  className="flex w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                  className="flex w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#3BBA93]"
                   required
                 />
               </div>
@@ -308,7 +308,7 @@ export const AdminContentPage: React.FC = () => {
                 <Button variant="outline" type="button" onClick={() => setShowModal(false)}>
                   Cancel
                 </Button>
-                <Button variant="gradient" type="submit" disabled={saving}>
+                <Button variant="gradient" type="submit" disabled={saving} className="bg-[#3BBA93] hover:bg-[#32a481] text-white">
                   {saving ? 'Publishing...' : 'Save & Publish'}
                 </Button>
               </div>
