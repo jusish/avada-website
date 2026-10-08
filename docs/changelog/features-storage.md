@@ -435,4 +435,46 @@ This document is the **single source of truth** for every feature implemented in
   - **Navbar Flag Indicators**: Added active country flag display in the top navigation bar when viewing country routes.
   - **Footer Contextual CTAs**: Registered tailored headline and button CTAs for each country in `Footer.tsx`.
 
+---
+
+## FEAT-021: Enterprise CMS Platform, Visual RBAC Matrix, Real-Time Security Telemetry & Shadcn UI Standardization
+- **ID**: `FEAT-021`
+- **Status**: Completed
+- **Created**: 2026-10-08
+- **Description**: Full-scale Enterprise CMS platform featuring visual Role-Based Access Control (RBAC), dynamic country and office location management, customer inquiry CRM with unread tracking, legal policy engine, live telemetry diagnostics, site footer and social media settings, and complete UI standardization using shadcn/ui primitives.
+- **Files Involved**:
+  - [`packages/shared/src/types/index.ts`](../../packages/shared/src/types/index.ts)
+  - [`apps/api/prisma/schema.prisma`](../../apps/api/prisma/schema.prisma)
+  - [`apps/api/src/server.ts`](../../apps/api/src/server.ts)
+  - [`apps/api/src/routes/roles.routes.ts`](../../apps/api/src/routes/roles.routes.ts)
+  - [`apps/api/src/routes/countries.routes.ts`](../../apps/api/src/routes/countries.routes.ts)
+  - [`apps/api/src/routes/inquiry-types.routes.ts`](../../apps/api/src/routes/inquiry-types.routes.ts)
+  - [`apps/api/src/routes/inquiries.routes.ts`](../../apps/api/src/routes/inquiries.routes.ts)
+  - [`apps/api/src/routes/policies.routes.ts`](../../apps/api/src/routes/policies.routes.ts)
+  - [`apps/api/src/routes/settings.routes.ts`](../../apps/api/src/routes/settings.routes.ts)
+  - [`apps/api/src/routes/analytics.routes.ts`](../../apps/api/src/routes/analytics.routes.ts)
+  - [`apps/api/src/routes/audit-logs.routes.ts`](../../apps/api/src/routes/audit-logs.routes.ts)
+  - [`apps/api/src/routes/users.routes.ts`](../../apps/api/src/routes/users.routes.ts)
+  - [`apps/web/src/components/AdminSidebar.tsx`](../../apps/web/src/components/AdminSidebar.tsx)
+  - [`apps/web/src/components/AdminPermissionGuard.tsx`](../../apps/web/src/components/AdminPermissionGuard.tsx)
+  - [`apps/web/src/components/ui/dialog.tsx`](../../apps/web/src/components/ui/dialog.tsx)
+  - [`apps/web/src/pages/admin/AdminDashboardPage.tsx`](../../apps/web/src/pages/admin/AdminDashboardPage.tsx)
+  - [`apps/web/src/pages/admin/AdminRolesPage.tsx`](../../apps/web/src/pages/admin/AdminRolesPage.tsx)
+  - [`apps/web/src/pages/admin/AdminCountriesPage.tsx`](../../apps/web/src/pages/admin/AdminCountriesPage.tsx)
+  - [`apps/web/src/pages/admin/AdminInquiriesPage.tsx`](../../apps/web/src/pages/admin/AdminInquiriesPage.tsx)
+  - [`apps/web/src/pages/admin/AdminInquiryTypesPage.tsx`](../../apps/web/src/pages/admin/AdminInquiryTypesPage.tsx)
+  - [`apps/web/src/pages/admin/AdminPoliciesPage.tsx`](../../apps/web/src/pages/admin/AdminPoliciesPage.tsx)
+  - [`apps/web/src/pages/admin/AdminSecurityPage.tsx`](../../apps/web/src/pages/admin/AdminSecurityPage.tsx)
+  - [`apps/web/src/pages/admin/AdminSettingsPage.tsx`](../../apps/web/src/pages/admin/AdminSettingsPage.tsx)
+  - [`apps/web/src/pages/admin/AdminUsersPage.tsx`](../../apps/web/src/pages/admin/AdminUsersPage.tsx)
+- **Implementation Details**:
+  - **Visual Permission Manager (RBAC)**: Visual permission editor covering 10 modules (`roles`, `users`, `countries`, `inquiry_types`, `inquiries`, `articles`, `policies`, `settings`, `insights`, `audit_logs`). Each module provides independent `view` and `edit` capabilities enforced by `requirePermission` backend middleware and frontend `AdminPermissionGuard`.
+  - **Dynamic Country & Office Management**: Allows creating, editing, and disabling countries, updating office addresses, phone numbers, emails, and head office coordinates for rendering live interactive maps.
+  - **Inquiry Types & Customer Inquiries CRM**: Categorization of incoming inquiries, unread badge counters, status workflow (`UNREAD`, `READ`, `CONTACTED`, `RESOLVED`), and internal handler notes.
+  - **Legal Policies Engine**: In-browser Markdown editing of legal documents (Terms of Service, Privacy Policy, Cookie Policy) with version history tracking, effective dates, and public legal route rendering (`/legal/:slug`).
+  - **Footer & Social Links Configuration**: Centralized editing of footer contact information and social media links with customizable link target behaviors (`_blank` vs `_self`).
+  - **Availability & Threat Diagnostics**: Diagnostic endpoint at `/api/admin/analytics/security` and `/api/admin/security/diagnostic` reporting real PostgreSQL query latency, telemetry counts, threat feeds, memory usage, and TLS 1.3 status.
+  - **Design System Polish (shadcn/ui)**: Replaced all native `<select>` tags and custom modal overlays with Radix `Select` and `Dialog`. Standardized card corners to `rounded-xl` and removed unnecessary `uppercase` Tailwind styles.
+
+
 

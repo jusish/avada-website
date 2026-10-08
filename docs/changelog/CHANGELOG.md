@@ -5,6 +5,25 @@ All notable changes to the Avada Website and CMS project will be documented in t
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.9.0] - 2026-10-08
+
+### Added
+- **Visual Permission Manager & RBAC (`/admin/roles`)**: Complete role and permission management allowing custom role creation with granular per-module access (`view` and `edit`) across 10 system modules (`roles`, `users`, `countries`, `inquiry_types`, `inquiries`, `articles`, `policies`, `settings`, `insights`, `audit_logs`). Enforced by backend middleware `requirePermission` and frontend `AdminPermissionGuard`.
+- **Dynamic Country & Head Office Management (`/admin/countries`)**: Allows administrators to add, edit, or disable country availability on the live site, complete with office location coordinates, map views, phone numbers, and address details.
+- **Inquiries CRM Pipeline (`/admin/inquiries`, `/admin/inquiry-types`)**: Full customer inquiry management with dynamic inquiry types, unread counters on the dashboard and sidebar, status tracking (`UNREAD`, `READ`, `CONTACTED`, `RESOLVED`), and internal staff notes.
+- **Legal Policies Engine (`/admin/policies`)**: In-browser Markdown editing of legal agreements (Terms of Service, Privacy Policy, Cookie Policy) with version tracking, effective dates, and public legal route rendering (`/legal/:slug`).
+- **Site Settings & Footer Configuration (`/admin/settings`)**: Centralized management of general contacts, office addresses, copyright text, and social links (Twitter/X, LinkedIn, Facebook, Instagram, YouTube) with new tab/window target toggling.
+- **Availability, Performance & Threat Diagnostics (`/admin/security`)**: Real-time infrastructure diagnostics at `/api/admin/analytics/security` and `/api/admin/security/diagnostic` monitoring live database response times, telemetry request rates, threat feeds, and TLS 1.3 certificate status.
+
+### Changed
+- **Design System Polish & shadcn/ui Migration**: Replaced all native `<select>` dropdowns and ad-hoc modals across all 9 admin pages with Radix UI `Select` and `Dialog` primitives from `@/components/ui`.
+- **Border Radius & Typography Standardization**: Normalized cards to `rounded-xl` and inputs to `rounded-lg`. Eliminated all excessive `uppercase` Tailwind classes across tables, cards, and buttons for a clean, natural title-cased fintech aesthetic.
+- **Sidebar & Login Page UX Improvements**: Added the official AvadaPay logo to the CMS sidebar with a direct home link (`/`), gated demo login credentials behind `import.meta.env.DEV`, and added automatic redirect to dashboard for already-authenticated users.
+
+### Fixed
+- **Security Diagnostic 404 Resolution**: Fixed missing route mapping for security diagnostics in `analytics.routes.ts` and mounted `/api/admin/security` in `server.ts`.
+- **Type Safety & Strict Lint Standards**: Eliminated all remaining `@typescript-eslint/no-explicit-any` ESLint warnings and TypeScript type mismatches, achieving 0 errors and 0 warnings across monorepo builds.
+
 ---
 
 ## [1.8.0] - 2026-10-07

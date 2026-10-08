@@ -40,7 +40,17 @@ This document establishes the UI/UX conventions, styling philosophy, and design 
 - **Status Indicators**: Clean badges with semantic color tokens (`#3BBA93` for active/live/success, `amber-500` for draft/staging).
 
 ### ❌ What We Dislike (Strictly Forbidden)
-- Native HTML `<select>` inputs with default OS bevels.
-- Plain HTML input fields with default black outlines.
-- Tables without header formatting, zebra striping or hover effects, and proper cell padding.
-- Hardcoded inline styles (`style={{ ... }}`) unless dynamic CSS variables for background images/animations are required.
+- **Native HTML `<select>` elements**: Never use default OS select dropdowns. Always use shadcn/ui `Select`.
+- **Excessive `uppercase` Tailwind Classes**: Never overuse `uppercase` or `tracking-widest` on cards, badges, buttons, or table headers. Use natural title casing or clean sentence casing.
+- **Oversized Border Radii**: Strictly avoid bulbous, excessive border radii (`rounded-3xl` or `rounded-2xl`) on cards and containers. Use standard, crisp `rounded-xl` for cards/dialogs and `rounded-lg` for inputs/buttons.
+- **Custom / Ad-hoc Modals & Dialogs**: Never implement custom fixed overlay modal divs. Always use shadcn/ui Radix primitives (`Dialog`, `DialogContent`, `DialogHeader`, `DialogTitle`, `DialogFooter`).
+- **Plain HTML Inputs & Buttons**: Never use unstyled `<input>` or raw `<button>`. Always use `@/components/ui/input` and `@/components/ui/button`.
+- **Demo Credentials in Production**: Never expose prefilled demo credentials or test hints in production builds. Gate all developer helpers behind `import.meta.env.DEV`.
+- **Hardcoded Inline Styles**: Avoid `style={{ ... }}` unless dynamic CSS variables for background positions/images are strictly necessary.
+
+---
+
+## 🧭 Authentication & Navigation Flow Rules
+1. **Authenticated Redirection**: If a user is already authenticated (`token` exists in AuthContext), accessing `/admin/login` must automatically redirect to `/admin/dashboard` with replacement navigation.
+2. **Branded Sidebar Navigation**: The Admin Sidebar header must display the official AvadaPay logo (`/logo.svg`) wrapped in a link pointing to the root live website (`/`), allowing direct navigation to the public site without needing a separate button.
+3. **Comprehensive Entity Actions**: Every manageable CMS entity (Countries, Inquiry Types, Roles, Users, Content, Policies) must implement the full CRUD lifecycle: Create, View, Edit, and Delete/Toggle Status.
