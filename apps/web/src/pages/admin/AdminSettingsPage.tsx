@@ -4,6 +4,13 @@ import { GeneralContacts, SocialLink, FooterConfig } from '@avada/shared';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import {
   Settings,
   Mail,
   Phone,
@@ -161,7 +168,7 @@ export const AdminSettingsPage: React.FC = () => {
   };
 
   // Update social field
-  const handleSocialChange = (index: number, field: keyof SocialLink, value: any) => {
+  const handleSocialChange = (index: number, field: keyof SocialLink, value: SocialLink[keyof SocialLink]) => {
     setSocials((prev) =>
       prev.map((item, idx) => (idx === index ? { ...item, [field]: value } : item))
     );
@@ -191,7 +198,7 @@ export const AdminSettingsPage: React.FC = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Card 1: Official Corporate Contacts */}
-        <Card className="bg-white border-gray-200/80 shadow-sm rounded-3xl overflow-hidden">
+        <Card className="bg-white border-gray-200/80 shadow-sm rounded-xl overflow-hidden">
           <CardHeader className="bg-gray-50/70 border-b border-gray-100 p-5">
             <CardTitle className="text-sm font-bold text-[#2A292D] flex items-center gap-2">
               <Building className="w-4 h-4 text-[#3BBA93]" />
@@ -280,7 +287,7 @@ export const AdminSettingsPage: React.FC = () => {
         </Card>
 
         {/* Card 2: Footer Copy & Legal Disclaimers */}
-        <Card className="bg-white border-gray-200/80 shadow-sm rounded-3xl overflow-hidden">
+        <Card className="bg-white border-gray-200/80 shadow-sm rounded-xl overflow-hidden">
           <CardHeader className="bg-gray-50/70 border-b border-gray-100 p-5">
             <CardTitle className="text-sm font-bold text-[#2A292D] flex items-center gap-2">
               <Globe className="w-4 h-4 text-[#3BBA93]" />
@@ -341,7 +348,7 @@ export const AdminSettingsPage: React.FC = () => {
       </div>
 
       {/* Card 3: Social Media Channels & Window Target Controls */}
-      <Card className="bg-white border-gray-200/80 shadow-sm rounded-3xl overflow-hidden">
+      <Card className="bg-white border-gray-200/80 shadow-sm rounded-xl overflow-hidden">
         <CardHeader className="bg-gray-50/70 border-b border-gray-100 p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div>
             <CardTitle className="text-sm font-bold text-[#2A292D] flex items-center gap-2">
@@ -360,7 +367,7 @@ export const AdminSettingsPage: React.FC = () => {
                   variant="outline"
                   size="sm"
                   onClick={handleAddSocial}
-                  className="rounded-xl text-xs font-bold border-gray-200 space-x-1"
+                  className="rounded-lg text-xs font-semibold border-gray-200 space-x-1"
                 >
                   <Plus className="w-3.5 h-3.5" />
                   <span>Add Channel</span>
@@ -370,7 +377,7 @@ export const AdminSettingsPage: React.FC = () => {
                   size="sm"
                   onClick={handleSaveSocials}
                   disabled={savingSocials}
-                  className="rounded-xl text-xs font-bold space-x-1.5"
+                  className="rounded-lg text-xs font-semibold space-x-1.5"
                 >
                   <Save className="w-3.5 h-3.5" />
                   <span>{savingSocials ? 'Saving...' : 'Save Social Links'}</span>
@@ -388,11 +395,11 @@ export const AdminSettingsPage: React.FC = () => {
               socials.map((soc, idx) => (
                 <div
                   key={soc.key || idx}
-                  className="p-3 rounded-2xl bg-gray-50/80 border border-gray-200/80 flex flex-col md:flex-row md:items-center justify-between gap-3 text-xs"
+                  className="p-3 rounded-lg bg-gray-50/80 border border-gray-200/80 flex flex-col md:flex-row md:items-center justify-between gap-3 text-xs"
                 >
                   {/* Channel Name */}
                   <div className="w-full md:w-44">
-                    <label className="text-[10px] text-gray-400 font-bold uppercase block mb-1">
+                    <label className="text-[11px] text-gray-500 font-medium block mb-1">
                       Network Name
                     </label>
                     <input
@@ -400,13 +407,13 @@ export const AdminSettingsPage: React.FC = () => {
                       value={soc.name}
                       onChange={(e) => handleSocialChange(idx, 'name', e.target.value)}
                       placeholder="e.g. LinkedIn"
-                      className="w-full p-2 bg-white border border-gray-200 rounded-xl font-bold text-gray-800 text-xs"
+                      className="w-full p-2 bg-white border border-gray-200 rounded-lg font-semibold text-gray-800 text-xs"
                     />
                   </div>
 
                   {/* URL */}
                   <div className="flex-1">
-                    <label className="text-[10px] text-gray-400 font-bold uppercase block mb-1">
+                    <label className="text-[11px] text-gray-500 font-medium block mb-1">
                       Target URL
                     </label>
                     <input
@@ -414,25 +421,29 @@ export const AdminSettingsPage: React.FC = () => {
                       value={soc.url || ''}
                       onChange={(e) => handleSocialChange(idx, 'url', e.target.value)}
                       placeholder="https://..."
-                      className="w-full p-2 bg-white border border-gray-200 rounded-xl text-gray-700 text-xs font-mono"
+                      className="w-full p-2 bg-white border border-gray-200 rounded-lg text-gray-700 text-xs font-mono"
                     />
                   </div>
 
                   {/* Window Target Dropdown */}
-                  <div className="w-full md:w-36">
-                    <label className="text-[10px] text-gray-400 font-bold uppercase block mb-1">
+                  <div className="w-full md:w-44">
+                    <label className="text-[11px] text-gray-500 font-medium block mb-1">
                       Window Target
                     </label>
-                    <select
+                    <Select
                       value={soc.target || '_blank'}
-                      onChange={(e) =>
-                        handleSocialChange(idx, 'target', e.target.value as '_blank' | '_self')
+                      onValueChange={(val) =>
+                        handleSocialChange(idx, 'target', val as '_blank' | '_self')
                       }
-                      className="w-full p-2 bg-white border border-gray-200 rounded-xl font-semibold text-gray-700 text-xs"
                     >
-                      <option value="_blank">New Tab (_blank)</option>
-                      <option value="_self">Current Tab (_self)</option>
-                    </select>
+                      <SelectTrigger className="w-full h-8 bg-white border-gray-200 rounded-lg text-xs font-medium">
+                        <SelectValue placeholder="Window Target" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="_blank">New Tab (_blank)</SelectItem>
+                        <SelectItem value="_self">Current Tab (_self)</SelectItem>
+                      </SelectContent>
+                    </Select>
                   </div>
 
                   {/* Enabled Toggle */}

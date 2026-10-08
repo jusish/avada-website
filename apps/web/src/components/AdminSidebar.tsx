@@ -169,21 +169,21 @@ export const AdminSidebar: React.FC = () => {
   ];
 
   return (
-    <aside className="w-64 bg-[#2A292D] border-r border-white/10 flex flex-col justify-between h-screen sticky top-0 text-white select-none overflow-hidden">
-      <div className="flex-1 overflow-y-auto p-5 space-y-6">
+    <aside className="w-64 bg-[#2A292D] border-r border-white/10 flex flex-col justify-between h-screen sticky top-0 text-white select-none overflow-x-hidden">
+      <div className="flex-1 overflow-y-auto overflow-x-hidden p-4 space-y-6">
         {/* Brand header with AvadaPay Logo */}
         <Link
           to="/"
           title="Return to AvadaPay Website"
-          className="flex items-center justify-between px-3 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 transition-all duration-200 group"
+          className="flex items-center justify-between gap-2 px-3 py-2 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 transition-colors group"
         >
           <img
             src="/logo.svg"
             alt="AvadaPay"
-            className="h-6 sm:h-7 w-auto object-contain transition-transform group-hover:scale-105"
+            className="h-5 w-auto max-w-[110px] object-contain shrink-0 transition-transform group-hover:scale-105"
           />
-          <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded bg-[#3BBA93]/20 text-[#3BBA93] border border-[#3BBA93]/30">
-            Enterprise CMS
+          <span className="shrink-0 text-[10px] font-semibold tracking-wide px-1.5 py-0.5 rounded-md bg-[#3BBA93]/20 text-[#3BBA93] border border-[#3BBA93]/30">
+            CMS
           </span>
         </Link>
 
@@ -196,7 +196,7 @@ export const AdminSidebar: React.FC = () => {
 
             return (
               <div key={grp.group} className="space-y-1">
-                <p className="px-3 text-[10px] font-extrabold uppercase tracking-wider text-white/40">
+                <p className="px-3 text-[11px] font-semibold tracking-wide text-white/45">
                   {grp.group}
                 </p>
                 <nav className="space-y-1">
@@ -207,9 +207,9 @@ export const AdminSidebar: React.FC = () => {
                       <Link
                         key={item.path}
                         to={item.path}
-                        className={`flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold transition-all ${
+                        className={`flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium transition-all ${
                           isActive
-                            ? 'bg-[#3BBA93] text-white shadow-md shadow-[#3BBA93]/20'
+                            ? 'bg-[#3BBA93] text-white shadow-sm'
                             : 'text-white/70 hover:text-white hover:bg-white/10'
                         }`}
                       >
@@ -235,7 +235,7 @@ export const AdminSidebar: React.FC = () => {
         <div className="pt-4 border-t border-white/10">
           <Link
             to="/"
-            className="flex items-center justify-between px-3 py-2 text-xs font-semibold text-white/70 hover:text-white hover:bg-white/10 rounded-xl transition-colors border border-transparent hover:border-white/10"
+            className="flex items-center justify-between px-3 py-2 text-xs font-medium text-white/70 hover:text-white hover:bg-white/10 rounded-lg transition-colors border border-transparent hover:border-white/10"
           >
             <span className="flex items-center space-x-2">
               <ExternalLink className="w-3.5 h-3.5 text-[#3BBA93]" />

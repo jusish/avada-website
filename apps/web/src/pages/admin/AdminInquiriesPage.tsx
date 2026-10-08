@@ -5,6 +5,18 @@ import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import {
+  Dialog,
+  DialogContent,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import {
   Inbox,
   Search,
   CheckCircle2,
@@ -16,7 +28,6 @@ import {
   Globe2,
   UserCheck,
   Trash2,
-  X,
   Save,
   RotateCw,
 } from 'lucide-react';
@@ -239,7 +250,7 @@ export const AdminInquiriesPage: React.FC = () => {
 
       {/* KPI Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <Card className="bg-white border-gray-200/80 shadow-sm rounded-2xl">
+        <Card className="bg-white border-gray-200/80 shadow-sm rounded-xl">
           <CardHeader className="flex flex-row items-center justify-between pb-1 pt-4 px-5">
             <CardTitle className="text-xs font-semibold text-gray-500 tracking-wider">
               Total Inquiries
@@ -247,12 +258,12 @@ export const AdminInquiriesPage: React.FC = () => {
             <Inbox className="w-4 h-4 text-[#3BBA93]" />
           </CardHeader>
           <CardContent className="px-5 pb-4">
-            <div className="text-2xl font-black text-[#2A292D]">{stats.total}</div>
+            <div className="text-2xl font-bold text-[#2A292D]">{stats.total}</div>
             <p className="text-[11px] text-gray-400 mt-0.5">All time submissions</p>
           </CardContent>
         </Card>
 
-        <Card className="bg-white border-gray-200/80 shadow-sm rounded-2xl">
+        <Card className="bg-white border-gray-200/80 shadow-sm rounded-xl">
           <CardHeader className="flex flex-row items-center justify-between pb-1 pt-4 px-5">
             <CardTitle className="text-xs font-semibold text-gray-500 tracking-wider">
               Unread Leads
@@ -260,12 +271,12 @@ export const AdminInquiriesPage: React.FC = () => {
             <AlertCircle className="w-4 h-4 text-emerald-500" />
           </CardHeader>
           <CardContent className="px-5 pb-4">
-            <div className="text-2xl font-black text-emerald-600">{stats.unread}</div>
+            <div className="text-2xl font-bold text-emerald-600">{stats.unread}</div>
             <p className="text-[11px] text-gray-400 mt-0.5">Require initial outreach</p>
           </CardContent>
         </Card>
 
-        <Card className="bg-white border-gray-200/80 shadow-sm rounded-2xl">
+        <Card className="bg-white border-gray-200/80 shadow-sm rounded-xl">
           <CardHeader className="flex flex-row items-center justify-between pb-1 pt-4 px-5">
             <CardTitle className="text-xs font-semibold text-gray-500 tracking-wider">
               Contacted
@@ -273,12 +284,12 @@ export const AdminInquiriesPage: React.FC = () => {
             <Clock className="w-4 h-4 text-blue-500" />
           </CardHeader>
           <CardContent className="px-5 pb-4">
-            <div className="text-2xl font-black text-blue-600">{stats.contacted}</div>
+            <div className="text-2xl font-bold text-blue-600">{stats.contacted}</div>
             <p className="text-[11px] text-gray-400 mt-0.5">Under conversation</p>
           </CardContent>
         </Card>
 
-        <Card className="bg-white border-gray-200/80 shadow-sm rounded-2xl">
+        <Card className="bg-white border-gray-200/80 shadow-sm rounded-xl">
           <CardHeader className="flex flex-row items-center justify-between pb-1 pt-4 px-5">
             <CardTitle className="text-xs font-semibold text-gray-500 tracking-wider">
               Resolved
@@ -286,14 +297,14 @@ export const AdminInquiriesPage: React.FC = () => {
             <CheckCircle2 className="w-4 h-4 text-purple-500" />
           </CardHeader>
           <CardContent className="px-5 pb-4">
-            <div className="text-2xl font-black text-purple-600">{stats.resolved}</div>
+            <div className="text-2xl font-bold text-purple-600">{stats.resolved}</div>
             <p className="text-[11px] text-gray-400 mt-0.5">Successfully concluded</p>
           </CardContent>
         </Card>
       </div>
 
       {/* Filter and Search Bar */}
-      <Card className="bg-white border-gray-200/80 shadow-sm rounded-2xl p-4">
+      <Card className="bg-white border-gray-200/80 shadow-sm rounded-xl p-4">
         <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
           {/* Search Input */}
           <div className="relative flex-1">
@@ -303,7 +314,7 @@ export const AdminInquiriesPage: React.FC = () => {
               placeholder="Search by sender name, email, organization, or message..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 text-xs bg-gray-50/80 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#3BBA93] focus:bg-white transition-all text-[#2A292D]"
+              className="w-full pl-10 pr-4 py-2 text-xs bg-gray-50/80 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#3BBA93] focus:bg-white transition-all text-[#2A292D]"
             />
           </div>
 
@@ -313,7 +324,7 @@ export const AdminInquiriesPage: React.FC = () => {
               <button
                 key={st}
                 onClick={() => setSelectedStatus(st)}
-                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all whitespace-nowrap ${
+                className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all whitespace-nowrap ${
                   selectedStatus === st
                     ? 'bg-[#3BBA93] text-white shadow-sm'
                     : 'bg-gray-100 hover:bg-gray-200/70 text-gray-600'
@@ -324,39 +335,41 @@ export const AdminInquiriesPage: React.FC = () => {
             ))}
           </div>
 
-          {/* Country & Type Dropdowns */}
+          {/* Country & Type Shadcn Dropdowns */}
           <div className="flex items-center gap-2">
-            <select
-              value={selectedCountry}
-              onChange={(e) => setSelectedCountry(e.target.value)}
-              className="text-xs bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-gray-700 font-medium focus:outline-none focus:ring-2 focus:ring-[#3BBA93]"
-            >
-              <option value="ALL">All Countries</option>
-              {countries.map((c) => (
-                <option key={c.id} value={c.name}>
-                  {c.name}
-                </option>
-              ))}
-            </select>
+            <Select value={selectedCountry} onValueChange={setSelectedCountry}>
+              <SelectTrigger className="w-36 h-9 text-xs bg-gray-50 border-gray-200 rounded-lg">
+                <SelectValue placeholder="All Countries" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="ALL">All Countries</SelectItem>
+                {countries.map((c) => (
+                  <SelectItem key={c.id} value={c.name}>
+                    {c.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
 
-            <select
-              value={selectedType}
-              onChange={(e) => setSelectedType(e.target.value)}
-              className="text-xs bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-gray-700 font-medium focus:outline-none focus:ring-2 focus:ring-[#3BBA93]"
-            >
-              <option value="ALL">All Categories</option>
-              {inquiryTypes.map((t) => (
-                <option key={t.id} value={t.key}>
-                  {t.label}
-                </option>
-              ))}
-            </select>
+            <Select value={selectedType} onValueChange={setSelectedType}>
+              <SelectTrigger className="w-40 h-9 text-xs bg-gray-50 border-gray-200 rounded-lg">
+                <SelectValue placeholder="All Categories" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="ALL">All Categories</SelectItem>
+                {inquiryTypes.map((t) => (
+                  <SelectItem key={t.id} value={t.key}>
+                    {t.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
         </div>
       </Card>
 
       {/* Inquiries Table */}
-      <Card className="bg-white border-gray-200/80 shadow-sm rounded-2xl overflow-hidden">
+      <Card className="bg-white border-gray-200/80 shadow-sm rounded-xl overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
@@ -468,19 +481,19 @@ export const AdminInquiriesPage: React.FC = () => {
         </div>
       </Card>
 
-      {/* Inquiry Detail Drawer / Modal */}
-      {activeInquiry && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in">
-          <div className="bg-white w-full max-w-2xl rounded-3xl shadow-2xl border border-gray-100 overflow-hidden flex flex-col max-h-[90vh]">
-            {/* Modal Header */}
-            <div className="p-6 bg-[#2A292D] text-white flex items-start justify-between">
-              <div>
+      {/* Inquiry Detail Dialog */}
+      <Dialog open={!!activeInquiry} onOpenChange={(open) => { if (!open) setActiveInquiry(null); }}>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto p-0 rounded-xl gap-0 border-gray-200">
+          {activeInquiry && (
+            <>
+              {/* Modal Header */}
+              <div className="p-6 bg-[#2A292D] text-white">
                 <div className="flex items-center gap-2 mb-2">
-                  <span className="text-xs font-bold tracking-wider text-[#3BBA93]">Inquiry Details</span>
+                  <span className="text-xs font-semibold text-[#3BBA93]">Inquiry Details</span>
                   <span className="text-white/40">•</span>
-                  <span className="text-xs text-white/70">ID: {activeInquiry.id.slice(0, 8)}</span>
+                  <span className="text-xs text-white/70 font-mono">ID: {activeInquiry.id.slice(0, 8)}</span>
                 </div>
-                <h2 className="text-xl font-bold">{activeInquiry.fullName}</h2>
+                <DialogTitle className="text-xl font-bold text-white">{activeInquiry.fullName}</DialogTitle>
                 <div className="text-xs text-white/70 mt-1 flex flex-wrap items-center gap-3">
                   <span className="flex items-center gap-1">
                     <Mail className="w-3.5 h-3.5 text-[#3BBA93]" />
@@ -500,144 +513,138 @@ export const AdminInquiriesPage: React.FC = () => {
                   )}
                 </div>
               </div>
-              <button
-                onClick={() => setActiveInquiry(null)}
-                className="text-white/60 hover:text-white p-1 rounded-full hover:bg-white/10 transition-colors"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
 
-            {/* Modal Body */}
-            <div className="p-6 overflow-y-auto space-y-6 flex-1 text-xs">
-              {/* Submission Metadata */}
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 p-3.5 rounded-2xl bg-gray-50 border border-gray-100">
-                <div>
-                  <span className="text-[10px] text-gray-400 font-bold">Country</span>
-                  <p className="font-bold text-gray-800 mt-0.5">{activeInquiry.country || 'Global'}</p>
+              {/* Modal Body */}
+              <div className="p-6 space-y-5 text-xs">
+                {/* Submission Metadata */}
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 p-3.5 rounded-lg bg-gray-50 border border-gray-100">
+                  <div>
+                    <span className="text-[10px] text-gray-400 font-semibold">Country</span>
+                    <p className="font-semibold text-gray-800 mt-0.5">{activeInquiry.country || 'Global'}</p>
+                  </div>
+                  <div>
+                    <span className="text-[10px] text-gray-400 font-semibold">Category</span>
+                    <p className="font-semibold text-gray-800 mt-0.5">{activeInquiry.inquiryType}</p>
+                  </div>
+                  <div>
+                    <span className="text-[10px] text-gray-400 font-semibold">Submitted</span>
+                    <p className="font-semibold text-gray-800 mt-0.5">
+                      {new Date(activeInquiry.createdAt).toLocaleDateString()}
+                    </p>
+                  </div>
+                  <div>
+                    <span className="text-[10px] text-gray-400 font-semibold">Current Status</span>
+                    <div className="mt-0.5">{getStatusBadge(activeInquiry.status)}</div>
+                  </div>
                 </div>
-                <div>
-                  <span className="text-[10px] text-gray-400 font-bold">Category</span>
-                  <p className="font-bold text-gray-800 mt-0.5">{activeInquiry.inquiryType}</p>
-                </div>
-                <div>
-                  <span className="text-[10px] text-gray-400 font-bold">Submitted</span>
-                  <p className="font-bold text-gray-800 mt-0.5">
-                    {new Date(activeInquiry.createdAt).toLocaleDateString()}
-                  </p>
-                </div>
-                <div>
-                  <span className="text-[10px] text-gray-400 font-bold">Current Status</span>
-                  <div className="mt-0.5">{getStatusBadge(activeInquiry.status)}</div>
-                </div>
-              </div>
 
-              {/* Message Content */}
-              <div>
-                <label className="text-xs font-bold text-gray-700 tracking-wider block mb-2">
-                  Customer Message
-                </label>
-                <div className="p-4 rounded-2xl bg-gray-50/80 border border-gray-200/70 text-gray-800 text-sm whitespace-pre-wrap leading-relaxed font-normal">
-                  {activeInquiry.message}
+                {/* Message Content */}
+                <div>
+                  <label className="text-xs font-semibold text-gray-700 block mb-2">
+                    Customer Message
+                  </label>
+                  <div className="p-4 rounded-lg bg-gray-50/80 border border-gray-200/70 text-gray-800 text-sm whitespace-pre-wrap leading-relaxed font-normal">
+                    {activeInquiry.message}
+                  </div>
                 </div>
-              </div>
 
-              {/* Action: Status Workflow */}
-              <div className="p-4 rounded-2xl border border-gray-200/80 bg-white space-y-3">
-                <div className="flex items-center justify-between">
-                  <span className="font-bold text-gray-800 flex items-center gap-1.5">
-                    <UserCheck className="w-4 h-4 text-[#3BBA93]" />
-                    <span>Response & Workflow Status</span>
-                  </span>
-                  {activeInquiry.handledBy && (
-                    <span className="text-[11px] text-gray-500">
-                      Handled by <strong className="text-gray-800">{activeInquiry.handledBy.name}</strong> (
-                      {activeInquiry.handledAt ? new Date(activeInquiry.handledAt).toLocaleDateString() : 'Recent'})
+                {/* Action: Status Workflow */}
+                <div className="p-4 rounded-lg border border-gray-200/80 bg-white space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="font-semibold text-gray-800 flex items-center gap-1.5">
+                      <UserCheck className="w-4 h-4 text-[#3BBA93]" />
+                      <span>Response & Workflow Status</span>
                     </span>
+                    {activeInquiry.handledBy && (
+                      <span className="text-[11px] text-gray-500">
+                        Handled by <strong className="text-gray-800">{activeInquiry.handledBy.name}</strong> (
+                        {activeInquiry.handledAt ? new Date(activeInquiry.handledAt).toLocaleDateString() : 'Recent'})
+                      </span>
+                    )}
+                  </div>
+
+                  {canEdit('inquiries') ? (
+                    <div className="flex flex-wrap gap-2 pt-1">
+                      {(['UNREAD', 'READ', 'CONTACTED', 'RESOLVED'] as const).map((st) => (
+                        <Button
+                          key={st}
+                          size="sm"
+                          disabled={updatingStatus}
+                          variant={activeInquiry.status === st ? 'gradient' : 'outline'}
+                          onClick={() => handleStatusChange(st)}
+                          className={`text-xs font-semibold rounded-lg ${
+                            activeInquiry.status === st ? 'shadow-sm' : 'border-gray-200 text-gray-700'
+                          }`}
+                        >
+                          {st}
+                        </Button>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-gray-400 italic text-[11px]">
+                      You have view-only permissions. Status cannot be modified.
+                    </p>
                   )}
                 </div>
 
-                {canEdit('inquiries') ? (
-                  <div className="flex flex-wrap gap-2 pt-1">
-                    {(['UNREAD', 'READ', 'CONTACTED', 'RESOLVED'] as const).map((st) => (
+                {/* Internal Notes */}
+                <div className="space-y-2">
+                  <label className="text-xs font-semibold text-gray-700 flex items-center justify-between">
+                    <span>Internal Staff Notes</span>
+                    <span className="text-[10px] text-gray-400 font-normal">Private team log</span>
+                  </label>
+                  <textarea
+                    rows={3}
+                    disabled={!canEdit('inquiries')}
+                    value={adminNotes}
+                    onChange={(e) => setAdminNotes(e.target.value)}
+                    placeholder="Record outcome of phone call, email response, assigned account manager, or follow-up details..."
+                    className="w-full p-3 text-xs bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#3BBA93] focus:bg-white transition-all text-[#2A292D]"
+                  />
+                  {canEdit('inquiries') && (
+                    <div className="flex justify-end">
                       <Button
-                        key={st}
                         size="sm"
-                        disabled={updatingStatus}
-                        variant={activeInquiry.status === st ? 'gradient' : 'outline'}
-                        onClick={() => handleStatusChange(st)}
-                        className={`text-xs font-bold rounded-xl ${
-                          activeInquiry.status === st ? 'shadow-md' : 'border-gray-200 text-gray-700'
-                        }`}
+                        onClick={handleSaveNotes}
+                        disabled={savingNotes}
+                        className="bg-[#2A292D] hover:bg-black text-white text-xs font-semibold rounded-lg space-x-1.5"
                       >
-                        {st}
+                        <Save className="w-3.5 h-3.5" />
+                        <span>{savingNotes ? 'Saving...' : 'Save Notes'}</span>
                       </Button>
-                    ))}
-                  </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Modal Footer */}
+              <div className="p-4 bg-gray-50 border-t border-gray-100 flex items-center justify-between">
+                {canEdit('inquiries') ? (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => handleDelete(activeInquiry.id)}
+                    className="text-red-500 hover:text-red-700 hover:bg-red-50 text-xs font-semibold space-x-1"
+                  >
+                    <Trash2 className="w-3.5 h-3.5" />
+                    <span>Delete Inquiry</span>
+                  </Button>
                 ) : (
-                  <p className="text-gray-400 italic text-[11px]">
-                    You have view-only permissions. Status cannot be modified.
-                  </p>
+                  <div />
                 )}
-              </div>
-
-              {/* Internal Notes */}
-              <div className="space-y-2">
-                <label className="text-xs font-bold text-gray-700 tracking-wider flex items-center justify-between">
-                  <span>Internal Staff Notes</span>
-                  <span className="text-[10px] text-gray-400 font-normal">Private team log</span>
-                </label>
-                <textarea
-                  rows={3}
-                  disabled={!canEdit('inquiries')}
-                  value={adminNotes}
-                  onChange={(e) => setAdminNotes(e.target.value)}
-                  placeholder="Record outcome of phone call, email response, assigned account manager, or follow-up details..."
-                  className="w-full p-3 text-xs bg-gray-50 border border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#3BBA93] focus:bg-white transition-all text-[#2A292D]"
-                />
-                {canEdit('inquiries') && (
-                  <div className="flex justify-end">
-                    <Button
-                      size="sm"
-                      onClick={handleSaveNotes}
-                      disabled={savingNotes}
-                      className="bg-[#2A292D] hover:bg-black text-white text-xs font-bold rounded-xl space-x-1.5"
-                    >
-                      <Save className="w-3.5 h-3.5" />
-                      <span>{savingNotes ? 'Saving...' : 'Save Notes'}</span>
-                    </Button>
-                  </div>
-                )}
-              </div>
-            </div>
-
-            {/* Modal Footer */}
-            <div className="p-4 bg-gray-50 border-t border-gray-100 flex items-center justify-between">
-              {canEdit('inquiries') ? (
                 <Button
-                  variant="ghost"
+                  variant="outline"
                   size="sm"
-                  onClick={() => handleDelete(activeInquiry.id)}
-                  className="text-red-500 hover:text-red-700 hover:bg-red-50 text-xs font-bold space-x-1"
+                  onClick={() => setActiveInquiry(null)}
+                  className="rounded-lg border-gray-200 text-xs font-semibold"
                 >
-                  <Trash2 className="w-3.5 h-3.5" />
-                  <span>Delete Inquiry</span>
+                  Close
                 </Button>
-              ) : (
-                <div />
-              )}
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setActiveInquiry(null)}
-                className="rounded-xl border-gray-200 text-xs font-bold"
-              >
-                Close Drawer
-              </Button>
-            </div>
-          </div>
-        </div>
-      )}
+              </div>
+            </>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

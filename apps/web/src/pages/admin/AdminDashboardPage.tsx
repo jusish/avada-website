@@ -13,6 +13,7 @@ import {
   TrendingUp,
   ScrollText,
 } from 'lucide-react';
+import { ContactInquiry, AuditLog } from '@avada/shared';
 
 export const AdminDashboardPage: React.FC = () => {
   const { user, token } = useAuth();
@@ -20,8 +21,8 @@ export const AdminDashboardPage: React.FC = () => {
   const [unreadInquiries, setUnreadInquiries] = useState<number>(0);
   const [countriesCount, setCountriesCount] = useState<number>(0);
   const [articlesCount, setArticlesCount] = useState<number>(0);
-  const [recentInquiries, setRecentInquiries] = useState<any[]>([]);
-  const [recentAudit, setRecentAudit] = useState<any[]>([]);
+  const [recentInquiries, setRecentInquiries] = useState<ContactInquiry[]>([]);
+  const [recentAudit, setRecentAudit] = useState<AuditLog[]>([]);
   const [apiHealth, setApiHealth] = useState<string>('Operational');
   const [loading, setLoading] = useState<boolean>(true);
 
@@ -40,7 +41,7 @@ export const AdminDashboardPage: React.FC = () => {
       .then(([inqStats, inqs, countries, articles, audit, health]) => {
         if (inqStats.success && inqStats.data) {
           setInquiriesCount(inqStats.data.total || 0);
-          setUnreadInquiries(inqStats.data.new || 0);
+          setUnreadInquiries(inqStats.data.unread ?? inqStats.data.new ?? 0);
         }
         if (inqs.success && Array.isArray(inqs.data)) {
           setRecentInquiries(inqs.data);
@@ -62,15 +63,15 @@ export const AdminDashboardPage: React.FC = () => {
   }, [token]);
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6">
       {/* Welcome Banner */}
-      <div className="bg-[#2A292D] rounded-3xl p-6 sm:p-8 text-white relative overflow-hidden shadow-xl border border-white/5">
+      <div className="bg-[#2A292D] rounded-xl p-6 sm:p-7 text-white relative overflow-hidden shadow-lg border border-white/10">
         <div className="relative z-10 max-w-2xl">
-          <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-[#3BBA93]/20 border border-[#3BBA93]/30 text-[#3BBA93] text-xs font-bold mb-3">
+          <div className="inline-flex items-center space-x-2 px-2.5 py-1 rounded-full bg-[#3BBA93]/20 border border-[#3BBA93]/30 text-[#3BBA93] text-xs font-semibold mb-3">
             <span className="w-2 h-2 rounded-full bg-[#3BBA93] animate-pulse"></span>
             <span>Enterprise CMS Operational</span>
           </div>
-          <h1 className="text-2xl sm:text-3xl font-black tracking-tight">
+          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">
             Welcome back, {user?.name || 'Administrator'}
           </h1>
           <p className="text-xs sm:text-sm text-white/70 mt-2 leading-relaxed">
@@ -79,20 +80,20 @@ export const AdminDashboardPage: React.FC = () => {
 
           <div className="flex flex-wrap items-center gap-3 pt-4">
             <Link to="/admin/inquiries">
-              <Button size="sm" variant="gradient" className="rounded-xl text-xs font-bold space-x-1.5 shadow-md">
+              <Button size="sm" className="rounded-lg text-xs font-semibold bg-[#3BBA93] hover:bg-[#32a481] text-white border border-[#3BBA93] space-x-1.5 shadow-sm">
                 <Inbox className="w-3.5 h-3.5" />
                 <span>Open Inquiries ({unreadInquiries} New)</span>
               </Button>
             </Link>
             <Link to="/admin/content/countries">
-              <Button size="sm" variant="outline" className="rounded-xl text-xs font-bold text-white border-white/20 hover:bg-white/10 space-x-1.5">
+              <Button size="sm" variant="ghost" className="rounded-lg text-xs font-semibold bg-black/40 hover:bg-black/60 text-white/90 border border-white/15 hover:border-[#3BBA93]/40 space-x-1.5 transition-colors">
                 <Globe2 className="w-3.5 h-3.5 text-[#3BBA93]" />
                 <span>African Markets</span>
               </Button>
             </Link>
             <Link to="/admin/insights/analytics">
-              <Button size="sm" variant="outline" className="rounded-xl text-xs font-bold text-white border-white/20 hover:bg-white/10 space-x-1.5">
-                <TrendingUp className="w-3.5 h-3.5 text-blue-400" />
+              <Button size="sm" variant="ghost" className="rounded-lg text-xs font-semibold bg-black/40 hover:bg-black/60 text-white/90 border border-white/15 hover:border-[#3BBA93]/40 space-x-1.5 transition-colors">
+                <TrendingUp className="w-3.5 h-3.5 text-[#3BBA93]" />
                 <span>Live Analytics</span>
               </Button>
             </Link>
@@ -106,7 +107,7 @@ export const AdminDashboardPage: React.FC = () => {
       {/* KPI Stat Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <Link to="/admin/inquiries">
-          <Card className="bg-white border-gray-200/80 shadow-sm rounded-2xl hover:shadow-md transition-all cursor-pointer">
+          <Card className="bg-white border-gray-200/80 shadow-sm rounded-xl hover:shadow-md transition-all cursor-pointer">
             <CardHeader className="flex flex-row items-center justify-between pb-1 pt-4 px-5">
               <CardTitle className="text-xs font-semibold text-gray-500 tracking-wider">
                 Leads & Inquiries
@@ -114,10 +115,10 @@ export const AdminDashboardPage: React.FC = () => {
               <Inbox className="w-4 h-4 text-[#3BBA93]" />
             </CardHeader>
             <CardContent className="px-5 pb-4">
-              <div className="text-2xl font-black text-[#2A292D]">
+              <div className="text-2xl font-bold text-[#2A292D]">
                 {loading ? '-' : inquiriesCount}
               </div>
-              <p className="text-[11px] text-emerald-600 font-semibold mt-0.5">
+              <p className="text-[11px] text-emerald-600 font-medium mt-0.5">
                 {unreadInquiries} unread requires response
               </p>
             </CardContent>
@@ -125,7 +126,7 @@ export const AdminDashboardPage: React.FC = () => {
         </Link>
 
         <Link to="/admin/content/countries">
-          <Card className="bg-white border-gray-200/80 shadow-sm rounded-2xl hover:shadow-md transition-all cursor-pointer">
+          <Card className="bg-white border-gray-200/80 shadow-sm rounded-xl hover:shadow-md transition-all cursor-pointer">
             <CardHeader className="flex flex-row items-center justify-between pb-1 pt-4 px-5">
               <CardTitle className="text-xs font-semibold text-gray-500 tracking-wider">
                 African Markets
@@ -133,7 +134,7 @@ export const AdminDashboardPage: React.FC = () => {
               <Globe2 className="w-4 h-4 text-blue-500" />
             </CardHeader>
             <CardContent className="px-5 pb-4">
-              <div className="text-2xl font-black text-blue-600">
+              <div className="text-2xl font-bold text-blue-600">
                 {loading ? '-' : countriesCount}
               </div>
               <p className="text-[11px] text-gray-400 mt-0.5">Live regional payment rails</p>
@@ -142,7 +143,7 @@ export const AdminDashboardPage: React.FC = () => {
         </Link>
 
         <Link to="/admin/content/articles">
-          <Card className="bg-white border-gray-200/80 shadow-sm rounded-2xl hover:shadow-md transition-all cursor-pointer">
+          <Card className="bg-white border-gray-200/80 shadow-sm rounded-xl hover:shadow-md transition-all cursor-pointer">
             <CardHeader className="flex flex-row items-center justify-between pb-1 pt-4 px-5">
               <CardTitle className="text-xs font-semibold text-gray-500 tracking-wider">
                 Articles & Press
@@ -150,7 +151,7 @@ export const AdminDashboardPage: React.FC = () => {
               <FileText className="w-4 h-4 text-purple-500" />
             </CardHeader>
             <CardContent className="px-5 pb-4">
-              <div className="text-2xl font-black text-purple-600">
+              <div className="text-2xl font-bold text-purple-600">
                 {loading ? '-' : articlesCount}
               </div>
               <p className="text-[11px] text-gray-400 mt-0.5">Marketing & guides published</p>
@@ -159,7 +160,7 @@ export const AdminDashboardPage: React.FC = () => {
         </Link>
 
         <Link to="/admin/insights/security">
-          <Card className="bg-white border-gray-200/80 shadow-sm rounded-2xl hover:shadow-md transition-all cursor-pointer">
+          <Card className="bg-white border-gray-200/80 shadow-sm rounded-xl hover:shadow-md transition-all cursor-pointer">
             <CardHeader className="flex flex-row items-center justify-between pb-1 pt-4 px-5">
               <CardTitle className="text-xs font-semibold text-gray-500 tracking-wider">
                 System Health
@@ -177,7 +178,7 @@ export const AdminDashboardPage: React.FC = () => {
       {/* Two Column Grid: Recent Inquiries & Recent Audit Trail */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Recent Inquiries Panel */}
-        <Card className="bg-white border-gray-200/80 shadow-sm rounded-3xl overflow-hidden">
+        <Card className="bg-white border-gray-200/80 shadow-sm rounded-xl overflow-hidden">
           <CardHeader className="bg-gray-50/70 border-b border-gray-100 p-5 flex flex-row items-center justify-between">
             <div>
               <CardTitle className="text-sm font-bold text-[#2A292D] flex items-center gap-2">
@@ -218,7 +219,7 @@ export const AdminDashboardPage: React.FC = () => {
                     <div className="text-right">
                       <Badge
                         className={`text-[10px] font-semibold ${
-                          inq.status === 'NEW'
+                          inq.status === 'UNREAD'
                             ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
                             : 'bg-gray-100 text-gray-600'
                         }`}
@@ -237,7 +238,7 @@ export const AdminDashboardPage: React.FC = () => {
         </Card>
 
         {/* Recent Audit Activity Panel */}
-        <Card className="bg-white border-gray-200/80 shadow-sm rounded-3xl overflow-hidden">
+        <Card className="bg-white border-gray-200/80 shadow-sm rounded-xl overflow-hidden">
           <CardHeader className="bg-gray-50/70 border-b border-gray-100 p-5 flex flex-row items-center justify-between">
             <div>
               <CardTitle className="text-sm font-bold text-[#2A292D] flex items-center gap-2">
@@ -266,9 +267,9 @@ export const AdminDashboardPage: React.FC = () => {
                 recentAudit.map((log) => (
                   <div key={log.id} className="p-4 flex items-center justify-between">
                     <div>
-                      <div className="font-semibold text-gray-800">{log.description}</div>
+                      <div className="font-semibold text-gray-800">{log.action} {log.entityType}</div>
                       <div className="text-[11px] text-gray-400 mt-0.5">
-                        By <strong className="text-gray-600">{log.user?.name || 'System'}</strong> • Module: {log.module}
+                        By <strong className="text-gray-600">{log.userEmail || 'System'}</strong> • Entity ID: {log.entityId || 'N/A'}
                       </div>
                     </div>
                     <div className="text-right">

@@ -94,9 +94,9 @@ export const AdminAnalyticsPage: React.FC = () => {
 
       {/* KPI Stat Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <Card className="bg-white border-gray-200/80 shadow-sm rounded-2xl">
+        <Card className="bg-white border-gray-200/80 shadow-sm rounded-xl">
           <CardHeader className="flex flex-row items-center justify-between pb-1 pt-4 px-5">
-            <CardTitle className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
+            <CardTitle className="text-xs font-semibold text-gray-500 tracking-wider">
               Total Visits
             </CardTitle>
             <TrendingUp className="w-4 h-4 text-[#3BBA93]" />
@@ -112,9 +112,9 @@ export const AdminAnalyticsPage: React.FC = () => {
           </CardContent>
         </Card>
 
-        <Card className="bg-white border-gray-200/80 shadow-sm rounded-2xl">
+        <Card className="bg-white border-gray-200/80 shadow-sm rounded-xl">
           <CardHeader className="flex flex-row items-center justify-between pb-1 pt-4 px-5">
-            <CardTitle className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
+            <CardTitle className="text-xs font-semibold text-gray-500 tracking-wider">
               Unique Visitors
             </CardTitle>
             <Users className="w-4 h-4 text-blue-500" />
@@ -127,9 +127,9 @@ export const AdminAnalyticsPage: React.FC = () => {
           </CardContent>
         </Card>
 
-        <Card className="bg-white border-gray-200/80 shadow-sm rounded-2xl">
+        <Card className="bg-white border-gray-200/80 shadow-sm rounded-xl">
           <CardHeader className="flex flex-row items-center justify-between pb-1 pt-4 px-5">
-            <CardTitle className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
+            <CardTitle className="text-xs font-semibold text-gray-500 tracking-wider">
               Avg Response Time
             </CardTitle>
             <Clock className="w-4 h-4 text-purple-500" />
@@ -142,9 +142,9 @@ export const AdminAnalyticsPage: React.FC = () => {
           </CardContent>
         </Card>
 
-        <Card className="bg-white border-gray-200/80 shadow-sm rounded-2xl">
+        <Card className="bg-white border-gray-200/80 shadow-sm rounded-xl">
           <CardHeader className="flex flex-row items-center justify-between pb-1 pt-4 px-5">
-            <CardTitle className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
+            <CardTitle className="text-xs font-semibold text-gray-500 tracking-wider">
               SLA Availability
             </CardTitle>
             <Activity className="w-4 h-4 text-emerald-500" />
@@ -159,7 +159,7 @@ export const AdminAnalyticsPage: React.FC = () => {
       </div>
 
       {/* Visual Timeline Chart */}
-      <Card className="bg-white border-gray-200/80 shadow-sm rounded-3xl p-6">
+      <Card className="bg-white border-gray-200/80 shadow-sm rounded-xl p-6">
         <div className="flex items-center justify-between mb-6">
           <div>
             <h3 className="text-sm font-bold text-[#2A292D] flex items-center gap-2">
@@ -207,7 +207,7 @@ export const AdminAnalyticsPage: React.FC = () => {
       {/* Two Column: Top Visited Pages & African Geography Breakdown */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Top Routes */}
-        <Card className="bg-white border-gray-200/80 shadow-sm rounded-3xl overflow-hidden">
+        <Card className="bg-white border-gray-200/80 shadow-sm rounded-xl overflow-hidden">
           <CardHeader className="bg-gray-50/70 border-b border-gray-100 p-5">
             <CardTitle className="text-sm font-bold text-[#2A292D] flex items-center gap-2">
               <FileText className="w-4 h-4 text-[#3BBA93]" />
@@ -251,7 +251,7 @@ export const AdminAnalyticsPage: React.FC = () => {
         </Card>
 
         {/* African Geography Breakdown */}
-        <Card className="bg-white border-gray-200/80 shadow-sm rounded-3xl overflow-hidden">
+        <Card className="bg-white border-gray-200/80 shadow-sm rounded-xl overflow-hidden">
           <CardHeader className="bg-gray-50/70 border-b border-gray-100 p-5">
             <CardTitle className="text-sm font-bold text-[#2A292D] flex items-center gap-2">
               <Globe2 className="w-4 h-4 text-[#3BBA93]" />

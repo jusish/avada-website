@@ -5,6 +5,12 @@ import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import {
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  DialogDescription,
+} from '@/components/ui/dialog';
+import {
   Tags,
   Plus,
   Edit2,
@@ -12,7 +18,6 @@ import {
   ToggleLeft,
   ToggleRight,
   Search,
-  X,
   Save,
 } from 'lucide-react';
 
@@ -205,7 +210,7 @@ export const AdminInquiryTypesPage: React.FC = () => {
       </div>
 
       {/* Filter and Summary */}
-      <Card className="bg-white border-gray-200/80 shadow-sm rounded-2xl p-4">
+      <Card className="bg-white border-gray-200/80 shadow-sm rounded-xl p-4">
         <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
           <div className="relative w-full sm:w-80">
             <Search className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
@@ -226,7 +231,7 @@ export const AdminInquiryTypesPage: React.FC = () => {
       </Card>
 
       {/* Categories Table */}
-      <Card className="bg-white border-gray-200/80 shadow-sm rounded-2xl overflow-hidden">
+      <Card className="bg-white border-gray-200/80 shadow-sm rounded-xl overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
@@ -331,106 +336,101 @@ export const AdminInquiryTypesPage: React.FC = () => {
       </Card>
 
       {/* Modal: Create or Edit */}
-      {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in">
-          <div className="bg-white w-full max-w-lg rounded-3xl shadow-2xl border border-gray-100 overflow-hidden">
-            <div className="p-5 bg-[#2A292D] text-white flex items-center justify-between">
-              <div>
-                <span className="text-xs font-bold tracking-wider text-[#3BBA93]">
-                  {editingType ? 'Edit Category' : 'Create Category'}
-                </span>
-                <h2 className="text-lg font-bold">{editingType ? editingType.label : 'New Inquiry Category'}</h2>
-              </div>
-              <button
-                onClick={() => setIsModalOpen(false)}
-                className="text-white/60 hover:text-white p-1 rounded-full hover:bg-white/10"
-              >
-                <X className="w-5 h-5" />
-              </button>
+      <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
+        <DialogContent className="max-w-lg p-0 rounded-xl overflow-hidden border border-gray-100">
+          <div className="p-5 bg-[#2A292D] text-white">
+            <span className="text-xs font-semibold tracking-wider text-[#3BBA93]">
+              {editingType ? 'Edit Category' : 'Create Category'}
+            </span>
+            <DialogTitle className="text-lg font-bold text-white mt-1">
+              {editingType ? editingType.label : 'New Inquiry Category'}
+            </DialogTitle>
+            <DialogDescription className="text-xs text-gray-400 mt-0.5">
+              Manage the classification option available on the contact form.
+            </DialogDescription>
+          </div>
+
+          <form onSubmit={handleSave} className="p-6 space-y-4 text-xs">
+            <div>
+              <label className="block text-xs font-bold text-gray-700 mb-1">Category Label *</label>
+              <input
+                type="text"
+                required
+                value={form.label}
+                onChange={(e) => handleLabelChange(e.target.value)}
+                placeholder="e.g. Developer & API Integration"
+                className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#3BBA93] focus:bg-white text-[#2A292D]"
+              />
             </div>
 
-            <form onSubmit={handleSave} className="p-6 space-y-4 text-xs">
+            <div>
+              <label className="block text-xs font-bold text-gray-700 mb-1">Unique Key Identifier *</label>
+              <input
+                type="text"
+                required
+                value={form.key}
+                onChange={(e) => setForm({ ...form, key: e.target.value })}
+                placeholder="e.g. developer-api"
+                className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-xl font-mono text-xs focus:ring-2 focus:ring-[#3BBA93] focus:bg-white text-[#2A292D]"
+              />
+            </div>
+
+            <div>
+              <label className="block text-xs font-bold text-gray-700 mb-1">Description (Optional)</label>
+              <textarea
+                rows={2}
+                value={form.description}
+                onChange={(e) => setForm({ ...form, description: e.target.value })}
+                placeholder="Brief explanation of when users should select this inquiry category..."
+                className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#3BBA93] focus:bg-white text-[#2A292D]"
+              />
+            </div>
+
+            <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="block text-xs font-bold text-gray-700 mb-1">Category Label *</label>
+                <label className="block text-xs font-bold text-gray-700 mb-1">Display Sort Order</label>
                 <input
-                  type="text"
-                  required
-                  value={form.label}
-                  onChange={(e) => handleLabelChange(e.target.value)}
-                  placeholder="e.g. Developer & API Integration"
-                  className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#3BBA93] focus:bg-white text-[#2A292D]"
+                  type="number"
+                  value={form.displayOrder}
+                  onChange={(e) => setForm({ ...form, displayOrder: parseInt(e.target.value) || 0 })}
+                  className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-xl text-center font-bold text-[#2A292D]"
                 />
               </div>
-
-              <div>
-                <label className="block text-xs font-bold text-gray-700 mb-1">Unique Key Identifier *</label>
-                <input
-                  type="text"
-                  required
-                  value={form.key}
-                  onChange={(e) => setForm({ ...form, key: e.target.value })}
-                  placeholder="e.g. developer-api"
-                  className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-xl font-mono text-xs focus:ring-2 focus:ring-[#3BBA93] focus:bg-white text-[#2A292D]"
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-bold text-gray-700 mb-1">Description (Optional)</label>
-                <textarea
-                  rows={2}
-                  value={form.description}
-                  onChange={(e) => setForm({ ...form, description: e.target.value })}
-                  placeholder="Brief explanation of when users should select this inquiry category..."
-                  className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#3BBA93] focus:bg-white text-[#2A292D]"
-                />
-              </div>
-
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-xs font-bold text-gray-700 mb-1">Display Sort Order</label>
+              <div className="flex flex-col justify-end">
+                <label className="inline-flex items-center gap-2 cursor-pointer pb-2">
                   <input
-                    type="number"
-                    value={form.displayOrder}
-                    onChange={(e) => setForm({ ...form, displayOrder: parseInt(e.target.value) || 0 })}
-                    className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-xl text-center font-bold text-[#2A292D]"
+                    type="checkbox"
+                    checked={form.active}
+                    onChange={(e) => setForm({ ...form, active: e.target.checked })}
+                    className="rounded text-[#3BBA93] focus:ring-[#3BBA93] w-4 h-4"
                   />
-                </div>
-                <div className="flex flex-col justify-end">
-                  <label className="inline-flex items-center gap-2 cursor-pointer pb-2">
-                    <input
-                      type="checkbox"
-                      checked={form.active}
-                      onChange={(e) => setForm({ ...form, active: e.target.checked })}
-                      className="rounded text-[#3BBA93] focus:ring-[#3BBA93] w-4 h-4"
-                    />
-                    <span className="text-xs font-bold text-gray-700">Display as Active</span>
-                  </label>
-                </div>
+                  <span className="text-xs font-bold text-gray-700">Display as Active</span>
+                </label>
               </div>
+            </div>
 
-              <div className="pt-4 flex items-center justify-end gap-2 border-t border-gray-100">
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => setIsModalOpen(false)}
-                  className="rounded-xl border-gray-200 text-xs font-bold"
-                >
-                  Cancel
-                </Button>
-                <Button
-                  type="submit"
-                  disabled={saving}
-                  variant="gradient"
-                  className="rounded-xl text-xs font-bold space-x-1.5"
-                >
-                  <Save className="w-3.5 h-3.5" />
-                  <span>{saving ? 'Saving...' : 'Save Category'}</span>
-                </Button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
+            <div className="pt-4 flex items-center justify-end gap-2 border-t border-gray-100">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setIsModalOpen(false)}
+                className="rounded-xl border-gray-200 text-xs font-bold"
+              >
+                Cancel
+              </Button>
+              <Button
+                type="submit"
+                disabled={saving}
+                variant="gradient"
+                className="rounded-xl text-xs font-bold space-x-1.5"
+              >
+                <Save className="w-3.5 h-3.5" />
+                <span>{saving ? 'Saving...' : 'Save Category'}</span>
+              </Button>
+            </div>
+          </form>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

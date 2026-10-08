@@ -211,6 +211,51 @@ router.patch('/:id/status', requirePermission('users', 'edit'), async (req: Auth
   }
 });
 
+// POST & PATCH /api/admin/users/:id/toggle-status
+const handleToggleUserStatus = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+  try {
+    const { id } = req.params;
+
+    if (req.user?.id === id) {
+      res.status(400).json({ success: false, error: 'You cannot change your own administrator status.' });
+      return;
+    }
+
+    const existing = await prisma.user.findUnique({ where: { id }, include: { role: true } });
+    if (!existing) {
+      res.status(404).json({ success: false, error: 'User not found' });
+      return;
+    }
+
+    const nextStatus = existing.status === 'ACTIVE' ? 'SUSPENDED' : 'ACTIVE';
+    const updated = await prisma.user.update({
+      where: { id },
+      data: { status: nextStatus },
+      include: { role: true },
+    });
+
+    await logAudit({
+      req,
+      action: 'CHANGE_USER_STATUS',
+      entityType: 'User',
+      entityId: id,
+      details: { email: updated.email, status: nextStatus },
+    });
+
+    res.json({
+      success: true,
+      data: updated,
+      message: `User status changed to ${nextStatus}`,
+    });
+  } catch (error) {
+    console.error('Toggle status error:', error);
+    res.status(500).json({ success: false, error: 'Failed to toggle user status' });
+  }
+};
+
+router.post('/:id/toggle-status', requirePermission('users', 'edit'), handleToggleUserStatus);
+router.patch('/:id/toggle-status', requirePermission('users', 'edit'), handleToggleUserStatus);
+
 // DELETE /api/admin/users/:id
 router.delete('/:id', requirePermission('users', 'edit'), async (req: AuthenticatedRequest, res: Response): Promise<void> => {
   try {

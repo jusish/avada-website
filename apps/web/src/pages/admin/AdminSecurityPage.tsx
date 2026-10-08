@@ -98,9 +98,9 @@ export const AdminSecurityPage: React.FC = () => {
 
       {/* Health Overview Metric Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <Card className="bg-white border-gray-200/80 shadow-sm rounded-2xl">
+        <Card className="bg-white border-gray-200/80 shadow-sm rounded-xl">
           <CardHeader className="flex flex-row items-center justify-between pb-1 pt-4 px-5">
-            <CardTitle className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
+            <CardTitle className="text-xs font-semibold text-gray-500 tracking-wider">
               Uptime Availability
             </CardTitle>
             <CheckCircle2 className="w-4 h-4 text-[#3BBA93]" />
@@ -113,9 +113,9 @@ export const AdminSecurityPage: React.FC = () => {
           </CardContent>
         </Card>
 
-        <Card className="bg-white border-gray-200/80 shadow-sm rounded-2xl">
+        <Card className="bg-white border-gray-200/80 shadow-sm rounded-xl">
           <CardHeader className="flex flex-row items-center justify-between pb-1 pt-4 px-5">
-            <CardTitle className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
+            <CardTitle className="text-xs font-semibold text-gray-500 tracking-wider">
               System Latency
             </CardTitle>
             <Zap className="w-4 h-4 text-emerald-500" />
@@ -128,9 +128,9 @@ export const AdminSecurityPage: React.FC = () => {
           </CardContent>
         </Card>
 
-        <Card className="bg-white border-gray-200/80 shadow-sm rounded-2xl">
+        <Card className="bg-white border-gray-200/80 shadow-sm rounded-xl">
           <CardHeader className="flex flex-row items-center justify-between pb-1 pt-4 px-5">
-            <CardTitle className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
+            <CardTitle className="text-xs font-semibold text-gray-500 tracking-wider">
               Threats Flagged
             </CardTitle>
             <ShieldAlert className="w-4 h-4 text-amber-500" />
@@ -143,9 +143,9 @@ export const AdminSecurityPage: React.FC = () => {
           </CardContent>
         </Card>
 
-        <Card className="bg-white border-gray-200/80 shadow-sm rounded-2xl">
+        <Card className="bg-white border-gray-200/80 shadow-sm rounded-xl">
           <CardHeader className="flex flex-row items-center justify-between pb-1 pt-4 px-5">
-            <CardTitle className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
+            <CardTitle className="text-xs font-semibold text-gray-500 tracking-wider">
               Core Status
             </CardTitle>
             <Server className="w-4 h-4 text-[#3BBA93]" />
@@ -162,48 +162,48 @@ export const AdminSecurityPage: React.FC = () => {
 
       {/* Subsystem Health Checks Grid */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <div className="p-4 rounded-2xl bg-white border border-gray-200/80 shadow-sm flex items-center gap-3">
+        <div className="p-4 rounded-xl bg-white border border-gray-200/80 shadow-sm flex items-center gap-3">
           <div className="w-10 h-10 rounded-xl bg-emerald-50 text-[#3BBA93] flex items-center justify-center">
             <Database className="w-5 h-5" />
           </div>
           <div>
-            <span className="text-[11px] font-bold text-gray-400 uppercase">PostgreSQL DB</span>
+            <span className="text-[11px] font-bold text-gray-400">PostgreSQL DB</span>
             <div className="text-xs font-bold text-gray-800">
               {data?.healthChecks?.database || 'Connected (Port 5435)'}
             </div>
           </div>
         </div>
 
-        <div className="p-4 rounded-2xl bg-white border border-gray-200/80 shadow-sm flex items-center gap-3">
+        <div className="p-4 rounded-xl bg-white border border-gray-200/80 shadow-sm flex items-center gap-3">
           <div className="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center">
             <Zap className="w-5 h-5" />
           </div>
           <div>
-            <span className="text-[11px] font-bold text-gray-400 uppercase">API Gateway</span>
+            <span className="text-[11px] font-bold text-gray-400">API Gateway</span>
             <div className="text-xs font-bold text-gray-800">
               {data?.healthChecks?.apiLatency || 'Healthy (Port 5005)'}
             </div>
           </div>
         </div>
 
-        <div className="p-4 rounded-2xl bg-white border border-gray-200/80 shadow-sm flex items-center gap-3">
+        <div className="p-4 rounded-xl bg-white border border-gray-200/80 shadow-sm flex items-center gap-3">
           <div className="w-10 h-10 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center">
             <Cpu className="w-5 h-5" />
           </div>
           <div>
-            <span className="text-[11px] font-bold text-gray-400 uppercase">Memory Footprint</span>
+            <span className="text-[11px] font-bold text-gray-400">Memory Footprint</span>
             <div className="text-xs font-bold text-gray-800">
               {data?.healthChecks?.memoryUsage || '42.8 MB (Normal)'}
             </div>
           </div>
         </div>
 
-        <div className="p-4 rounded-2xl bg-white border border-gray-200/80 shadow-sm flex items-center gap-3">
+        <div className="p-4 rounded-xl bg-white border border-gray-200/80 shadow-sm flex items-center gap-3">
           <div className="w-10 h-10 rounded-xl bg-emerald-50 text-[#3BBA93] flex items-center justify-center">
             <Lock className="w-5 h-5" />
           </div>
           <div>
-            <span className="text-[11px] font-bold text-gray-400 uppercase">TLS & SSL</span>
+            <span className="text-[11px] font-bold text-gray-400">TLS & SSL</span>
             <div className="text-xs font-bold text-gray-800">
               {data?.healthChecks?.tlsCertificate || 'Active & Encrypted'}
             </div>
@@ -212,7 +212,7 @@ export const AdminSecurityPage: React.FC = () => {
       </div>
 
       {/* Security Threat Feed Table */}
-      <Card className="bg-white border-gray-200/80 shadow-sm rounded-3xl overflow-hidden">
+      <Card className="bg-white border-gray-200/80 shadow-sm rounded-xl overflow-hidden">
         <CardHeader className="bg-gray-50/70 border-b border-gray-100 p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div>
             <CardTitle className="text-sm font-bold text-[#2A292D] flex items-center gap-2">
@@ -232,7 +232,7 @@ export const AdminSecurityPage: React.FC = () => {
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse text-xs">
               <thead>
-                <tr className="bg-gray-50/80 border-b border-gray-200 text-[11px] font-bold text-gray-500 uppercase tracking-wider">
+                <tr className="bg-gray-50/80 border-b border-gray-200 text-[11px] font-bold text-gray-500 tracking-wider">
                   <th className="py-3 px-4">Detected Threat</th>
                   <th className="py-3 px-4">Target URI</th>
                   <th className="py-3 px-4">Client IP Address</th>

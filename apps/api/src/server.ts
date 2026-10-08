@@ -52,6 +52,8 @@ app.use('/api/auth', authRoutes);
 
 // Protected Admin CMS Endpoints
 app.use('/api/content', contentRoutes);
+app.use('/api/admin/content', contentRoutes);
+app.use('/api/admin/articles', contentRoutes);
 app.use('/api/admin/countries', countriesRoutes);
 app.use('/api/admin/inquiry-types', inquiryTypesRoutes);
 app.use('/api/admin/inquiries', inquiriesRoutes);
@@ -60,6 +62,7 @@ app.use('/api/admin/policies', policiesRoutes);
 app.use('/api/admin/roles', rolesRoutes);
 app.use('/api/admin/users', usersRoutes);
 app.use('/api/admin/analytics', analyticsRoutes);
+app.use('/api/admin/security', analyticsRoutes);
 app.use('/api/admin/audit-logs', auditLogsRoutes);
 
 // 404 Handler

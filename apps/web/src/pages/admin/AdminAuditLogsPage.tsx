@@ -4,10 +4,21 @@ import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import {
+  Dialog,
+  DialogContent,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import {
   ScrollText,
   Search,
   Eye,
-  X,
   RotateCw,
 } from 'lucide-react';
 
@@ -18,7 +29,7 @@ interface AuditLogItem {
   action: string;
   entityType: string;
   entityId?: string | null;
-  details?: any;
+  details?: Record<string, unknown> | null;
   ipAddress?: string | null;
   userAgent?: string | null;
   user?: { id: string; name: string; email: string } | null;
@@ -117,7 +128,7 @@ export const AdminAuditLogsPage: React.FC = () => {
       </div>
 
       {/* Filter and Search Bar */}
-      <Card className="bg-white border-gray-200/80 shadow-sm rounded-2xl p-4">
+      <Card className="bg-white border-gray-200/80 shadow-sm rounded-xl p-4">
         <form onSubmit={handleSearchSubmit} className="flex flex-col sm:flex-row items-center justify-between gap-3">
           <div className="relative flex-1 w-full sm:w-auto">
             <Search className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
@@ -126,41 +137,43 @@ export const AdminAuditLogsPage: React.FC = () => {
               placeholder="Search by action, email, or entity..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full pl-9 pr-3 py-1.5 text-xs bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#3BBA93] text-[#2A292D]"
+              className="w-full pl-9 pr-3 py-1.5 text-xs bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#3BBA93] text-[#2A292D]"
             />
           </div>
 
           <div className="flex items-center gap-2 w-full sm:w-auto">
-            <select
-              value={selectedEntity}
-              onChange={(e) => setSelectedEntity(e.target.value)}
-              className="text-xs bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-gray-700 font-medium focus:ring-2 focus:ring-[#3BBA93]"
-            >
-              <option value="ALL">All Entities</option>
-              <option value="ContactInquiry">Inquiries</option>
-              <option value="InquiryType">Inquiry Categories</option>
-              <option value="Country">Countries & Markets</option>
-              <option value="LegalPolicy">Legal Policies</option>
-              <option value="SiteSetting">Site Settings</option>
-              <option value="Role">Roles & Access</option>
-              <option value="User">Team Members</option>
-              <option value="ContentItem">Articles</option>
-            </select>
+            <Select value={selectedEntity} onValueChange={setSelectedEntity}>
+              <SelectTrigger className="w-36 h-9 text-xs bg-gray-50 border-gray-200 rounded-lg">
+                <SelectValue placeholder="All Entities" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="ALL">All Entities</SelectItem>
+                <SelectItem value="ContactInquiry">Inquiries</SelectItem>
+                <SelectItem value="InquiryType">Inquiry Categories</SelectItem>
+                <SelectItem value="Country">Countries & Markets</SelectItem>
+                <SelectItem value="LegalPolicy">Legal Policies</SelectItem>
+                <SelectItem value="SiteSetting">Site Settings</SelectItem>
+                <SelectItem value="Role">Roles & Access</SelectItem>
+                <SelectItem value="User">Team Members</SelectItem>
+                <SelectItem value="ContentItem">Articles</SelectItem>
+              </SelectContent>
+            </Select>
 
-            <select
-              value={selectedAction}
-              onChange={(e) => setSelectedAction(e.target.value)}
-              className="text-xs bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-gray-700 font-medium focus:ring-2 focus:ring-[#3BBA93]"
-            >
-              <option value="ALL">All Actions</option>
-              <option value="CREATE">CREATE</option>
-              <option value="UPDATE">UPDATE</option>
-              <option value="DELETE">DELETE</option>
-              <option value="TOGGLE">TOGGLE</option>
-              <option value="LOGIN">LOGIN</option>
-            </select>
+            <Select value={selectedAction} onValueChange={setSelectedAction}>
+              <SelectTrigger className="w-32 h-9 text-xs bg-gray-50 border-gray-200 rounded-lg">
+                <SelectValue placeholder="All Actions" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="ALL">All Actions</SelectItem>
+                <SelectItem value="CREATE">CREATE</SelectItem>
+                <SelectItem value="UPDATE">UPDATE</SelectItem>
+                <SelectItem value="DELETE">DELETE</SelectItem>
+                <SelectItem value="TOGGLE">TOGGLE</SelectItem>
+                <SelectItem value="LOGIN">LOGIN</SelectItem>
+              </SelectContent>
+            </Select>
 
-            <Button type="submit" variant="gradient" size="sm" className="rounded-xl text-xs font-bold px-4">
+            <Button type="submit" variant="gradient" size="sm" className="rounded-lg text-xs font-semibold px-4">
               Filter
             </Button>
           </div>
@@ -168,7 +181,7 @@ export const AdminAuditLogsPage: React.FC = () => {
       </Card>
 
       {/* Audit Log Table */}
-      <Card className="bg-white border-gray-200/80 shadow-sm rounded-2xl overflow-hidden">
+      <Card className="bg-white border-gray-200/80 shadow-sm rounded-xl overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse text-xs">
             <thead>
@@ -263,58 +276,52 @@ export const AdminAuditLogsPage: React.FC = () => {
       </Card>
 
       {/* Modal: Diff / Details Viewer */}
-      {activeLog && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in">
-          <div className="bg-white w-full max-w-2xl rounded-3xl shadow-2xl border border-gray-100 overflow-hidden flex flex-col max-h-[90vh]">
-            {/* Header */}
-            <div className="p-5 bg-[#2A292D] text-white flex items-center justify-between">
-              <div>
-                <span className="text-xs font-bold tracking-wider text-[#3BBA93]">
+      <Dialog open={!!activeLog} onOpenChange={(open) => { if (!open) setActiveLog(null); }}>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto p-0 rounded-xl gap-0 border-gray-200">
+          {activeLog && (
+            <>
+              {/* Header */}
+              <div className="p-5 bg-[#2A292D] text-white">
+                <span className="text-xs font-semibold text-[#3BBA93] block mb-1">
                   Audit Record Details
                 </span>
-                <h2 className="text-lg font-bold">{activeLog.action}</h2>
-                <div className="text-xs text-white/60 mt-0.5">
+                <DialogTitle className="text-lg font-bold text-white">{activeLog.action}</DialogTitle>
+                <div className="text-xs text-white/60 mt-1">
                   Actor: <strong>{activeLog.user?.name || activeLog.userEmail}</strong> • Entity: <strong>{activeLog.entityType}</strong>
                 </div>
               </div>
-              <button
-                onClick={() => setActiveLog(null)}
-                className="text-white/60 hover:text-white p-1 rounded-full hover:bg-white/10"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
 
-            {/* Body */}
-            <div className="p-6 space-y-4 text-xs overflow-y-auto flex-1">
-              <div className="space-y-1.5">
-                <label className="font-bold text-gray-700 tracking-wider text-[11px] flex items-center gap-1.5">
-                  <span className="w-2 h-2 rounded-full bg-[#3BBA93]"></span>
-                  <span>Modification Payload & Before/After Snapshot</span>
-                </label>
-                <pre className="p-4 bg-gray-50 border border-gray-200 rounded-2xl text-[11px] font-mono text-gray-800 overflow-x-auto max-h-96 leading-relaxed">
-                  {JSON.stringify(activeLog.details, null, 2)}
-                </pre>
+              {/* Body */}
+              <div className="p-6 space-y-4 text-xs overflow-y-auto flex-1">
+                <div className="space-y-1.5">
+                  <label className="font-semibold text-gray-700 text-xs flex items-center gap-1.5">
+                    <span className="w-2 h-2 rounded-full bg-[#3BBA93]"></span>
+                    <span>Modification Payload & Before/After Snapshot</span>
+                  </label>
+                  <pre className="p-4 bg-gray-50 border border-gray-200 rounded-lg text-[11px] font-mono text-gray-800 overflow-x-auto max-h-96 leading-relaxed">
+                    {JSON.stringify(activeLog.details, null, 2)}
+                  </pre>
+                </div>
               </div>
-            </div>
 
-            {/* Footer */}
-            <div className="p-4 bg-gray-50 border-t border-gray-100 flex items-center justify-between">
-              <span className="text-[11px] text-gray-400 font-mono">
-                Log ID: {activeLog.id} • IP: {activeLog.ipAddress || '127.0.0.1'}
-              </span>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setActiveLog(null)}
-                className="rounded-xl border-gray-200 text-xs font-bold"
-              >
-                Close Inspector
-              </Button>
-            </div>
-          </div>
-        </div>
-      )}
+              {/* Footer */}
+              <div className="p-4 bg-gray-50 border-t border-gray-100 flex items-center justify-between">
+                <span className="text-[11px] text-gray-400 font-mono">
+                  Log ID: {activeLog.id} • IP: {activeLog.ipAddress || '127.0.0.1'}
+                </span>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setActiveLog(null)}
+                  className="rounded-lg border-gray-200 text-xs font-semibold"
+                >
+                  Close
+                </Button>
+              </div>
+            </>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

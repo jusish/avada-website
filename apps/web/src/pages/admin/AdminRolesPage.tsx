@@ -5,11 +5,16 @@ import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import {
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  DialogDescription,
+} from '@/components/ui/dialog';
+import {
   ShieldAlert,
   Plus,
   Edit2,
   Trash2,
-  X,
   Save,
   Users,
   Shield,
@@ -261,7 +266,7 @@ export const AdminRolesPage: React.FC = () => {
             return (
               <Card
                 key={role.id}
-                className="bg-white border border-gray-200/90 shadow-sm rounded-3xl overflow-hidden flex flex-col justify-between hover:shadow-md transition-all"
+                className="bg-white border border-gray-200/90 shadow-sm rounded-xl overflow-hidden flex flex-col justify-between hover:shadow-md transition-all"
               >
                 <div>
                   {/* Top Bar */}
@@ -300,11 +305,11 @@ export const AdminRolesPage: React.FC = () => {
 
                     <div className="grid grid-cols-2 gap-2 pt-2">
                       <div className="p-2.5 rounded-xl bg-gray-50 border border-gray-100 text-center">
-                        <span className="text-[10px] text-gray-400 uppercase font-bold block">View Only</span>
+                        <span className="text-[11px] text-gray-500 font-bold block">View Only</span>
                         <span className="text-sm font-black text-gray-700">{viewCount - editCount}</span>
                       </div>
                       <div className="p-2.5 rounded-xl bg-emerald-50/50 border border-emerald-100 text-center">
-                        <span className="text-[10px] text-emerald-600 uppercase font-bold block">Full Edit</span>
+                        <span className="text-[11px] text-emerald-600 font-bold block">Full Edit</span>
                         <span className="text-sm font-black text-emerald-700">{editCount}</span>
                       </div>
                     </div>
@@ -347,192 +352,187 @@ export const AdminRolesPage: React.FC = () => {
       </div>
 
       {/* Visual Permission Matrix Editor Modal */}
-      {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in">
-          <div className="bg-white w-full max-w-4xl rounded-3xl shadow-2xl border border-gray-100 overflow-hidden flex flex-col max-h-[92vh]">
-            {/* Modal Header */}
-            <div className="p-5 bg-[#2A292D] text-white flex items-center justify-between">
+      <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
+        <DialogContent className="max-w-4xl max-h-[92vh] overflow-y-auto p-0 rounded-xl border border-gray-100">
+          {/* Modal Header */}
+          <div className="p-5 bg-[#2A292D] text-white">
+            <span className="text-xs font-semibold tracking-wider text-[#3BBA93]">
+              {editingRole ? 'Edit Permission Matrix' : 'Create Role & Access Policy'}
+            </span>
+            <DialogTitle className="text-lg font-bold text-white mt-1">
+              {editingRole ? editingRole.name : 'New Security Role'}
+            </DialogTitle>
+            <DialogDescription className="text-xs text-gray-400 mt-0.5">
+              Configure granular View and Edit privileges per CMS module.
+            </DialogDescription>
+          </div>
+
+          {/* Modal Body */}
+          <form onSubmit={handleSave} className="p-6 space-y-6 text-xs">
+            {/* Role Metadata */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <span className="text-xs uppercase font-bold tracking-wider text-[#3BBA93]">
-                  {editingRole ? 'Edit Permission Matrix' : 'Create Role & Access Policy'}
-                </span>
-                <h2 className="text-lg font-bold">{editingRole ? editingRole.name : 'New Security Role'}</h2>
+                <label className="block text-xs font-bold text-gray-700 mb-1">Role Name *</label>
+                <input
+                  type="text"
+                  required
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  placeholder="e.g. Regional Support Officer"
+                  className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#3BBA93] focus:bg-white text-[#2A292D] font-bold"
+                />
               </div>
-              <button
-                onClick={() => setIsModalOpen(false)}
-                className="text-white/60 hover:text-white p-1 rounded-full hover:bg-white/10"
-              >
-                <X className="w-5 h-5" />
-              </button>
+              <div>
+                <label className="block text-xs font-bold text-gray-700 mb-1">Role Description</label>
+                <input
+                  type="text"
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                  placeholder="Brief description of responsibilities..."
+                  className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#3BBA93] focus:bg-white text-[#2A292D]"
+                />
+              </div>
             </div>
 
-            {/* Modal Body */}
-            <form onSubmit={handleSave} className="p-6 space-y-6 text-xs overflow-y-auto flex-1">
-              {/* Role Metadata */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* Visual Permission Manager Section */}
+            <div className="space-y-3">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-gray-100 pb-3">
                 <div>
-                  <label className="block text-xs font-bold text-gray-700 mb-1">Role Name *</label>
-                  <input
-                    type="text"
-                    required
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    placeholder="e.g. Regional Support Officer"
-                    className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#3BBA93] focus:bg-white text-[#2A292D] font-bold"
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs font-bold text-gray-700 mb-1">Role Description</label>
-                  <input
-                    type="text"
-                    value={description}
-                    onChange={(e) => setDescription(e.target.value)}
-                    placeholder="Brief description of responsibilities..."
-                    className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#3BBA93] focus:bg-white text-[#2A292D]"
-                  />
-                </div>
-              </div>
-
-              {/* Visual Permission Manager Section */}
-              <div className="space-y-3">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-gray-100 pb-3">
-                  <div>
-                    <h3 className="font-bold text-sm text-[#2A292D] flex items-center gap-1.5">
-                      <Shield className="w-4 h-4 text-[#3BBA93]" />
-                      <span>Visual Access Matrix</span>
-                    </h3>
-                    <p className="text-[11px] text-gray-500">
-                      Configure granular View and Edit privileges per CMS module. Edit privilege automatically includes View access.
-                    </p>
-                  </div>
-
-                  <div className="flex items-center gap-1.5">
-                    <Button
-                      type="button"
-                      size="sm"
-                      variant="outline"
-                      onClick={handleSelectAllView}
-                      className="text-[11px] h-7 rounded-lg border-gray-200 font-semibold"
-                    >
-                      All View
-                    </Button>
-                    <Button
-                      type="button"
-                      size="sm"
-                      variant="outline"
-                      onClick={handleSelectAllEdit}
-                      className="text-[11px] h-7 rounded-lg border-gray-200 font-semibold"
-                    >
-                      All Edit
-                    </Button>
-                    <Button
-                      type="button"
-                      size="sm"
-                      variant="outline"
-                      onClick={handleClearAll}
-                      className="text-[11px] h-7 rounded-lg border-gray-200 text-red-500 font-semibold"
-                    >
-                      Clear All
-                    </Button>
-                  </div>
+                  <h3 className="font-bold text-sm text-[#2A292D] flex items-center gap-1.5">
+                    <Shield className="w-4 h-4 text-[#3BBA93]" />
+                    <span>Visual Access Matrix</span>
+                  </h3>
+                  <p className="text-[11px] text-gray-500">
+                    Configure granular View and Edit privileges per CMS module. Edit privilege automatically includes View access.
+                  </p>
                 </div>
 
-                {/* Matrix Table */}
-                <div className="border border-gray-200 rounded-2xl overflow-hidden bg-white">
-                  <table className="w-full text-left border-collapse">
-                    <thead>
-                      <tr className="bg-gray-50 border-b border-gray-200 text-[11px] font-bold text-gray-500 uppercase tracking-wider">
-                        <th className="py-2.5 px-4">Subsystem / Module</th>
-                        <th className="py-2.5 px-4 text-center w-28">View Access</th>
-                        <th className="py-2.5 px-4 text-center w-28">Edit Access</th>
-                        <th className="py-2.5 px-4 text-right w-36">Effective Status</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-gray-100 text-xs">
-                      {MODULES.map((mod) => {
-                        const perm: ModulePermission = permissions[mod.key] || { view: false, edit: false };
-                        const hasView = perm.view || perm.edit;
-                        const hasEdit = perm.edit;
-
-                        return (
-                          <tr key={mod.key} className="hover:bg-gray-50/70 transition-colors">
-                            <td className="py-3 px-4">
-                              <div className="font-bold text-[#2A292D]">{mod.label}</div>
-                              <div className="text-[11px] text-gray-400 mt-0.5">{mod.description}</div>
-                            </td>
-
-                            {/* View Checkbox */}
-                            <td className="py-3 px-4 text-center">
-                              <label className="inline-flex items-center justify-center cursor-pointer p-1">
-                                <input
-                                  type="checkbox"
-                                  checked={hasView}
-                                  onChange={() => handleTogglePerm(mod.key, 'view')}
-                                  className="w-4 h-4 rounded text-[#3BBA93] focus:ring-[#3BBA93]"
-                                />
-                              </label>
-                            </td>
-
-                            {/* Edit Checkbox */}
-                            <td className="py-3 px-4 text-center">
-                              <label className="inline-flex items-center justify-center cursor-pointer p-1">
-                                <input
-                                  type="checkbox"
-                                  checked={hasEdit}
-                                  onChange={() => handleTogglePerm(mod.key, 'edit')}
-                                  className="w-4 h-4 rounded text-[#3BBA93] focus:ring-[#3BBA93]"
-                                />
-                              </label>
-                            </td>
-
-                            {/* Effective Status Badge */}
-                            <td className="py-3 px-4 text-right">
-                              {hasEdit ? (
-                                <Badge className="bg-emerald-500/15 text-emerald-700 border-emerald-300 text-[10px] font-bold">
-                                  Full Edit & View
-                                </Badge>
-                              ) : hasView ? (
-                                <Badge className="bg-blue-500/15 text-blue-700 border-blue-300 text-[10px] font-bold">
-                                  View Only
-                                </Badge>
-                              ) : (
-                                <Badge variant="outline" className="text-gray-400 border-gray-200 text-[10px]">
-                                  No Access (Hidden)
-                                </Badge>
-                              )}
-                            </td>
-                          </tr>
-                        );
-                      })}
-                    </tbody>
-                  </table>
+                <div className="flex items-center gap-1.5">
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="outline"
+                    onClick={handleSelectAllView}
+                    className="text-[11px] h-7 rounded-lg border-gray-200 font-semibold"
+                  >
+                    All View
+                  </Button>
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="outline"
+                    onClick={handleSelectAllEdit}
+                    className="text-[11px] h-7 rounded-lg border-gray-200 font-semibold"
+                  >
+                    All Edit
+                  </Button>
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="outline"
+                    onClick={handleClearAll}
+                    className="text-[11px] h-7 rounded-lg border-gray-200 text-red-500 font-semibold"
+                  >
+                    Clear All
+                  </Button>
                 </div>
               </div>
 
-              {/* Modal Buttons */}
-              <div className="pt-4 flex items-center justify-end gap-2 border-t border-gray-100">
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => setIsModalOpen(false)}
-                  className="rounded-xl border-gray-200 text-xs font-bold"
-                >
-                  Cancel
-                </Button>
-                <Button
-                  type="submit"
-                  disabled={saving}
-                  variant="gradient"
-                  className="rounded-xl text-xs font-bold space-x-1.5"
-                >
-                  <Save className="w-3.5 h-3.5" />
-                  <span>{saving ? 'Saving...' : 'Save Permissions'}</span>
-                </Button>
+              {/* Matrix Table */}
+              <div className="border border-gray-200 rounded-xl overflow-hidden bg-white">
+                <table className="w-full text-left border-collapse">
+                  <thead>
+                    <tr className="bg-gray-50 border-b border-gray-200 text-[11px] font-bold text-gray-500 tracking-wider">
+                      <th className="py-2.5 px-4">Subsystem / Module</th>
+                      <th className="py-2.5 px-4 text-center w-28">View Access</th>
+                      <th className="py-2.5 px-4 text-center w-28">Edit Access</th>
+                      <th className="py-2.5 px-4 text-right w-36">Effective Status</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-100 text-xs">
+                    {MODULES.map((mod) => {
+                      const perm: ModulePermission = permissions[mod.key] || { view: false, edit: false };
+                      const hasView = perm.view || perm.edit;
+                      const hasEdit = perm.edit;
+
+                      return (
+                        <tr key={mod.key} className="hover:bg-gray-50/70 transition-colors">
+                          <td className="py-3 px-4">
+                            <div className="font-bold text-[#2A292D]">{mod.label}</div>
+                            <div className="text-[11px] text-gray-400 mt-0.5">{mod.description}</div>
+                          </td>
+
+                          {/* View Checkbox */}
+                          <td className="py-3 px-4 text-center">
+                            <label className="inline-flex items-center justify-center cursor-pointer p-1">
+                              <input
+                                type="checkbox"
+                                checked={hasView}
+                                onChange={() => handleTogglePerm(mod.key, 'view')}
+                                className="w-4 h-4 rounded text-[#3BBA93] focus:ring-[#3BBA93]"
+                              />
+                            </label>
+                          </td>
+
+                          {/* Edit Checkbox */}
+                          <td className="py-3 px-4 text-center">
+                            <label className="inline-flex items-center justify-center cursor-pointer p-1">
+                              <input
+                                type="checkbox"
+                                checked={hasEdit}
+                                onChange={() => handleTogglePerm(mod.key, 'edit')}
+                                className="w-4 h-4 rounded text-[#3BBA93] focus:ring-[#3BBA93]"
+                              />
+                            </label>
+                          </td>
+
+                          {/* Effective Status Badge */}
+                          <td className="py-3 px-4 text-right">
+                            {hasEdit ? (
+                              <Badge className="bg-emerald-500/15 text-emerald-700 border-emerald-300 text-[10px] font-bold">
+                                Full Edit & View
+                              </Badge>
+                            ) : hasView ? (
+                              <Badge className="bg-blue-500/15 text-blue-700 border-blue-300 text-[10px] font-bold">
+                                View Only
+                              </Badge>
+                            ) : (
+                              <Badge variant="outline" className="text-gray-400 border-gray-200 text-[10px]">
+                                No Access (Hidden)
+                              </Badge>
+                            )}
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
               </div>
-            </form>
-          </div>
-        </div>
-      )}
+            </div>
+
+            {/* Modal Buttons */}
+            <div className="pt-4 flex items-center justify-end gap-2 border-t border-gray-100">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setIsModalOpen(false)}
+                className="rounded-xl border-gray-200 text-xs font-bold"
+              >
+                Cancel
+              </Button>
+              <Button
+                type="submit"
+                disabled={saving}
+                variant="gradient"
+                className="rounded-xl text-xs font-bold space-x-1.5"
+              >
+                <Save className="w-3.5 h-3.5" />
+                <span>{saving ? 'Saving...' : 'Save Permissions'}</span>
+              </Button>
+            </div>
+          </form>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

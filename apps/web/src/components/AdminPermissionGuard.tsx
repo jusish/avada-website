@@ -16,7 +16,7 @@ export const AdminPermissionGuard: React.FC<AdminPermissionGuardProps> = ({ modu
   if (!canView(module)) {
     return (
       <div className="py-16 flex items-center justify-center">
-        <div className="max-w-md bg-white border border-gray-100 rounded-3xl p-8 text-center space-y-4 shadow-xl">
+        <div className="max-w-md bg-white border border-gray-100 rounded-xl p-8 text-center space-y-4 shadow-xl">
           <div className="w-16 h-16 rounded-full bg-red-50 text-red-500 flex items-center justify-center mx-auto border border-red-100">
             <ShieldAlert className="w-8 h-8" />
           </div>

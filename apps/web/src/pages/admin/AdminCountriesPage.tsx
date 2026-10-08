@@ -5,6 +5,12 @@ import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import {
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  DialogDescription,
+} from '@/components/ui/dialog';
+import {
   Globe2,
   Plus,
   Edit2,
@@ -16,7 +22,6 @@ import {
   Radio,
   CreditCard,
   Search,
-  X,
   Save,
 } from 'lucide-react';
 
@@ -260,7 +265,7 @@ export const AdminCountriesPage: React.FC = () => {
       </div>
 
       {/* Filter and Summary */}
-      <Card className="bg-white border-gray-200/80 shadow-sm rounded-2xl p-4">
+      <Card className="bg-white border-gray-200/80 shadow-sm rounded-xl p-4">
         <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
           <div className="relative w-full sm:w-80">
             <Search className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
@@ -290,7 +295,7 @@ export const AdminCountriesPage: React.FC = () => {
             </div>
           </div>
         ) : filtered.length === 0 ? (
-          <div className="col-span-full py-16 text-center text-gray-400 bg-white rounded-3xl border border-gray-100">
+          <div className="col-span-full py-16 text-center text-gray-400 bg-white rounded-xl border border-gray-100">
             <Globe2 className="w-10 h-10 mx-auto text-gray-300 mb-2" />
             <p className="font-bold text-gray-600">No countries found</p>
             <p className="text-xs text-gray-400 mt-1">Try another search or click Add New Country</p>
@@ -299,7 +304,7 @@ export const AdminCountriesPage: React.FC = () => {
           filtered.map((country) => (
             <Card
               key={country.id}
-              className={`bg-white border transition-all rounded-3xl overflow-hidden flex flex-col justify-between ${
+              className={`bg-white border transition-all rounded-xl overflow-hidden flex flex-col justify-between ${
                 country.active ? 'border-gray-200/90 shadow-sm hover:shadow-md' : 'border-gray-200/50 opacity-75'
               }`}
             >
@@ -307,7 +312,7 @@ export const AdminCountriesPage: React.FC = () => {
                 {/* Card Top */}
                 <div className="p-5 pb-3 border-b border-gray-100 flex items-start justify-between">
                   <div className="flex items-center gap-3">
-                    <div className="w-11 h-11 rounded-2xl bg-[#2A292D] text-white flex items-center justify-center font-black text-sm tracking-wider shadow-sm">
+                    <div className="w-11 h-11 rounded-xl bg-[#2A292D] text-white flex items-center justify-center font-black text-sm tracking-wider shadow-sm">
                       {country.code}
                     </div>
                     <div>
@@ -335,7 +340,7 @@ export const AdminCountriesPage: React.FC = () => {
                 <div className="p-5 space-y-4 text-xs">
                   {/* Office Address */}
                   <div>
-                    <span className="text-[10px] text-gray-400 font-bold uppercase tracking-wider flex items-center gap-1 mb-1">
+                    <span className="text-[11px] text-gray-500 font-semibold tracking-wide flex items-center gap-1 mb-1">
                       <MapPin className="w-3 h-3 text-[#3BBA93]" />
                       <span>Head Office</span>
                     </span>
@@ -346,7 +351,7 @@ export const AdminCountriesPage: React.FC = () => {
 
                   {/* Telecom & Carrier Partners */}
                   <div>
-                    <span className="text-[10px] text-gray-400 font-bold uppercase tracking-wider flex items-center gap-1 mb-1.5">
+                    <span className="text-[11px] text-gray-500 font-semibold tracking-wide flex items-center gap-1 mb-1.5">
                       <Radio className="w-3 h-3 text-[#3BBA93]" />
                       <span>Telco & Network Partners</span>
                     </span>
@@ -368,7 +373,7 @@ export const AdminCountriesPage: React.FC = () => {
 
                   {/* Payment Rails */}
                   <div>
-                    <span className="text-[10px] text-gray-400 font-bold uppercase tracking-wider flex items-center gap-1 mb-1.5">
+                    <span className="text-[11px] text-gray-500 font-semibold tracking-wide flex items-center gap-1 mb-1.5">
                       <CreditCard className="w-3 h-3 text-[#3BBA93]" />
                       <span>Payment Rails</span>
                     </span>
@@ -440,178 +445,173 @@ export const AdminCountriesPage: React.FC = () => {
       </div>
 
       {/* Modal: Create or Edit Country */}
-      {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in">
-          <div className="bg-white w-full max-w-xl rounded-3xl shadow-2xl border border-gray-100 overflow-hidden flex flex-col max-h-[90vh]">
-            <div className="p-5 bg-[#2A292D] text-white flex items-center justify-between">
+      <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
+        <DialogContent className="max-w-xl max-h-[90vh] overflow-y-auto p-0 rounded-xl border border-gray-100">
+          <div className="p-5 bg-[#2A292D] text-white">
+            <span className="text-xs font-semibold tracking-wider text-[#3BBA93]">
+              {editingCountry ? 'Edit African Market' : 'Add New Market'}
+            </span>
+            <DialogTitle className="text-lg font-bold text-white mt-1">
+              {editingCountry ? editingCountry.name : 'Configure African Country'}
+            </DialogTitle>
+            <DialogDescription className="text-xs text-gray-400 mt-0.5">
+              Configure market regional office, currency, telco rails, and map embeddings.
+            </DialogDescription>
+          </div>
+
+          <form onSubmit={handleSave} className="p-6 space-y-4 text-xs">
+            <div className="grid grid-cols-2 gap-3">
               <div>
-                <span className="text-xs uppercase font-bold tracking-wider text-[#3BBA93]">
-                  {editingCountry ? 'Edit African Market' : 'Add New Market'}
-                </span>
-                <h2 className="text-lg font-bold">{editingCountry ? editingCountry.name : 'Configure African Country'}</h2>
+                <label className="block text-xs font-bold text-gray-700 mb-1">Country Name *</label>
+                <input
+                  type="text"
+                  required
+                  value={form.name}
+                  onChange={(e) => handleNameChange(e.target.value)}
+                  placeholder="e.g. Uganda"
+                  className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#3BBA93] focus:bg-white text-[#2A292D]"
+                />
               </div>
-              <button
-                onClick={() => setIsModalOpen(false)}
-                className="text-white/60 hover:text-white p-1 rounded-full hover:bg-white/10"
-              >
-                <X className="w-5 h-5" />
-              </button>
+              <div>
+                <label className="block text-xs font-bold text-gray-700 mb-1">URL Slug *</label>
+                <input
+                  type="text"
+                  required
+                  value={form.slug}
+                  onChange={(e) => setForm({ ...form, slug: e.target.value })}
+                  placeholder="e.g. uganda"
+                  className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-xl font-mono text-xs focus:ring-2 focus:ring-[#3BBA93] focus:bg-white text-[#2A292D]"
+                />
+              </div>
             </div>
 
-            <form onSubmit={handleSave} className="p-6 space-y-4 text-xs overflow-y-auto flex-1">
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-xs font-bold text-gray-700 mb-1">Country Name *</label>
-                  <input
-                    type="text"
-                    required
-                    value={form.name}
-                    onChange={(e) => handleNameChange(e.target.value)}
-                    placeholder="e.g. Uganda"
-                    className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#3BBA93] focus:bg-white text-[#2A292D]"
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs font-bold text-gray-700 mb-1">URL Slug *</label>
-                  <input
-                    type="text"
-                    required
-                    value={form.slug}
-                    onChange={(e) => setForm({ ...form, slug: e.target.value })}
-                    placeholder="e.g. uganda"
-                    className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-xl font-mono text-xs focus:ring-2 focus:ring-[#3BBA93] focus:bg-white text-[#2A292D]"
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-xs font-bold text-gray-700 mb-1">ISO Code (2-4 letters) *</label>
-                  <input
-                    type="text"
-                    required
-                    maxLength={4}
-                    value={form.code}
-                    onChange={(e) => setForm({ ...form, code: e.target.value.toUpperCase() })}
-                    placeholder="UG"
-                    className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-xl uppercase font-bold text-center text-[#2A292D]"
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs font-bold text-gray-700 mb-1">Currency Code *</label>
-                  <input
-                    type="text"
-                    required
-                    maxLength={4}
-                    value={form.currencyCode}
-                    onChange={(e) => setForm({ ...form, currencyCode: e.target.value.toUpperCase() })}
-                    placeholder="UGX"
-                    className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-xl uppercase font-bold text-center text-[#2A292D]"
-                  />
-                </div>
-              </div>
-
+            <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="block text-xs font-bold text-gray-700 mb-1">Regional Office Address</label>
+                <label className="block text-xs font-bold text-gray-700 mb-1">ISO Code (2-4 letters) *</label>
                 <input
                   type="text"
-                  value={form.officeAddress}
-                  onChange={(e) => setForm({ ...form, officeAddress: e.target.value })}
-                  placeholder="e.g. Plot 14, Jinja Road, Kampala, Uganda"
-                  className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#3BBA93] focus:bg-white text-[#2A292D]"
+                  required
+                  maxLength={4}
+                  value={form.code}
+                  onChange={(e) => setForm({ ...form, code: e.target.value.toUpperCase() })}
+                  placeholder="UG"
+                  className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-xl font-bold text-center text-[#2A292D]"
                 />
               </div>
-
               <div>
-                <label className="block text-xs font-bold text-gray-700 mb-1">Office Contact Phone</label>
+                <label className="block text-xs font-bold text-gray-700 mb-1">Currency Code *</label>
                 <input
                   type="text"
-                  value={form.officePhone}
-                  onChange={(e) => setForm({ ...form, officePhone: e.target.value })}
-                  placeholder="+256 700 000 000"
-                  className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#3BBA93] focus:bg-white text-[#2A292D]"
+                  required
+                  maxLength={4}
+                  value={form.currencyCode}
+                  onChange={(e) => setForm({ ...form, currencyCode: e.target.value.toUpperCase() })}
+                  placeholder="UGX"
+                  className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-xl font-bold text-center text-[#2A292D]"
                 />
               </div>
+            </div>
 
-              <div>
-                <label className="block text-xs font-bold text-gray-700 mb-1">
-                  Google Maps Embed URL (Iframe src)
-                </label>
+            <div>
+              <label className="block text-xs font-bold text-gray-700 mb-1">Regional Office Address</label>
+              <input
+                type="text"
+                value={form.officeAddress}
+                onChange={(e) => setForm({ ...form, officeAddress: e.target.value })}
+                placeholder="e.g. Plot 14, Jinja Road, Kampala, Uganda"
+                className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#3BBA93] focus:bg-white text-[#2A292D]"
+              />
+            </div>
+
+            <div>
+              <label className="block text-xs font-bold text-gray-700 mb-1">Office Contact Phone</label>
+              <input
+                type="text"
+                value={form.officePhone}
+                onChange={(e) => setForm({ ...form, officePhone: e.target.value })}
+                placeholder="+256 700 000 000"
+                className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#3BBA93] focus:bg-white text-[#2A292D]"
+              />
+            </div>
+
+            <div>
+              <label className="block text-xs font-bold text-gray-700 mb-1">
+                Google Maps Embed URL (Iframe src)
+              </label>
+              <input
+                type="text"
+                value={form.mapEmbedUrl}
+                onChange={(e) => setForm({ ...form, mapEmbedUrl: e.target.value })}
+                placeholder="https://www.google.com/maps/embed?pb=..."
+                className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-xl font-mono text-[11px] focus:ring-2 focus:ring-[#3BBA93] focus:bg-white text-[#2A292D]"
+              />
+              <span className="text-[10px] text-gray-400 mt-1 block">
+                Paste the full src link from Google Maps &gt; Share &gt; Embed a map.
+              </span>
+            </div>
+
+            <div>
+              <label className="block text-xs font-bold text-gray-700 mb-1">
+                Telco & Mobile Money Partners (comma-separated)
+              </label>
+              <input
+                type="text"
+                value={form.telcoPartners}
+                onChange={(e) => setForm({ ...form, telcoPartners: e.target.value })}
+                placeholder="MTN Mobile Money, Airtel Money"
+                className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#3BBA93] focus:bg-white text-[#2A292D]"
+              />
+            </div>
+
+            <div>
+              <label className="block text-xs font-bold text-gray-700 mb-1">
+                Supported Payment Rails (comma-separated)
+              </label>
+              <input
+                type="text"
+                value={form.paymentRails}
+                onChange={(e) => setForm({ ...form, paymentRails: e.target.value })}
+                placeholder="Mobile Money, Visa, Mastercard, Automated Bank Payouts"
+                className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#3BBA93] focus:bg-white text-[#2A292D]"
+              />
+            </div>
+
+            <div className="pt-2">
+              <label className="inline-flex items-center gap-2 cursor-pointer">
                 <input
-                  type="text"
-                  value={form.mapEmbedUrl}
-                  onChange={(e) => setForm({ ...form, mapEmbedUrl: e.target.value })}
-                  placeholder="https://www.google.com/maps/embed?pb=..."
-                  className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-xl font-mono text-[11px] focus:ring-2 focus:ring-[#3BBA93] focus:bg-white text-[#2A292D]"
+                  type="checkbox"
+                  checked={form.active}
+                  onChange={(e) => setForm({ ...form, active: e.target.checked })}
+                  className="rounded text-[#3BBA93] focus:ring-[#3BBA93] w-4 h-4"
                 />
-                <span className="text-[10px] text-gray-400 mt-1 block">
-                  Paste the full src link from Google Maps &gt; Share &gt; Embed a map.
+                <span className="text-xs font-bold text-gray-700">
+                  Publish country to Live Website (Navbar, Contact, and Hub)
                 </span>
-              </div>
+              </label>
+            </div>
 
-              <div>
-                <label className="block text-xs font-bold text-gray-700 mb-1">
-                  Telco & Mobile Money Partners (comma-separated)
-                </label>
-                <input
-                  type="text"
-                  value={form.telcoPartners}
-                  onChange={(e) => setForm({ ...form, telcoPartners: e.target.value })}
-                  placeholder="MTN Mobile Money, Airtel Money"
-                  className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#3BBA93] focus:bg-white text-[#2A292D]"
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-bold text-gray-700 mb-1">
-                  Supported Payment Rails (comma-separated)
-                </label>
-                <input
-                  type="text"
-                  value={form.paymentRails}
-                  onChange={(e) => setForm({ ...form, paymentRails: e.target.value })}
-                  placeholder="Mobile Money, Visa, Mastercard, Automated Bank Payouts"
-                  className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#3BBA93] focus:bg-white text-[#2A292D]"
-                />
-              </div>
-
-              <div className="pt-2">
-                <label className="inline-flex items-center gap-2 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={form.active}
-                    onChange={(e) => setForm({ ...form, active: e.target.checked })}
-                    className="rounded text-[#3BBA93] focus:ring-[#3BBA93] w-4 h-4"
-                  />
-                  <span className="text-xs font-bold text-gray-700">
-                    Publish country to Live Website (Navbar, Contact, and Hub)
-                  </span>
-                </label>
-              </div>
-
-              <div className="pt-4 flex items-center justify-end gap-2 border-t border-gray-100">
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => setIsModalOpen(false)}
-                  className="rounded-xl border-gray-200 text-xs font-bold"
-                >
-                  Cancel
-                </Button>
-                <Button
-                  type="submit"
-                  disabled={saving}
-                  variant="gradient"
-                  className="rounded-xl text-xs font-bold space-x-1.5"
-                >
-                  <Save className="w-3.5 h-3.5" />
-                  <span>{saving ? 'Saving...' : 'Save Market'}</span>
-                </Button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
+            <div className="pt-4 flex items-center justify-end gap-2 border-t border-gray-100">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setIsModalOpen(false)}
+                className="rounded-xl border-gray-200 text-xs font-bold"
+              >
+                Cancel
+              </Button>
+              <Button
+                type="submit"
+                disabled={saving}
+                variant="gradient"
+                className="rounded-xl text-xs font-bold space-x-1.5"
+              >
+                <Save className="w-3.5 h-3.5" />
+                <span>{saving ? 'Saving...' : 'Save Market'}</span>
+              </Button>
+            </div>
+          </form>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

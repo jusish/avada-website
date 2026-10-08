@@ -5,12 +5,23 @@ import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import {
+  Dialog,
+  DialogContent,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import {
   Users,
   UserPlus,
   Edit2,
   Trash2,
   Search,
-  X,
   Save,
   ToggleLeft,
   ToggleRight,
@@ -213,7 +224,7 @@ export const AdminUsersPage: React.FC = () => {
       </div>
 
       {/* Filter and Summary */}
-      <Card className="bg-white border-gray-200/80 shadow-sm rounded-2xl p-4">
+      <Card className="bg-white border-gray-200/80 shadow-sm rounded-xl p-4">
         <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
           <div className="relative w-full sm:w-80">
             <Search className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
@@ -222,7 +233,7 @@ export const AdminUsersPage: React.FC = () => {
               placeholder="Search by name, email, or role..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full pl-9 pr-3 py-1.5 text-xs bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#3BBA93] text-[#2A292D]"
+              className="w-full pl-9 pr-3 py-1.5 text-xs bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#3BBA93] text-[#2A292D]"
             />
           </div>
           <div className="text-xs text-gray-500 flex items-center gap-3">
@@ -234,11 +245,11 @@ export const AdminUsersPage: React.FC = () => {
       </Card>
 
       {/* Users Table */}
-      <Card className="bg-white border-gray-200/80 shadow-sm rounded-2xl overflow-hidden">
+      <Card className="bg-white border-gray-200/80 shadow-sm rounded-xl overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
-              <tr className="bg-gray-50/80 border-b border-gray-200/80 text-[11px] font-bold text-gray-500 uppercase tracking-wider">
+              <tr className="bg-gray-50/80 border-b border-gray-200/80 text-[11px] font-semibold text-gray-500 tracking-wider">
                 <th className="py-3 px-4">User</th>
                 <th className="py-3 px-4">Assigned Role</th>
                 <th className="py-3 px-4">Status</th>
@@ -347,116 +358,109 @@ export const AdminUsersPage: React.FC = () => {
         </div>
       </Card>
 
-      {/* Modal: Invite or Edit User */}
-      {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in">
-          <div className="bg-white w-full max-w-md rounded-3xl shadow-2xl border border-gray-100 overflow-hidden">
-            <div className="p-5 bg-[#2A292D] text-white flex items-center justify-between">
-              <div>
-                <span className="text-xs uppercase font-bold tracking-wider text-[#3BBA93]">
-                  {editingUser ? 'Edit Member Credentials' : 'Invite Team Member'}
-                </span>
-                <h2 className="text-lg font-bold">{editingUser ? editingUser.name : 'New Staff Account'}</h2>
-              </div>
-              <button
-                onClick={() => setIsModalOpen(false)}
-                className="text-white/60 hover:text-white p-1 rounded-full hover:bg-white/10"
-              >
-                <X className="w-5 h-5" />
-              </button>
+      {/* Dialog: Invite or Edit User */}
+      <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
+        <DialogContent className="max-w-md p-0 rounded-xl gap-0 border-gray-200 overflow-hidden">
+          <div className="p-5 bg-[#2A292D] text-white">
+            <span className="text-xs font-semibold text-[#3BBA93] block mb-1">
+              {editingUser ? 'Edit Member Credentials' : 'Invite Team Member'}
+            </span>
+            <DialogTitle className="text-lg font-bold text-white">
+              {editingUser ? editingUser.name : 'New Staff Account'}
+            </DialogTitle>
+          </div>
+
+          <form onSubmit={handleSave} className="p-6 space-y-4 text-xs">
+            <div>
+              <label className="block text-xs font-semibold text-gray-700 mb-1">Full Name *</label>
+              <input
+                type="text"
+                required
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="e.g. Kevin Mutesa"
+                className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#3BBA93] focus:bg-white text-[#2A292D]"
+              />
             </div>
 
-            <form onSubmit={handleSave} className="p-6 space-y-4 text-xs">
-              <div>
-                <label className="block text-xs font-bold text-gray-700 mb-1">Full Name *</label>
-                <input
-                  type="text"
-                  required
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  placeholder="e.g. Kevin Mutesa"
-                  className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#3BBA93] focus:bg-white text-[#2A292D]"
-                />
-              </div>
+            <div>
+              <label className="block text-xs font-semibold text-gray-700 mb-1">Corporate Email Address *</label>
+              <input
+                type="email"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="name@avadapay.com"
+                className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#3BBA93] focus:bg-white text-[#2A292D]"
+              />
+            </div>
 
-              <div>
-                <label className="block text-xs font-bold text-gray-700 mb-1">Corporate Email Address *</label>
-                <input
-                  type="email"
-                  required
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="name@avadapay.com"
-                  className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#3BBA93] focus:bg-white text-[#2A292D]"
-                />
-              </div>
+            <div>
+              <label className="block text-xs font-semibold text-gray-700 mb-1">
+                {editingUser ? 'Update Password (leave blank to keep current)' : 'Account Password *'}
+              </label>
+              <input
+                type="password"
+                required={!editingUser}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder={editingUser ? '••••••••' : 'Minimum 8 characters'}
+                className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#3BBA93] focus:bg-white text-[#2A292D]"
+              />
+            </div>
 
-              <div>
-                <label className="block text-xs font-bold text-gray-700 mb-1">
-                  {editingUser ? 'Update Password (leave blank to keep current)' : 'Account Password *'}
-                </label>
-                <input
-                  type="password"
-                  required={!editingUser}
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder={editingUser ? '••••••••' : 'Minimum 8 characters'}
-                  className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#3BBA93] focus:bg-white text-[#2A292D]"
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-bold text-gray-700 mb-1">Assigned Security Role *</label>
-                <select
-                  required
-                  value={roleId}
-                  onChange={(e) => setRoleId(e.target.value)}
-                  className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-xl font-bold text-[#2A292D] focus:ring-2 focus:ring-[#3BBA93]"
-                >
+            <div>
+              <label className="block text-xs font-semibold text-gray-700 mb-1">Assigned Security Role *</label>
+              <Select value={roleId} onValueChange={setRoleId}>
+                <SelectTrigger className="w-full h-9 bg-gray-50 border-gray-200 rounded-lg text-xs font-medium">
+                  <SelectValue placeholder="Select Role" />
+                </SelectTrigger>
+                <SelectContent>
                   {roles.map((r) => (
-                    <option key={r.id} value={r.id}>
+                    <SelectItem key={r.id} value={r.id}>
                       {r.name}
-                    </option>
+                    </SelectItem>
                   ))}
-                </select>
-              </div>
+                </SelectContent>
+              </Select>
+            </div>
 
-              <div>
-                <label className="block text-xs font-bold text-gray-700 mb-1">Account Lifecycle Status</label>
-                <select
-                  value={status}
-                  onChange={(e) => setStatus(e.target.value as any)}
-                  className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-xl font-semibold text-[#2A292D] focus:ring-2 focus:ring-[#3BBA93]"
-                >
-                  <option value="ACTIVE">ACTIVE - Granted Immediate Access</option>
-                  <option value="INVITED">INVITED - Pending Onboarding</option>
-                  <option value="SUSPENDED">SUSPENDED - Temporarily Blocked</option>
-                </select>
-              </div>
+            <div>
+              <label className="block text-xs font-semibold text-gray-700 mb-1">Account Lifecycle Status</label>
+              <Select value={status} onValueChange={(val) => setStatus(val as 'ACTIVE' | 'INVITED' | 'SUSPENDED')}>
+                <SelectTrigger className="w-full h-9 bg-gray-50 border-gray-200 rounded-lg text-xs font-medium">
+                  <SelectValue placeholder="Select Status" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="ACTIVE">ACTIVE - Granted Immediate Access</SelectItem>
+                  <SelectItem value="INVITED">INVITED - Pending Onboarding</SelectItem>
+                  <SelectItem value="SUSPENDED">SUSPENDED - Temporarily Blocked</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
 
-              <div className="pt-4 flex items-center justify-end gap-2 border-t border-gray-100">
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => setIsModalOpen(false)}
-                  className="rounded-xl border-gray-200 text-xs font-bold"
-                >
-                  Cancel
-                </Button>
-                <Button
-                  type="submit"
-                  disabled={saving}
-                  variant="gradient"
-                  className="rounded-xl text-xs font-bold space-x-1.5"
-                >
-                  <Save className="w-3.5 h-3.5" />
-                  <span>{saving ? 'Saving...' : 'Save Member'}</span>
-                </Button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
+            <div className="pt-4 flex items-center justify-end gap-2 border-t border-gray-100">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setIsModalOpen(false)}
+                className="rounded-lg border-gray-200 text-xs font-semibold"
+              >
+                Cancel
+              </Button>
+              <Button
+                type="submit"
+                disabled={saving}
+                variant="gradient"
+                className="rounded-lg text-xs font-semibold space-x-1.5"
+              >
+                <Save className="w-3.5 h-3.5" />
+                <span>{saving ? 'Saving...' : 'Save Member'}</span>
+              </Button>
+            </div>
+          </form>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

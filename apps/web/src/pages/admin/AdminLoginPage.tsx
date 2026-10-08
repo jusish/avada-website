@@ -72,7 +72,7 @@ export const AdminLoginPage: React.FC = () => {
           </Link>
           <div className="flex items-center justify-center space-x-2 mt-2">
             <h2 className="text-xl font-extrabold tracking-tight text-white">CMS Administration</h2>
-            <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded bg-[#3BBA93]/20 text-[#3BBA93] border border-[#3BBA93]/30">
+            <span className="text-[10px] font-bold tracking-wider px-2 py-0.5 rounded bg-[#3BBA93]/20 text-[#3BBA93] border border-[#3BBA93]/30">
               Portal
             </span>
           </div>

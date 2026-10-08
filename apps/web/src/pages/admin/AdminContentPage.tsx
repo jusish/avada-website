@@ -20,7 +20,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Plus, Trash2, AlertCircle, RefreshCw, X } from 'lucide-react';
+import {
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  DialogDescription,
+} from '@/components/ui/dialog';
+import { Plus, Trash2, AlertCircle, RefreshCw } from 'lucide-react';
 import { ContentItem } from '@avada/shared';
 
 export const AdminContentPage: React.FC = () => {
@@ -220,102 +226,90 @@ export const AdminContentPage: React.FC = () => {
       </Card>
 
       {/* Create Content Modal */}
-      {showModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="bg-card border border-border rounded-xl shadow-2xl w-full max-w-xl overflow-hidden">
-            <div className="flex items-center justify-between px-6 py-4 border-b border-border">
-              <div>
-                <h3 className="text-base font-bold text-foreground">Create New Content Article</h3>
-                <p className="text-xs text-muted-foreground">Publish or draft new company announcements</p>
-              </div>
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => setShowModal(false)}
-                className="rounded-full w-8 h-8 text-muted-foreground"
-              >
-                <X className="w-4 h-4" />
-              </Button>
+      <Dialog open={showModal} onOpenChange={setShowModal}>
+        <DialogContent className="max-w-xl p-0 overflow-hidden rounded-xl border border-border">
+          <div className="p-5 bg-[#2A292D] text-white">
+            <DialogTitle className="text-base font-bold text-white">Create New Content Article</DialogTitle>
+            <DialogDescription className="text-xs text-gray-400 mt-0.5">Publish or draft new company announcements</DialogDescription>
+          </div>
+
+          <form onSubmit={handleCreate} className="p-6 space-y-4">
+            <div className="space-y-1.5">
+              <Label htmlFor="title" className="text-xs">Article Title</Label>
+              <Input
+                id="title"
+                placeholder="e.g. Next-Gen Multi-Currency Virtual Accounts"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                required
+              />
             </div>
 
-            <form onSubmit={handleCreate} className="p-6 space-y-4">
+            <div className="grid grid-cols-2 gap-4">
               <div className="space-y-1.5">
-                <Label htmlFor="title" className="text-xs">Article Title</Label>
-                <Input
-                  id="title"
-                  placeholder="e.g. Next-Gen Multi-Currency Virtual Accounts"
-                  value={title}
-                  onChange={(e) => setTitle(e.target.value)}
-                  required
-                />
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-1.5">
-                  <Label htmlFor="category" className="text-xs">Category</Label>
-                  <Select value={category} onValueChange={(val) => setCategory(val)}>
-                    <SelectTrigger id="category">
-                      <SelectValue placeholder="Select category" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="announcements">Announcements</SelectItem>
-                      <SelectItem value="products">Products</SelectItem>
-                      <SelectItem value="security">Security</SelectItem>
-                      <SelectItem value="insights">Insights</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div className="space-y-1.5">
-                  <Label htmlFor="status" className="text-xs">Publishing Status</Label>
-                  <Select value={status} onValueChange={(val) => setStatus(val as 'PUBLISHED' | 'DRAFT')}>
-                    <SelectTrigger id="status">
-                      <SelectValue placeholder="Select status" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="PUBLISHED">Published (Live)</SelectItem>
-                      <SelectItem value="DRAFT">Draft</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
+                <Label htmlFor="category" className="text-xs">Category</Label>
+                <Select value={category} onValueChange={(val) => setCategory(val)}>
+                  <SelectTrigger id="category">
+                    <SelectValue placeholder="Select category" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="announcements">Announcements</SelectItem>
+                    <SelectItem value="products">Products</SelectItem>
+                    <SelectItem value="security">Security</SelectItem>
+                    <SelectItem value="insights">Insights</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
 
               <div className="space-y-1.5">
-                <Label htmlFor="excerpt" className="text-xs">Short Excerpt / Summary</Label>
-                <Input
-                  id="excerpt"
-                  placeholder="Brief summary appearing on homepage news cards..."
-                  value={excerpt}
-                  onChange={(e) => setExcerpt(e.target.value)}
-                  required
-                />
+                <Label htmlFor="status" className="text-xs">Publishing Status</Label>
+                <Select value={status} onValueChange={(val) => setStatus(val as 'PUBLISHED' | 'DRAFT')}>
+                  <SelectTrigger id="status">
+                    <SelectValue placeholder="Select status" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="PUBLISHED">Published (Live)</SelectItem>
+                    <SelectItem value="DRAFT">Draft</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
+            </div>
 
-              <div className="space-y-1.5">
-                <Label htmlFor="body" className="text-xs">Body Content</Label>
-                <textarea
-                  id="body"
-                  rows={5}
-                  value={body}
-                  onChange={(e) => setBody(e.target.value)}
-                  placeholder="Write the full article text here..."
-                  className="flex w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#3BBA93]"
-                  required
-                />
-              </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="excerpt" className="text-xs">Short Excerpt / Summary</Label>
+              <Input
+                id="excerpt"
+                placeholder="Brief summary appearing on homepage news cards..."
+                value={excerpt}
+                onChange={(e) => setExcerpt(e.target.value)}
+                required
+              />
+            </div>
 
-              <div className="pt-4 border-t border-border flex items-center justify-end space-x-3">
-                <Button variant="outline" type="button" onClick={() => setShowModal(false)}>
-                  Cancel
-                </Button>
-                <Button variant="gradient" type="submit" disabled={saving} className="bg-[#3BBA93] hover:bg-[#32a481] text-white">
-                  {saving ? 'Publishing...' : 'Save & Publish'}
-                </Button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
+            <div className="space-y-1.5">
+              <Label htmlFor="body" className="text-xs">Body Content</Label>
+              <textarea
+                id="body"
+                rows={5}
+                value={body}
+                onChange={(e) => setBody(e.target.value)}
+                placeholder="Write the full article text here..."
+                className="flex w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#3BBA93]"
+                required
+              />
+            </div>
+
+            <div className="pt-4 border-t border-border flex items-center justify-end space-x-3">
+              <Button variant="outline" type="button" onClick={() => setShowModal(false)}>
+                Cancel
+              </Button>
+              <Button variant="gradient" type="submit" disabled={saving} className="bg-[#3BBA93] hover:bg-[#32a481] text-white">
+                {saving ? 'Publishing...' : 'Save & Publish'}
+              </Button>
+            </div>
+          </form>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

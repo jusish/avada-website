@@ -23,7 +23,7 @@ export const telemetryMiddleware = (req: Request, res: Response, next: NextFunct
     const suspiciousPatterns = [
       /union\s+select/i,
       /<script.*?>/i,
-      /(\%27)|(\')|(\-\-)|(\%23)|(#)/i,
+      /(%27)|(')|(--)|(%23)|(#)/i,
       /etc\/passwd/i,
       /\/wp-admin/i,
       /\/phpmyadmin/i,
