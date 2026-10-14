@@ -122,13 +122,19 @@ const INDUSTRIES = [
   },
 ];
 
-const OFFICES = [
+interface OfficeItem {
+  country: string;
+  address: string;
+  to: string;
+  disabled?: boolean;
+}
+
+const OFFICES: OfficeItem[] = [
   { country: 'Kenya', address: '8th Floor Westpark Towers, Westlands, Nairobi', to: '/countries/kenya' },
   { country: 'Tanzania', address: 'Dar es Salaam, Tanzania', to: '/countries/tanzania' },
   { country: 'Rwanda', address: 'Kigali, Rwanda', to: '/countries/rwanda' },
-  { country: 'DRC', address: 'SILIKIN VILLAGE, Local A012, Bâtiment Phase 3', to: 'https://avadapay.cd/en' },
-  { country: 'Benin', address: 'Cotonou, Littoral, Benin', to: '/countries/benin' },
-  { country: 'Togo', address: 'Lomé, Maritime, Togo', to: '/countries/togo' },
+  { country: 'DRC', address: 'SILIKIN VILLAGE, Local A012, Bâtiment Phase 3', to: 'https://avadapay.cd' },
+  { country: 'Benin', address: 'Cotonou, Littoral, Benin', to: '/countries/benin', disabled: true },
 ];
 
 export const HomePage: React.FC = () => {
@@ -368,13 +374,19 @@ export const HomePage: React.FC = () => {
           {OFFICES.map((o) => (
             <div
               key={o.country}
-              className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 rounded-xl border border-[#3BBA93]/30 bg-white px-6 py-4 shadow-xs hover:border-[#3BBA93] transition-colors"
+              className={`flex flex-col sm:flex-row sm:items-center justify-between gap-3 rounded-xl border bg-white px-6 py-4 shadow-xs transition-colors ${
+                o.disabled ? 'border-gray-200 opacity-75' : 'border-[#3BBA93]/30 hover:border-[#3BBA93]'
+              }`}
             >
               <p className="text-xs sm:text-sm text-gray-800 leading-snug">
                 <span className="font-bold text-gray-900 mr-3">{o.country}</span>
                 <span className="text-gray-600">{o.address}</span>
               </p>
-              {o.to.startsWith('http') ? (
+              {o.disabled ? (
+                <span className="inline-flex shrink-0 items-center justify-center h-9 px-4 rounded-md bg-gray-100 text-gray-500 font-semibold text-xs border border-gray-200 cursor-not-allowed select-none">
+                  Coming Soon
+                </span>
+              ) : o.to.startsWith('http') ? (
                 <a
                   href={o.to}
                   target="_blank"

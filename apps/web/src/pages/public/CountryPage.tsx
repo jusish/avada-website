@@ -96,12 +96,39 @@ export const CountryPage: React.FC = () => {
 
   // DRC external portal redirect as requested by client
   if (slug === 'drc' || slug === 'cd' || slug === 'congo' || slug.includes('d.r')) {
-    window.location.href = 'https://avadapay.cd/en';
+    window.location.replace('https://avadapay.cd');
     return (
       <div className="min-h-screen flex items-center justify-center bg-[#2A292D] text-white p-6 text-center">
         <div className="space-y-4">
           <div className="w-8 h-8 border-2 border-[#3BBA93] border-t-transparent rounded-full animate-spin mx-auto" />
           <p className="text-sm font-semibold">Redirecting to AvadaPay DRC portal (avadapay.cd)...</p>
+          <a href="https://avadapay.cd" className="text-xs text-[#3BBA93] underline font-bold">
+            Click here if not redirected automatically
+          </a>
+        </div>
+      </div>
+    );
+  }
+
+  // Benin: Coming soon state until custom design is finalized
+  if (slug === 'benin' || slug === 'bj') {
+    return (
+      <div className="min-h-screen bg-[#F8FAFC] flex items-center justify-center p-6 text-center">
+        <div className="max-w-md bg-white rounded-3xl p-8 border border-gray-100 shadow-xl space-y-4">
+          <div className="w-16 h-16 rounded-full bg-[#3BBA93]/15 text-[#3BBA93] flex items-center justify-center mx-auto">
+            <Building className="w-8 h-8" />
+          </div>
+          <h2 className="text-2xl font-black text-[#2A292D]">Benin — Coming Soon</h2>
+          <p className="text-sm text-gray-600">
+            AvadaPay is currently establishing direct telco connectivity and mobile money rails across Benin. Stay tuned or contact our team for early access.
+          </p>
+          <div className="pt-2">
+            <Link to="/contact?country=Benin">
+              <Button className="bg-[#3BBA93] hover:bg-[#32a481] text-white font-bold rounded-xl text-sm">
+                Inquire About Benin Launch
+              </Button>
+            </Link>
+          </div>
         </div>
       </div>
     );

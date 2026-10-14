@@ -140,14 +140,9 @@ export const CircleUAE: React.FC<Props> = (p) => (
 
 export const CIRCLE_FLAGS: React.FC<Props>[] = [
   CircleKenya,
-  CircleUganda,
   CircleTanzania,
-  CircleMali,
-  CircleDRC,
-  CircleBurkina,
   CircleRwanda,
+  CircleDRC,
   CircleBenin,
-  CircleTogo,
-  CircleUAE,
 ];
 
