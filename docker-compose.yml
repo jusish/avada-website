@@ -47,9 +47,9 @@ services:
     depends_on:
       - api
     environment:
-      - VIRTUAL_HOST=avadapay.rw,www.avadapay.rw
-      - LETSENCRYPT_HOST=avadapay.rw,www.avadapay.rw
-      - LETSENCRYPT_EMAIL=avada.rwanda@avadapay.com
+      - VIRTUAL_HOST=avadapay.com,www.avadapay.com,avadapay.rw,www.avadapay.rw
+      - LETSENCRYPT_HOST=avadapay.com,www.avadapay.com,avadapay.rw,www.avadapay.rw
+      - LETSENCRYPT_EMAIL=admin@avadapay.com
     networks:
       - default
       - proxy
