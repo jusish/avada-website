@@ -109,6 +109,35 @@ export const CircleRwanda: React.FC<Props> = (p) => (
   </Circle>
 );
 
+export const CircleBenin: React.FC<Props> = (p) => (
+  <Circle {...p} label="Benin">
+    <rect width="40" height="100" fill="#008751" />
+    <rect x="40" width="60" height="50" fill="#FCD116" />
+    <rect x="40" y="50" width="60" height="50" fill="#E8112D" />
+  </Circle>
+);
+
+export const CircleTogo: React.FC<Props> = (p) => (
+  <Circle {...p} label="Togo">
+    <rect width="100" height="20" fill="#006A4E" />
+    <rect y="20" width="100" height="20" fill="#FFCE00" />
+    <rect y="40" width="100" height="20" fill="#006A4E" />
+    <rect y="60" width="100" height="20" fill="#FFCE00" />
+    <rect y="80" width="100" height="20" fill="#006A4E" />
+    <rect width="40" height="60" fill="#D21034" />
+    {star(20, 30, 14, '#FFFFFF')}
+  </Circle>
+);
+
+export const CircleUAE: React.FC<Props> = (p) => (
+  <Circle {...p} label="UAE">
+    <rect width="25" height="100" fill="#FF0000" />
+    <rect x="25" width="75" height="33.3" fill="#00732F" />
+    <rect x="25" y="33.3" width="75" height="33.3" fill="#FFFFFF" />
+    <rect x="25" y="66.6" width="75" height="33.4" fill="#000000" />
+  </Circle>
+);
+
 export const CIRCLE_FLAGS: React.FC<Props>[] = [
   CircleKenya,
   CircleUganda,
@@ -117,4 +146,8 @@ export const CIRCLE_FLAGS: React.FC<Props>[] = [
   CircleDRC,
   CircleBurkina,
   CircleRwanda,
+  CircleBenin,
+  CircleTogo,
+  CircleUAE,
 ];
+

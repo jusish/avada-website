@@ -7,6 +7,78 @@ import { useSiteConfig } from '@/context/SiteConfigContext';
 import { Button } from '@/components/ui/button';
 import { MapPin, Phone, Mail, CheckCircle2, Building, CreditCard, Radio } from 'lucide-react';
 import { CountryFlag } from '@/components/CountryFlag';
+import { Country } from '@avada/shared';
+
+const makeFallback = (c: Omit<Country, 'displayOrder' | 'createdAt' | 'updatedAt'>): Country => ({
+  ...c,
+  displayOrder: 99,
+  createdAt: new Date().toISOString(),
+  updatedAt: new Date().toISOString(),
+});
+
+const BENIN_DATA = makeFallback({
+  id: 'benin-fb',
+  name: 'Benin',
+  slug: 'benin',
+  code: 'BJ',
+  currencyCode: 'XOF',
+  headline: 'Benin Payment Gateway & Telco Aggregator',
+  tagline: 'Direct mobile money integration with MTN MoMo, Moov Africa, and Celtiis.',
+  description: 'AvadaPay powers instant mobile money collections, merchant point-of-sale, and automated payouts across the Republic of Benin with enterprise uptime and bank-grade reconciliation.',
+  telcoPartners: ['MTN Mobile Money Benin', 'Moov Africa Benin', 'Celtiis'],
+  paymentRails: ['Mobile Money (Collections & Payouts)', 'Cards (Visa, Mastercard)', 'Bulk SMS & Notifications'],
+  pricingSummary: 'Competitive collection and payout fees with local currency (XOF) settlement.',
+  officeAddress: 'Cotonou, Littoral, Benin',
+  officePhone: '+229 01 00 00 00',
+  officeEmail: 'benin@avadapay.com',
+  active: true,
+});
+
+const TOGO_DATA = makeFallback({
+  id: 'togo-fb',
+  name: 'Togo',
+  slug: 'togo',
+  code: 'TG',
+  currencyCode: 'XOF',
+  headline: 'Togo Digital Payments & Carrier Aggregation',
+  tagline: 'Reliable payment processing across Togocom TMoney and Moov Money.',
+  description: 'Expand your business across Togo with AvadaPay single-API access for collections, payouts, and automated transactional alerts.',
+  telcoPartners: ['Togocom TMoney', 'Moov Money Togo'],
+  paymentRails: ['TMoney & Moov Money Payouts', 'Omnichannel In-Store & Online Checkout', 'SMS Notifications'],
+  pricingSummary: 'Low-friction integration with transparent per-transaction pricing in XOF.',
+  officeAddress: 'Lomé, Maritime, Togo',
+  officePhone: '+228 90 00 00 00',
+  officeEmail: 'togo@avadapay.com',
+  active: true,
+});
+
+const UAE_DATA = makeFallback({
+  id: 'uae-fb',
+  name: 'UAE (Headquarters)',
+  slug: 'uae',
+  code: 'AE',
+  currencyCode: 'AED',
+  headline: 'AvadaPay Corporate Headquarters — Dubai, UAE',
+  tagline: 'Global treasury, compliance, and international settlement operations.',
+  description: 'AvadaPay global headquarters in Dubai coordinates our pan-African financial operations, treasury infrastructure, and international enterprise relationships.',
+  telcoPartners: ['Global Banking Rails', 'Pan-African Switch Network'],
+  paymentRails: ['International Wire Transfers', 'Treasury & Liquidity Management', 'Multi-Currency Settlement (USD, AED, EUR)'],
+  pricingSummary: 'Custom enterprise volume pricing and bespoke treasury solutions.',
+  officeAddress: '25th floor, SORP Business Centre, Tameem House, Barsha Heights, Dubai, United Arab Emirates (UAE)',
+  officePhone: '+971 4 000 0000',
+  officeEmail: 'dubai@avadapay.com',
+  mapEmbedUrl: 'https://maps.google.com/maps?q=SORP+Business+Centre+Tameem+House+Barsha+Heights+Dubai&output=embed',
+  active: true,
+});
+
+const FALLBACK_COUNTRIES: Record<string, Country> = {
+  benin: BENIN_DATA,
+  bj: BENIN_DATA,
+  togo: TOGO_DATA,
+  tg: TOGO_DATA,
+  uae: UAE_DATA,
+  ae: UAE_DATA,
+};
 
 export const CountryPage: React.FC = () => {
   const { countrySlug } = useParams<{ countrySlug: string }>();
@@ -22,13 +94,28 @@ export const CountryPage: React.FC = () => {
 
   const slug = countrySlug.toLowerCase().trim();
 
+  // DRC external portal redirect as requested by client
+  if (slug === 'drc' || slug === 'cd' || slug === 'congo' || slug.includes('d.r')) {
+    window.location.href = 'https://avadapay.cd/en';
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-[#2A292D] text-white p-6 text-center">
+        <div className="space-y-4">
+          <div className="w-8 h-8 border-2 border-[#3BBA93] border-t-transparent rounded-full animate-spin mx-auto" />
+          <p className="text-sm font-semibold">Redirecting to AvadaPay DRC portal (avadapay.cd)...</p>
+        </div>
+      </div>
+    );
+  }
+
   // Bespoke pages for primary launch markets
   if (slug === 'kenya' || slug === 'ke') return <KenyaPage />;
   if (slug === 'rwanda' || slug === 'rw') return <RwandaPage />;
   if (slug === 'tanzania' || slug === 'tz') return <TanzaniaPage />;
 
-  // Search in dynamic countries from CMS
-  const country = countries.find((c) => c.slug.toLowerCase() === slug || c.code.toLowerCase() === slug);
+  // Search in dynamic countries from CMS, fallback to built-in regional presence data
+  const country =
+    countries.find((c) => c.slug.toLowerCase() === slug || c.code.toLowerCase() === slug) ||
+    FALLBACK_COUNTRIES[slug];
 
   if (!country && !loading) {
     return (
@@ -115,7 +202,7 @@ export const CountryPage: React.FC = () => {
             </div>
             <p className="text-xs text-gray-500">Direct mobile network operator connectivity with instant STK push & callbacks.</p>
             <div className="space-y-2 pt-2">
-              {country.telcoPartners.map((partner, i) => (
+              {country.telcoPartners.map((partner: string, i: number) => (
                 <div key={i} className="flex items-center space-x-2 text-sm font-bold text-[#2A292D]">
                   <CheckCircle2 className="w-4 h-4 text-[#3BBA93] flex-shrink-0" />
                   <span>{partner}</span>
@@ -134,7 +221,7 @@ export const CountryPage: React.FC = () => {
             </div>
             <p className="text-xs text-gray-500">Omnichannel processing across mobile money, card networks, and bank transfers.</p>
             <div className="space-y-2 pt-2">
-              {country.paymentRails.map((rail, i) => (
+              {country.paymentRails.map((rail: string, i: number) => (
                 <div key={i} className="flex items-center space-x-2 text-sm font-bold text-[#2A292D]">
                   <CheckCircle2 className="w-4 h-4 text-[#3BBA93] flex-shrink-0" />
                   <span>{rail}</span>

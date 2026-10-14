@@ -118,7 +118,7 @@ export const AdminSidebar: React.FC = () => {
       group: 'Content Management',
       items: [
         {
-          name: 'Countries & Markets',
+          name: 'Regional Presence',
           path: '/admin/content/countries',
           icon: Globe2,
           module: 'countries',

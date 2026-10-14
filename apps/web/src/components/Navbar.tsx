@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { ChevronDown, Menu, X } from 'lucide-react';
+import { ChevronDown, Menu, X, ExternalLink } from 'lucide-react';
 import { CountryFlag } from '@/components/CountryFlag';
 import { useSiteConfig } from '@/context/SiteConfigContext';
 
@@ -16,6 +16,10 @@ export const COUNTRIES: CountryInfo[] = [
   { code: 'kenya', name: 'Kenya', path: '/countries/kenya' },
   { code: 'rwanda', name: 'Rwanda', path: '/countries/rwanda' },
   { code: 'tanzania', name: 'Tanzania', path: '/countries/tanzania' },
+  { code: 'drc', name: 'DRC', path: 'https://avadapay.cd/en' },
+  { code: 'benin', name: 'Benin', path: '/countries/benin' },
+  { code: 'togo', name: 'Togo', path: '/countries/togo' },
+  { code: 'uae', name: 'UAE (Office)', path: '/countries/uae' },
 ];
 
 export const Navbar: React.FC = () => {
@@ -25,14 +29,25 @@ export const Navbar: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
 
-  const activeCountries: CountryInfo[] =
+  const baseList: CountryInfo[] =
     dynamicCountries && dynamicCountries.length > 0
       ? dynamicCountries.map((c) => ({
           code: c.code,
           name: c.name,
-          path: `/countries/${c.slug}`,
+          path:
+            c.slug === 'drc' || c.code.toLowerCase() === 'cd'
+              ? 'https://avadapay.cd/en'
+              : `/countries/${c.slug}`,
         }))
       : COUNTRIES;
+
+  // Merge so all primary regional presence locations (DRC, Benin, Togo, UAE) are always visible
+  const activeCountries: CountryInfo[] = [...baseList];
+  for (const c of COUNTRIES) {
+    if (!activeCountries.some((item) => item.code.toLowerCase() === c.code.toLowerCase())) {
+      activeCountries.push(c);
+    }
+  }
 
   const variant: 'overlay' | 'light' | 'dark' =
     location.pathname === '/' ? 'overlay' : location.pathname === '/contact' ? 'light' : 'dark';
@@ -47,7 +62,11 @@ export const Navbar: React.FC = () => {
 
   const handleCountrySelect = (path: string) => {
     setCountryDropdownOpen(false);
-    navigate(path);
+    if (path.startsWith('http')) {
+      window.open(path, '_blank', 'noopener,noreferrer');
+    } else {
+      navigate(path);
+    }
   };
 
   return (
@@ -110,26 +129,47 @@ export const Navbar: React.FC = () => {
                 </span>
               ) : (
                 <span className="flex items-center space-x-1.5">
-                  <span>Countries</span>
+                  <span>Regional Presence</span>
                   <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-200 ${countryDropdownOpen ? 'rotate-180' : ''}`} />
                 </span>
               )}
             </button>
 
             {countryDropdownOpen && (
-              <div className="absolute right-0 mt-2 w-44 rounded-xl bg-white shadow-2xl border border-gray-100 py-1.5 z-50 animate-in fade-in-0 zoom-in-95">
-                {activeCountries.map((c) => (
-                  <button
-                    key={c.code}
-                    onMouseDown={() => handleCountrySelect(c.path)}
-                    className={`w-full flex items-center space-x-2.5 px-3 py-2 text-xs text-left hover:bg-gray-50 transition-colors ${
-                      location.pathname === c.path ? 'bg-gray-50 text-[#3BBA93] font-semibold' : 'text-gray-700'
-                    }`}
-                  >
-                    <CountryFlag country={c.code} className="w-4 h-3" />
-                    <span>{c.name}</span>
-                  </button>
-                ))}
+              <div className="absolute right-0 mt-2 w-52 rounded-xl bg-white shadow-2xl border border-gray-100 py-1.5 z-50 animate-in fade-in-0 zoom-in-95">
+                {activeCountries.map((c) => {
+                  const isExternal = c.path.startsWith('http');
+                  if (isExternal) {
+                    return (
+                      <a
+                        key={c.code}
+                        href={c.path}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onMouseDown={() => setCountryDropdownOpen(false)}
+                        className="w-full flex items-center justify-between px-3 py-2 text-xs text-left hover:bg-gray-50 transition-colors text-gray-700"
+                      >
+                        <span className="flex items-center space-x-2.5">
+                          <CountryFlag country={c.code} className="w-4 h-3" />
+                          <span>{c.name}</span>
+                        </span>
+                        <ExternalLink className="w-3 h-3 text-gray-400" />
+                      </a>
+                    );
+                  }
+                  return (
+                    <button
+                      key={c.code}
+                      onMouseDown={() => handleCountrySelect(c.path)}
+                      className={`w-full flex items-center space-x-2.5 px-3 py-2 text-xs text-left hover:bg-gray-50 transition-colors ${
+                        location.pathname === c.path ? 'bg-gray-50 text-[#3BBA93] font-semibold' : 'text-gray-700'
+                      }`}
+                    >
+                      <CountryFlag country={c.code} className="w-4 h-3" />
+                      <span>{c.name}</span>
+                    </button>
+                  );
+                })}
               </div>
             )}
           </div>
@@ -182,19 +222,40 @@ export const Navbar: React.FC = () => {
 
           <div className="pt-2 border-t border-white/10 space-y-1">
             <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider px-3">
-              Markets & Countries
+              Regional Presence
             </p>
-            {activeCountries.map((c) => (
-              <Link
-                key={c.code}
-                to={c.path}
-                onClick={() => setMobileMenuOpen(false)}
-                className="flex items-center space-x-2.5 px-3 py-2 rounded-lg text-sm font-medium text-white hover:bg-white/10"
-              >
-                <CountryFlag country={c.code} className="w-5 h-3.5" />
-                <span>{c.name}</span>
-              </Link>
-            ))}
+            {activeCountries.map((c) => {
+              const isExternal = c.path.startsWith('http');
+              if (isExternal) {
+                return (
+                  <a
+                    key={c.code}
+                    href={c.path}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="flex items-center justify-between px-3 py-2 rounded-lg text-sm font-medium text-white hover:bg-white/10"
+                  >
+                    <span className="flex items-center space-x-2.5">
+                      <CountryFlag country={c.code} className="w-5 h-3.5" />
+                      <span>{c.name}</span>
+                    </span>
+                    <ExternalLink className="w-3.5 h-3.5 text-gray-400" />
+                  </a>
+                );
+              }
+              return (
+                <Link
+                  key={c.code}
+                  to={c.path}
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="flex items-center space-x-2.5 px-3 py-2 rounded-lg text-sm font-medium text-white hover:bg-white/10"
+                >
+                  <CountryFlag country={c.code} className="w-5 h-3.5" />
+                  <span>{c.name}</span>
+                </Link>
+              );
+            })}
           </div>
 
           <div className="pt-4 border-t border-white/10">

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowRight, ChevronUp } from 'lucide-react';
+import { ArrowRight, ChevronUp, ExternalLink } from 'lucide-react';
 import { CIRCLE_FLAGS } from '@/components/home/CircleFlags';
 import { ROW_ONE, ROW_TWO } from '@/components/home/PartnerLogos';
 import { Marquee } from '@/components/Marquee';
@@ -126,7 +126,9 @@ const OFFICES = [
   { country: 'Kenya', address: '8th Floor Westpark Towers, Westlands, Nairobi', to: '/countries/kenya' },
   { country: 'Tanzania', address: 'Dar es Salaam, Tanzania', to: '/countries/tanzania' },
   { country: 'Rwanda', address: 'Kigali, Rwanda', to: '/countries/rwanda' },
-  { country: 'DRC', address: 'SILIKIN VILLAGE, Local A012, Bâtiment Phase 3', to: '/contact' },
+  { country: 'DRC', address: 'SILIKIN VILLAGE, Local A012, Bâtiment Phase 3', to: 'https://avadapay.cd/en' },
+  { country: 'Benin', address: 'Cotonou, Littoral, Benin', to: '/countries/benin' },
+  { country: 'Togo', address: 'Lomé, Maritime, Togo', to: '/countries/togo' },
 ];
 
 export const HomePage: React.FC = () => {
@@ -372,13 +374,25 @@ export const HomePage: React.FC = () => {
                 <span className="font-bold text-gray-900 mr-3">{o.country}</span>
                 <span className="text-gray-600">{o.address}</span>
               </p>
-              <Link
-                to={o.to}
-                className="inline-flex shrink-0 items-center justify-center gap-1.5 h-9 px-4 rounded-md bg-[#3BBA93] text-white font-semibold text-xs transition-colors hover:bg-[#32a481] active:scale-[0.98] shadow-xs"
-              >
-                <span>{o.country} services</span>
-                <ArrowRight className="w-3.5 h-3.5" strokeWidth={2.5} />
-              </Link>
+              {o.to.startsWith('http') ? (
+                <a
+                  href={o.to}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex shrink-0 items-center justify-center gap-1.5 h-9 px-4 rounded-md bg-[#3BBA93] text-white font-semibold text-xs transition-colors hover:bg-[#32a481] active:scale-[0.98] shadow-xs"
+                >
+                  <span>{o.country} services</span>
+                  <ExternalLink className="w-3.5 h-3.5" />
+                </a>
+              ) : (
+                <Link
+                  to={o.to}
+                  className="inline-flex shrink-0 items-center justify-center gap-1.5 h-9 px-4 rounded-md bg-[#3BBA93] text-white font-semibold text-xs transition-colors hover:bg-[#32a481] active:scale-[0.98] shadow-xs"
+                >
+                  <span>{o.country} services</span>
+                  <ArrowRight className="w-3.5 h-3.5" strokeWidth={2.5} />
+                </Link>
+              )}
             </div>
           ))}
         </div>

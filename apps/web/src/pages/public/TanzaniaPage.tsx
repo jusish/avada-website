@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import {
   Layers,
@@ -7,6 +7,7 @@ import {
   MapPin,
   ArrowRight,
   Filter,
+  Globe,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { CountryFlag } from '@/components/CountryFlag';
@@ -91,6 +92,50 @@ const TanzaniaHeroVisual: React.FC = () => (
 /* ------------------------------------------------------------------ */
 
 export const TanzaniaPage: React.FC = () => {
+  const [language, setLanguage] = useState<'sw' | 'en'>(() => {
+    return (localStorage.getItem('avada_tz_lang') as 'sw' | 'en') || 'sw';
+  });
+
+  const handleLanguageChange = (lang: 'sw' | 'en') => {
+    setLanguage(lang);
+    localStorage.setItem('avada_tz_lang', lang);
+  };
+
+  useEffect(() => {
+    // Add Google Translate script if not present for international visitors
+    if (!document.getElementById('google-translate-script')) {
+      const script = document.createElement('script');
+      script.id = 'google-translate-script';
+      script.src = 'https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit';
+      script.async = true;
+      document.body.appendChild(script);
+
+      (window as any).googleTranslateElementInit = () => {
+        if ((window as any).google?.translate?.TranslateElement) {
+          try {
+            new (window as any).google.translate.TranslateElement(
+              {
+                pageLanguage: 'en',
+                includedLanguages: 'en,sw,fr,ar,rw',
+                layout: (window as any).google.translate.TranslateElement.InlineLayout?.SIMPLE,
+                autoDisplay: false,
+              },
+              'google_translate_element'
+            );
+          } catch (err) {
+            console.warn('Google translate init warning:', err);
+          }
+        }
+      };
+    } else if ((window as any).googleTranslateElementInit) {
+      try {
+        (window as any).googleTranslateElementInit();
+      } catch {
+        // ignore duplicate init
+      }
+    }
+  }, []);
+
   const threeCards = [
     {
       n: 1,
@@ -154,11 +199,69 @@ export const TanzaniaPage: React.FC = () => {
       <section className="bg-[#2A292D] text-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 sm:pt-12 pb-16 sm:pb-24 grid lg:grid-cols-[1.3fr_1fr] gap-10 lg:gap-14 items-center">
           <div className="lg:pl-8">
-            <h1 className="font-extrabold tracking-tight leading-[1.1] text-[clamp(2.25rem,5vw,4.1rem)]">
-              Malipo rahisi kwa <br className="hidden sm:inline" />
-              biashara Tanzania.
-            </h1>
-            <p className="mt-8 max-w-[34rem] text-base sm:text-lg font-semibold leading-[1.5] text-white">
+            {/* Language Switcher & Foreigner Translate Capsule */}
+            <div className="flex flex-wrap items-center gap-3 mb-6">
+              <div className="inline-flex items-center p-1 rounded-full bg-white/10 border border-white/15 text-xs font-semibold backdrop-blur-xs">
+                <button
+                  type="button"
+                  onClick={() => handleLanguageChange('sw')}
+                  className={`px-3 py-1 rounded-full transition-all duration-200 flex items-center gap-1.5 ${
+                    language === 'sw'
+                      ? 'bg-[#3BBA93] text-white shadow-xs font-bold'
+                      : 'text-gray-300 hover:text-white'
+                  }`}
+                >
+                  <span className="text-xs leading-none">🇹🇿</span>
+                  <span>Kiswahili</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleLanguageChange('en')}
+                  className={`px-3 py-1 rounded-full transition-all duration-200 flex items-center gap-1.5 ${
+                    language === 'en'
+                      ? 'bg-[#3BBA93] text-white shadow-xs font-bold'
+                      : 'text-gray-300 hover:text-white'
+                  }`}
+                >
+                  <span className="text-xs leading-none">🇬🇧</span>
+                  <span>English (Translate)</span>
+                </button>
+              </div>
+
+              {/* Google Translate Plugin Mount Container */}
+              <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-xs text-gray-300">
+                <Globe className="w-3.5 h-3.5 text-[#3BBA93]" />
+                <span className="text-[11px] text-gray-400">Translate:</span>
+                <div id="google_translate_element" className="inline-block" />
+              </div>
+            </div>
+
+            {/* Headline with Bilingual & Foreigner Translation Support */}
+            {language === 'sw' ? (
+              <div>
+                <h1 className="font-extrabold tracking-tight leading-[1.1] text-[clamp(2.25rem,5vw,4.1rem)]">
+                  Malipo rahisi kwa <br className="hidden sm:inline" />
+                  biashara Tanzania.
+                </h1>
+                <p className="mt-3 text-xs sm:text-sm font-semibold text-[#3BBA93] bg-[#3BBA93]/10 border border-[#3BBA93]/20 px-3 py-1.5 rounded-lg inline-flex items-center gap-1.5">
+                  <span className="font-bold">English:</span>
+                  <span>"Simple, stress-free payments for businesses in Tanzania"</span>
+                </p>
+              </div>
+            ) : (
+              <div>
+                <h1 className="font-extrabold tracking-tight leading-[1.1] text-[clamp(2.25rem,5vw,4.1rem)]">
+                  Simple, stress-free <br className="hidden sm:inline" />
+                  payments for <br className="hidden sm:inline" />
+                  businesses in Tanzania.
+                </h1>
+                <p className="mt-3 text-xs sm:text-sm font-medium text-gray-400 italic">
+                  Translated to English for international merchants and foreign visitors
+                </p>
+              </div>
+            )}
+
+            <p className="mt-6 max-w-[34rem] text-base sm:text-lg font-semibold leading-[1.5] text-white">
               Connect to every major Tanzanian mobile money network through one integration.
               Collect payments faster, send payouts, and keep customers updated without managing
               four different providers.
@@ -166,12 +269,12 @@ export const TanzaniaPage: React.FC = () => {
             <div className="mt-8 flex flex-wrap gap-4">
               <Link to="/contact?country=Tanzania">
                 <Button className="h-[3.1rem] px-7 rounded-md bg-[#3BBA93] hover:bg-[#32a481] text-white text-base font-bold shadow-none">
-                  Contact Us
+                  {language === 'sw' ? 'Wasiliana Nasi (Contact Us)' : 'Contact Us'}
                 </Button>
               </Link>
               <Link to="/contact?country=Tanzania&inquiry=pricing">
                 <Button className="h-[3.1rem] px-7 rounded-md bg-transparent border border-[#3BBA93] text-[#3BBA93] hover:bg-[#3BBA93]/10 text-base font-bold shadow-none">
-                  View Tanzania Pricing
+                  {language === 'sw' ? 'Bei za Tanzania (Tanzania Pricing)' : 'View Tanzania Pricing'}
                 </Button>
               </Link>
             </div>
@@ -469,7 +572,7 @@ export const TanzaniaPage: React.FC = () => {
             <div className="mt-4">
               <Link to="/contact?country=Tanzania&inquiry=meeting">
                 <Button className="h-11 px-6 bg-[#3BBA93] hover:bg-[#32a481] text-white font-bold rounded-lg flex items-center space-x-2">
-                  <span>Book a meeting</span>
+                  <span>{language === 'sw' ? 'Panga mkutano (Book a meeting)' : 'Book a meeting'}</span>
                   <ArrowRight className="w-4 h-4" />
                 </Button>
               </Link>

@@ -242,10 +242,10 @@ export const AdminCountriesPage: React.FC = () => {
         <div>
           <h1 className="text-2xl font-bold tracking-tight text-[#2A292D] flex items-center gap-2">
             <Globe2 className="w-6 h-6 text-[#3BBA93]" />
-            <span>African Markets & Countries</span>
+            <span>Regional Presence</span>
           </h1>
           <p className="text-xs text-gray-500 mt-1">
-            Define, update, and manage national payment markets, carrier integrations, and regional office locations.
+            Define, update, and manage national payment markets, carrier integrations, and regional office locations across Africa and our UAE headquarters.
           </p>
         </div>
 
@@ -258,7 +258,7 @@ export const AdminCountriesPage: React.FC = () => {
               className="space-x-1.5 rounded-xl font-bold text-xs"
             >
               <Plus className="w-4 h-4" />
-              <span>Add New Country</span>
+              <span>Add Regional Presence</span>
             </Button>
           )}
         </div>

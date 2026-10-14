@@ -110,8 +110,93 @@ export const FlagTanzania: React.FC<{ className?: string }> = ({ className = 'w-
   </svg>
 );
 
+const svgStar = (cx: number, cy: number, r: number, fill: string) => {
+  const pts = Array.from({ length: 10 }, (_, i) => {
+    const rad = (i * 36 - 90) * (Math.PI / 180);
+    const rr = i % 2 === 0 ? r : r * 0.4;
+    return `${cx + rr * Math.cos(rad)},${cy + rr * Math.sin(rad)}`;
+  }).join(' ');
+  return <polygon points={pts} fill={fill} />;
+};
+
+/**
+ * Democratic Republic of Congo Flag SVG Vector
+ */
+export const FlagDRC: React.FC<{ className?: string }> = ({ className = 'w-6 h-4' }) => (
+  <svg
+    viewBox="0 0 60 40"
+    className={`inline-block shrink-0 rounded-[2px] shadow-xs border border-black/15 overflow-hidden ${className}`}
+    aria-label="DRC Flag"
+  >
+    <rect width="60" height="40" fill="#007FFF" />
+    <line x1="-5" y1="45" x2="65" y2="-5" stroke="#F7D618" strokeWidth="11" />
+    <line x1="-5" y1="45" x2="65" y2="-5" stroke="#CE1021" strokeWidth="7" />
+    {svgStar(12, 12, 6, '#F7D618')}
+  </svg>
+);
+
+/**
+ * Benin National Flag SVG Vector
+ */
+export const FlagBenin: React.FC<{ className?: string }> = ({ className = 'w-6 h-4' }) => (
+  <svg
+    viewBox="0 0 60 40"
+    className={`inline-block shrink-0 rounded-[2px] shadow-xs border border-black/15 overflow-hidden ${className}`}
+    aria-label="Benin Flag"
+  >
+    {/* Left vertical green stripe (2/5) */}
+    <rect width="24" height="40" fill="#008751" />
+    {/* Upper yellow horizontal stripe (3/5) */}
+    <rect x="24" width="36" height="20" fill="#FCD116" />
+    {/* Lower red horizontal stripe (3/5) */}
+    <rect x="24" y="20" width="36" height="20" fill="#E8112D" />
+  </svg>
+);
+
+/**
+ * Togo National Flag SVG Vector
+ */
+export const FlagTogo: React.FC<{ className?: string }> = ({ className = 'w-6 h-4' }) => (
+  <svg
+    viewBox="0 0 60 40"
+    className={`inline-block shrink-0 rounded-[2px] shadow-xs border border-black/15 overflow-hidden ${className}`}
+    aria-label="Togo Flag"
+  >
+    {/* 5 alternating horizontal stripes */}
+    <rect width="60" height="8" fill="#006A4E" />
+    <rect y="8" width="60" height="8" fill="#FFCE00" />
+    <rect y="16" width="60" height="8" fill="#006A4E" />
+    <rect y="24" width="60" height="8" fill="#FFCE00" />
+    <rect y="32" width="60" height="8" fill="#006A4E" />
+    {/* Red canton square (3 stripes high) */}
+    <rect width="24" height="24" fill="#D21034" />
+    {/* Five-pointed white star */}
+    {svgStar(12, 12, 5.5, '#FFFFFF')}
+  </svg>
+);
+
+/**
+ * United Arab Emirates (UAE) Flag SVG Vector
+ */
+export const FlagUAE: React.FC<{ className?: string }> = ({ className = 'w-6 h-4' }) => (
+  <svg
+    viewBox="0 0 60 40"
+    className={`inline-block shrink-0 rounded-[2px] shadow-xs border border-black/15 overflow-hidden ${className}`}
+    aria-label="UAE Flag"
+  >
+    {/* Left red vertical stripe */}
+    <rect width="15" height="40" fill="#FF0000" />
+    {/* Upper green horizontal stripe */}
+    <rect x="15" width="45" height="13.33" fill="#00732F" />
+    {/* Middle white horizontal stripe */}
+    <rect x="15" y="13.33" width="45" height="13.33" fill="#FFFFFF" />
+    {/* Lower black horizontal stripe */}
+    <rect x="15" y="26.66" width="45" height="13.34" fill="#000000" />
+  </svg>
+);
+
 export interface CountryFlagProps {
-  country: 'kenya' | 'rwanda' | 'tanzania' | string;
+  country: 'kenya' | 'rwanda' | 'tanzania' | 'drc' | 'benin' | 'togo' | 'uae' | string;
   className?: string;
 }
 
@@ -129,6 +214,18 @@ export const CountryFlag: React.FC<CountryFlagProps> = ({ country, className }) 
   }
   if (c === 'tanzania' || c === 'tz') {
     return <FlagTanzania className={className} />;
+  }
+  if (c === 'drc' || c === 'cd' || c === 'congo' || c.includes('dr c') || c.includes('d.r')) {
+    return <FlagDRC className={className} />;
+  }
+  if (c === 'benin' || c === 'bj') {
+    return <FlagBenin className={className} />;
+  }
+  if (c === 'togo' || c === 'tg') {
+    return <FlagTogo className={className} />;
+  }
+  if (c === 'uae' || c === 'ae' || c === 'dubai' || c.includes('emirates')) {
+    return <FlagUAE className={className} />;
   }
   return null;
 };

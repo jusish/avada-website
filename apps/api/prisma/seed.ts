@@ -150,6 +150,82 @@ async function main() {
       active: true,
       displayOrder: 3,
     },
+    {
+      code: 'cd',
+      slug: 'drc',
+      name: 'DRC (Democratic Republic of Congo)',
+      currencyCode: 'USD',
+      headline: 'AvadaPay RDC — Agréée par la Banque Centrale du Congo',
+      tagline: 'Fintech innovante installée en RDC depuis 2018.',
+      description:
+        'AvadaPay RDC provides licensed payment processing, mobile money, and merchant aggregation across the Democratic Republic of Congo.',
+      telcoPartners: ['Vodacom M-Pesa DRC', 'Airtel Money RDC', 'Orange Money RDC', 'Afrimoney'],
+      paymentRails: ['Mobile Money Collections', 'Direct Bank Settlements', 'Bulk Disbursements'],
+      pricingSummary: 'Transparent collection rates in USD and CDF.',
+      officeAddress: 'SILIKIN VILLAGE, Local A012, Bâtiment Phase 3, Kinshasa, DRC',
+      officePhone: '+243 81 000 0000',
+      officeEmail: 'drc@avadapay.cd',
+      mapEmbedUrl: 'https://maps.google.com/maps?q=Kinshasa,%20DRC&t=&z=15&ie=UTF8&iwloc=&output=embed',
+      active: true,
+      displayOrder: 4,
+    },
+    {
+      code: 'bj',
+      slug: 'benin',
+      name: 'Benin',
+      currencyCode: 'XOF',
+      headline: 'Benin Payment Gateway & Telco Integration',
+      tagline: 'Direct mobile money integration with MTN MoMo, Moov Africa and Celtiis.',
+      description:
+        'AvadaPay connects merchants and businesses in Benin to major mobile money operators and card networks with instant settlement and automated reconciliation.',
+      telcoPartners: ['MTN Mobile Money Benin', 'Moov Africa Benin', 'Celtiis'],
+      paymentRails: ['Mobile Money (Collections & Payouts)', 'Cards (Visa, Mastercard)', 'Bulk SMS'],
+      pricingSummary: 'Competitive collection and payout fees with local currency settlement.',
+      officeAddress: 'Cotonou, Littoral, Benin',
+      officePhone: '+229 01 00 00 00',
+      officeEmail: 'benin@avadapay.com',
+      mapEmbedUrl: 'https://maps.google.com/maps?q=Cotonou,%20Benin&t=&z=15&ie=UTF8&iwloc=&output=embed',
+      active: true,
+      displayOrder: 5,
+    },
+    {
+      code: 'tg',
+      slug: 'togo',
+      name: 'Togo',
+      currencyCode: 'XOF',
+      headline: 'Togo Digital Payments & Carrier Aggregation',
+      tagline: 'Reliable payment processing across Togocom TMoney and Moov Money.',
+      description:
+        'Expand your business across Togo with AvadaPay single-API access for collections, payouts, and automated transactional alerts.',
+      telcoPartners: ['Togocom TMoney', 'Moov Money Togo'],
+      paymentRails: ['TMoney & Moov Money Payouts', 'Omnichannel In-Store & Online Checkout', 'SMS Notifications'],
+      pricingSummary: 'Low-friction integration with transparent per-transaction pricing.',
+      officeAddress: 'Lomé, Maritime, Togo',
+      officePhone: '+228 90 00 00 00',
+      officeEmail: 'togo@avadapay.com',
+      mapEmbedUrl: 'https://maps.google.com/maps?q=Lome,%20Togo&t=&z=15&ie=UTF8&iwloc=&output=embed',
+      active: true,
+      displayOrder: 6,
+    },
+    {
+      code: 'ae',
+      slug: 'uae',
+      name: 'UAE (Headquarters)',
+      currencyCode: 'AED',
+      headline: 'AvadaPay Corporate Headquarters — Dubai, UAE',
+      tagline: 'Global treasury, compliance, and international settlement operations.',
+      description:
+        'AvadaPay global headquarters in Dubai coordinates our pan-African financial operations, treasury infrastructure, and international enterprise relationships.',
+      telcoPartners: ['Global Banking Rails', 'Pan-African Switch Network'],
+      paymentRails: ['International Wire Transfers', 'Treasury & Liquidity Management', 'Multi-Currency Settlement (USD, AED, EUR)'],
+      pricingSummary: 'Custom enterprise volume pricing and bespoke treasury solutions.',
+      officeAddress: '25th floor, SORP Business Centre, Tameem House, Barsha Heights, Dubai, United Arab Emirates (UAE)',
+      officePhone: '+971 4 000 0000',
+      officeEmail: 'dubai@avadapay.com',
+      mapEmbedUrl: 'https://maps.google.com/maps?q=SORP+Business+Centre+Tameem+House+Barsha+Heights+Dubai&output=embed',
+      active: true,
+      displayOrder: 7,
+    },
   ];
 
   for (const country of defaultCountries) {
@@ -159,7 +235,7 @@ async function main() {
       create: country,
     });
   }
-  console.log('✅ Seeded Countries: Rwanda, Kenya, Tanzania');
+  console.log('✅ Seeded Regional Presence: Rwanda, Kenya, Tanzania, DRC, Benin, Togo, UAE');
 
   // 4. Seed Default Inquiry Types
   const defaultInquiryTypes = [
