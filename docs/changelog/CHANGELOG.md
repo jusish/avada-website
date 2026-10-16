@@ -5,6 +5,15 @@ All notable changes to the Avada Website and CMS project will be documented in t
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.10.0] - 2026-10-16
+
+### Changed
+- **Direct Country Permalinks**: Migrated country URLs from `/countries/:countrySlug` to clean top-level permalinks (e.g. `https://avadapay.com/kenya`, `https://avadapay.com/rwanda`, `https://avadapay.com/tanzania`). Added an automated React Router `CountryRedirect` fallback to route legacy `/countries/*` URLs seamlessly without broken links.
+- **Rwanda Corporate Office Address Update**: Updated Rwanda office location to `BHC Building, KG 7 Ave Kacyiru, Gasabo, Kigali, Rwanda` on the Home page office list, the dedicated Rwanda country page office card, and updated the interactive Google Maps embed.
+- **Scaped Footer Contact Information**: Removed the global contact details (Dubai HQ, global phone) from generic solution pages (`/payment-processing`, `/pos`, `/bulk-sms`), contact page, and legal policy pages. Localized country pages (`/kenya`, `/rwanda`, `/tanzania`, or dynamic CMS markets) display localized office contact details, while the Home page retains the global headquarters contact information.
+
+---
+
 ## [1.9.0] - 2026-10-08
 
 ### Added

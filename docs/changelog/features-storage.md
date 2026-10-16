@@ -27,6 +27,7 @@ This document is the **single source of truth** for every feature implemented in
 19. [FEAT-019: Dedicated Contact & Technical Inquiry Page (ContactPage)](#feat-019-dedicated-contact--technical-inquiry-page-contactpage)
 20. [FEAT-020: Pixel-Perfect Dedicated Country Pages (Kenya, Rwanda, and Tanzania)](#feat-020-pixel-perfect-dedicated-country-pages-kenya-rwanda-and-tanzania)
 21. [FEAT-021: Enterprise CMS Platform, Visual RBAC Matrix, Real-Time Security Telemetry & Shadcn UI Standardization](#feat-021-enterprise-cms-platform-visual-rbac-matrix-real-time-security-telemetry--shadcn-ui-standardization)
+22. [FEAT-022: Direct Country Permalinks, Rwanda BHC Office Location & Country-Specific Footer Scoping](#feat-022-direct-country-permalinks-rwanda-bhc-office-location--country-specific-footer-scoping)
 
 ---
 
@@ -476,6 +477,30 @@ This document is the **single source of truth** for every feature implemented in
   - **Footer & Social Links Configuration**: Centralized editing of footer contact information and social media links with customizable link target behaviors (`_blank` vs `_self`).
   - **Availability & Threat Diagnostics**: Diagnostic endpoint at `/api/admin/analytics/security` and `/api/admin/security/diagnostic` reporting real PostgreSQL query latency, telemetry counts, threat feeds, memory usage, and TLS 1.3 status.
   - **Design System Polish (shadcn/ui)**: Replaced all native `<select>` tags and custom modal overlays with Radix `Select` and `Dialog`. Standardized card corners to `rounded-xl` and removed unnecessary `uppercase` Tailwind styles.
+
+---
+
+## FEAT-022: Direct Country Permalinks, Rwanda BHC Office Location & Country-Specific Footer Scoping
+- **ID**: `FEAT-022`
+- **Status**: Completed
+- **Created**: 2026-10-16
+- **Description**: Migrated national landing page URLs from nested `/countries/:countrySlug` paths to top-level clean permalinks (`/kenya`, `/rwanda`, `/tanzania`), configured automatic backward-compatible redirects from legacy `/countries/*` URLs, updated Rwanda's official corporate headquarters location to BHC Building in Kacyiru, Gasabo, Kigali across all public pages and seeds, and refined the global footer so generic solutions and legal pages omit Dubai contact details while localized country pages display each market's respective office contact credentials.
+- **Files Involved**:
+  - [`apps/web/src/App.tsx`](../../apps/web/src/App.tsx)
+  - [`apps/web/src/components/Navbar.tsx`](../../apps/web/src/components/Navbar.tsx)
+  - [`apps/web/src/components/Footer.tsx`](../../apps/web/src/components/Footer.tsx)
+  - [`apps/web/src/pages/public/HomePage.tsx`](../../apps/web/src/pages/public/HomePage.tsx)
+  - [`apps/web/src/pages/public/RwandaPage.tsx`](../../apps/web/src/pages/public/RwandaPage.tsx)
+  - [`apps/web/src/pages/admin/AdminCountriesPage.tsx`](../../apps/web/src/pages/admin/AdminCountriesPage.tsx)
+  - [`apps/api/prisma/seed.ts`](../../apps/api/prisma/seed.ts)
+  - [`apps/api/src/routes/analytics.routes.ts`](../../apps/api/src/routes/analytics.routes.ts)
+  - [`README.md`](../../README.md)
+  - [`docs/rules/frontend-styling-rules.md`](../../docs/rules/frontend-styling-rules.md)
+- **Implementation Details**:
+  - **Rwanda Office Location Modernization**: Updated Rwanda office location to `BHC Building, KG 7 Ave Kacyiru, Gasabo, Kigali, Rwanda` on `HomePage.tsx` (Regional Presence office directory) and `RwandaPage.tsx` (dedicated office section and Google Maps embed `src`). Synchronized Prisma database seeder (`apps/api/prisma/seed.ts`) with updated location coordinates and map embed links.
+  - **Clean Country Permalinks (`/kenya`, `/rwanda`, `/tanzania`)**: Replaced all `/countries/:countrySlug` routes with clean top-level permalinks (`/:countrySlug`) in React Router v6. Added an automatic `CountryRedirect` component that seamlessly navigates legacy `/countries/:countrySlug` deep links to the new permalinks without 404 errors. Updated Navbar country dropdown links, HomePage office action buttons, and Admin CMS public preview links.
+  - **Context-Aware Footer Scoping**: Reconfigured `Footer.tsx` so global contact information (Dubai HQ address, global phone) appears exclusively on the Home page (`/`). Country pages (`/kenya`, `/rwanda`, `/tanzania`, or dynamic CMS markets) dynamically render that country's dedicated office credentials. Generic solution pages (`/payment-processing`, `/pos`, `/bulk-sms`), contact, and legal policy pages omit the global contact column and smoothly format into a clean two-column layout (`Useful links` and `Legal & Compliance`).
+
 
 
 

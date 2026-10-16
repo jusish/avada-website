@@ -103,7 +103,7 @@ avada-website/
   - **Payment Processing (`/payment-processing`)**: High-converting breakdown of mobile money gateways, local cards, and disbursement rails.
   - **Smart POS Hardware (`/pos`)**: Retail point-of-sale specs, debit/credit cards, and USSD QR integrations.
   - **Bulk SMS & OTP (`/bulk-sms`)**: Sub-3-second transactional SMS aggregator and campaign dispatcher.
-- **Dedicated Regional Hubs (`/countries/:countrySlug`)**: Localized landing pages for Kenya, Rwanda, and Tanzania detailing in-country office addresses, central bank regulations, and local telco integrations.
+- **Dedicated Regional Hubs (`/:countrySlug`, e.g. `/kenya`, `/rwanda`, `/tanzania`)**: Localized landing pages for Kenya, Rwanda, and Tanzania detailing in-country office addresses, central bank regulations, and local telco integrations (with automatic backward-compatible redirects from `/countries/:countrySlug`).
 - **Scroll Restoration (`ScrollToTop`)**: Automatically resets scroll coordinates to `(0, 0)` upon route changes, eliminating SPA scroll-persistence bugs.
 
 ### 🛡️ Headless Content Management System (CMS)

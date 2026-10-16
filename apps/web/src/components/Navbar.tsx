@@ -13,11 +13,11 @@ export interface CountryInfo {
 }
 
 export const COUNTRIES: CountryInfo[] = [
-  { code: 'kenya', name: 'Kenya', path: '/countries/kenya' },
-  { code: 'tanzania', name: 'Tanzania', path: '/countries/tanzania' },
-  { code: 'rwanda', name: 'Rwanda', path: '/countries/rwanda' },
+  { code: 'kenya', name: 'Kenya', path: '/kenya' },
+  { code: 'tanzania', name: 'Tanzania', path: '/tanzania' },
+  { code: 'rwanda', name: 'Rwanda', path: '/rwanda' },
   { code: 'drc', name: 'DRC', path: 'https://avadapay.cd' },
-  { code: 'benin', name: 'Benin', path: '/countries/benin', disabled: true },
+  { code: 'benin', name: 'Benin', path: '/benin', disabled: true },
 ];
 
 export const Navbar: React.FC = () => {

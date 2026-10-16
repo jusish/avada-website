@@ -88,9 +88,55 @@ const FOOTER_CTAS: Record<string, FooterCta | null> = {
   '/cookies': null,
 };
 
+interface CountryContact {
+  title: string;
+  email?: string;
+  phone?: string;
+  address?: string;
+}
+
+const BUILTIN_COUNTRY_CONTACTS: Record<string, CountryContact> = {
+  rwanda: {
+    title: 'Contact Us',
+    email: 'rwanda@avadapay.com',
+    phone: '+250 788 123 456',
+    address: 'BHC Building, KG 7 Ave Kacyiru, Gasabo, Kigali, Rwanda',
+  },
+  rw: {
+    title: 'Contact Us',
+    email: 'rwanda@avadapay.com',
+    phone: '+250 788 123 456',
+    address: 'BHC Building, KG 7 Ave Kacyiru, Gasabo, Kigali, Rwanda',
+  },
+  kenya: {
+    title: 'Contact Us',
+    email: 'kenya@avadapay.com',
+    phone: '+254 700 987 654',
+    address: '8th Floor Westpark Towers, Westlands, Nairobi, Kenya',
+  },
+  ke: {
+    title: 'Contact Us',
+    email: 'kenya@avadapay.com',
+    phone: '+254 700 987 654',
+    address: '8th Floor Westpark Towers, Westlands, Nairobi, Kenya',
+  },
+  tanzania: {
+    title: 'Contact Us',
+    email: 'tanzania@avadapay.com',
+    phone: '+255 754 321 098',
+    address: 'Dar es Salaam, Tanzania',
+  },
+  tz: {
+    title: 'Contact Us',
+    email: 'tanzania@avadapay.com',
+    phone: '+255 754 321 098',
+    address: 'Dar es Salaam, Tanzania',
+  },
+};
+
 export const Footer: React.FC = () => {
   const { pathname } = useLocation();
-  const { contacts, socials, footer } = useSiteConfig();
+  const { contacts, socials, footer, countries } = useSiteConfig();
 
   const cta = pathname in FOOTER_CTAS ? FOOTER_CTAS[pathname] : DEFAULT_CTA;
 
@@ -98,6 +144,38 @@ export const Footer: React.FC = () => {
   const visibleSocials = (socials || []).filter(
     (s) => s.enabled && typeof s.url === 'string' && s.url.trim().length > 0 && s.url !== '#'
   );
+
+  const isHomePage = pathname === '/';
+  const cleanPath = pathname.replace(/^\/(?:countries\/)?/, '').replace(/\/+$/, '').toLowerCase();
+  const matchedCountry = countries.find(
+    (c) => c.slug.toLowerCase() === cleanPath || c.code.toLowerCase() === cleanPath
+  );
+
+  // Determine localized contact information:
+  // - On Home page (/): show global contacts
+  // - On Country pages (/kenya, /rwanda, /tanzania, or dynamic CMS country): show country-specific contact info
+  // - On All other pages (/pos, /bulk-sms, /payment-processing, /contact, legal): do not show contact column
+  let contactColumn: CountryContact | null = null;
+  if (isHomePage) {
+    contactColumn = {
+      title: 'Contact Us',
+      email: contacts.supportEmail,
+      phone: contacts.supportPhone,
+      address: contacts.officeAddress,
+    };
+  } else if (cleanPath in BUILTIN_COUNTRY_CONTACTS) {
+    contactColumn = BUILTIN_COUNTRY_CONTACTS[cleanPath];
+  } else if (
+    matchedCountry &&
+    (matchedCountry.officeAddress || matchedCountry.officeEmail || matchedCountry.officePhone)
+  ) {
+    contactColumn = {
+      title: 'Contact Us',
+      email: matchedCountry.officeEmail || undefined,
+      phone: matchedCountry.officePhone || undefined,
+      address: matchedCountry.officeAddress || undefined,
+    };
+  }
 
   return (
     <footer className="bg-[#2A292D] text-white">
@@ -137,9 +215,11 @@ export const Footer: React.FC = () => {
 
       {/* Link Columns */}
       <div
-        className={`max-w-[56rem] mx-auto px-6 grid grid-cols-1 sm:grid-cols-[1fr_1.3fr_1fr] gap-10 sm:gap-8 ${
-          cta ? 'mt-14 sm:mt-16' : 'pt-16 sm:pt-20'
-        }`}
+        className={`mx-auto px-6 grid grid-cols-1 ${
+          contactColumn
+            ? 'max-w-[56rem] sm:grid-cols-[1fr_1.3fr_1fr] gap-10 sm:gap-8'
+            : 'max-w-[40rem] sm:grid-cols-2 gap-10 sm:gap-12'
+        } ${cta ? 'mt-14 sm:mt-16' : 'pt-16 sm:pt-20'}`}
       >
         <div>
           <h3 className="text-[#3BBA93] text-lg font-extrabold">Useful links</h3>
@@ -150,23 +230,38 @@ export const Footer: React.FC = () => {
           </ul>
         </div>
 
-        <div>
-          <h3 className="text-[#3BBA93] text-lg font-extrabold">Contact Us</h3>
-          <div className="mt-4 text-sm font-medium leading-snug space-y-5">
-            <p>
-              <a href={`mailto:${contacts.supportEmail}`} className="hover:text-[#3BBA93] transition-colors">
-                {contacts.supportEmail}
-              </a>
-              <br />
-              <a href={`tel:${contacts.supportPhone.replace(/\s+/g, '')}`} className="hover:text-[#3BBA93] transition-colors">
-                {contacts.supportPhone}
-              </a>
-            </p>
-            <p className="whitespace-pre-line text-white/80">
-              {contacts.officeAddress}
-            </p>
+        {contactColumn && (
+          <div>
+            <h3 className="text-[#3BBA93] text-lg font-extrabold">{contactColumn.title}</h3>
+            <div className="mt-4 text-sm font-medium leading-snug space-y-5">
+              {(contactColumn.email || contactColumn.phone) && (
+                <p>
+                  {contactColumn.email && (
+                    <>
+                      <a href={`mailto:${contactColumn.email}`} className="hover:text-[#3BBA93] transition-colors">
+                        {contactColumn.email}
+                      </a>
+                      {contactColumn.phone && <br />}
+                    </>
+                  )}
+                  {contactColumn.phone && (
+                    <a
+                      href={`tel:${contactColumn.phone.replace(/\s+/g, '')}`}
+                      className="hover:text-[#3BBA93] transition-colors"
+                    >
+                      {contactColumn.phone}
+                    </a>
+                  )}
+                </p>
+              )}
+              {contactColumn.address && (
+                <p className="whitespace-pre-line text-white/80">
+                  {contactColumn.address}
+                </p>
+              )}
+            </div>
           </div>
-        </div>
+        )}
 
         <div>
           <h3 className="text-[#3BBA93] text-lg font-extrabold">Legal & Compliance</h3>

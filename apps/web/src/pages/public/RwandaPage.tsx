@@ -362,7 +362,7 @@ export const RwandaPage: React.FC = () => {
           <div className="h-72 sm:h-96 w-full rounded-3xl overflow-hidden border border-gray-200 shadow-md bg-gray-100">
             <iframe
               title="AvadaPay Rwanda Office — Kigali"
-              src="https://www.google.com/maps?q=Kigali+Rwanda&output=embed"
+              src="https://maps.google.com/maps?q=BHC%20Building,%20KG%207%20Ave%20Kacyiru,%20Gasabo,%20Kigali,%20Rwanda&output=embed"
               className="w-full h-full border-0"
               loading="lazy"
               referrerPolicy="no-referrer-when-downgrade"
@@ -373,7 +373,7 @@ export const RwandaPage: React.FC = () => {
           <div className="mt-6">
             <h3 className="text-xl sm:text-2xl font-black text-[#2A292D]">Kigali</h3>
             <p className="mt-1.5 text-base font-semibold text-gray-600">
-              Kigali, Rwanda, full address to confirm.
+              BHC Building, KG 7 Ave Kacyiru, Gasabo, Kigali, Rwanda
             </p>
             <div className="mt-4">
               <Link to="/contact?country=Rwanda&inquiry=meeting">

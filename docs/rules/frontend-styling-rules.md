@@ -35,7 +35,7 @@ This document establishes the UI/UX conventions, styling philosophy, and design 
 ### ✅ What We Like
 - **African Fintech Excellence**: Clean, high-performance aesthetics with dark atmospheric hero photography, soft gold/amber bokeh accents, and sharp `#3BBA93` highlights.
 - **Capsule / Pill Navbars**: Modern floating pill menu with high contrast text and smooth state transitions.
-- **Country Selection as Dedicated Pages**: The country selector in the header is NOT a simple form filter; each country (Kenya, Rwanda, Tanzania) is a rich dedicated landing page (`/countries/:countrySlug`).
+- **Country Selection as Dedicated Pages**: The country selector in the header is NOT a simple form filter; each country (Kenya, Rwanda, Tanzania) is a rich dedicated landing page with direct clean permalinks (e.g. `/kenya`, `/rwanda`, `/tanzania`).
 - **Micro-interactions**: Subtle hover state transitions (`transition-all duration-200 ease-in-out`), active scale effects, smooth focus rings.
 - **Status Indicators**: Clean badges with semantic color tokens (`#3BBA93` for active/live/success, `amber-500` for draft/staging).
 

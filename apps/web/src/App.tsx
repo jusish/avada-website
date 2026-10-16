@@ -1,5 +1,5 @@
 import React from 'react';
-import { Routes, Route, Navigate, Outlet, useLocation } from 'react-router-dom';
+import { Routes, Route, Navigate, Outlet, useLocation, useParams } from 'react-router-dom';
 import { AuthProvider, useAuth } from '@/context/AuthContext';
 import { SiteConfigProvider } from '@/context/SiteConfigContext';
 import { Navbar } from '@/components/Navbar';
@@ -45,6 +45,12 @@ const PublicLayout: React.FC = () => {
   );
 };
 
+// Backward-compatibility redirect for legacy /countries/:countrySlug URLs
+const CountryRedirect: React.FC = () => {
+  const { countrySlug } = useParams<{ countrySlug: string }>();
+  return <Navigate to={`/${countrySlug || ''}`} replace />;
+};
+
 // Admin Protected Layout
 const AdminProtectedLayout: React.FC = () => {
   const { token, isLoading } = useAuth();
@@ -84,7 +90,6 @@ export const App: React.FC = () => {
             <Route path="/payment-processing" element={<PaymentProcessingPage />} />
             <Route path="/pos" element={<PosPage />} />
             <Route path="/bulk-sms" element={<BulkSmsPage />} />
-            <Route path="/countries/:countrySlug" element={<CountryPage />} />
             <Route path="/contact" element={<ContactPage />} />
 
             {/* Official Legal & Compliance Pages */}
@@ -100,6 +105,12 @@ export const App: React.FC = () => {
               path="/cookies"
               element={<LegalPolicyPage slug="cookies" fallbackTitle="Cookie Policy" />}
             />
+
+            {/* Backward-compatibility redirect for legacy /countries/:countrySlug */}
+            <Route path="/countries/:countrySlug" element={<CountryRedirect />} />
+
+            {/* Direct Country Pages: /kenya, /rwanda, /tanzania, etc. */}
+            <Route path="/:countrySlug" element={<CountryPage />} />
           </Route>
 
           {/* Admin Login Route */}

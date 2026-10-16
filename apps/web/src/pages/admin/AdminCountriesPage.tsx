@@ -398,7 +398,7 @@ export const AdminCountriesPage: React.FC = () => {
               {/* Card Footer Actions */}
               <div className="p-4 bg-gray-50/80 border-t border-gray-100 flex items-center justify-between">
                 <a
-                  href={`/countries/${country.slug}`}
+                  href={`/${country.slug}`}
                   target="_blank"
                   rel="noreferrer"
                   className="inline-flex items-center gap-1 text-[11px] font-bold text-[#3BBA93] hover:text-[#2A292D] transition-colors"

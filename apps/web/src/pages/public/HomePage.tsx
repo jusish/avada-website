@@ -130,11 +130,11 @@ interface OfficeItem {
 }
 
 const OFFICES: OfficeItem[] = [
-  { country: 'Kenya', address: '8th Floor Westpark Towers, Westlands, Nairobi', to: '/countries/kenya' },
-  { country: 'Tanzania', address: 'Dar es Salaam, Tanzania', to: '/countries/tanzania' },
-  { country: 'Rwanda', address: 'Kigali, Rwanda', to: '/countries/rwanda' },
+  { country: 'Kenya', address: '8th Floor Westpark Towers, Westlands, Nairobi', to: '/kenya' },
+  { country: 'Tanzania', address: 'Dar es Salaam, Tanzania', to: '/tanzania' },
+  { country: 'Rwanda', address: 'BHC Building, KG 7 Ave Kacyiru, Gasabo, Kigali, Rwanda', to: '/rwanda' },
   { country: 'DRC', address: 'SILIKIN VILLAGE, Local A012, Bâtiment Phase 3', to: 'https://avadapay.cd' },
-  { country: 'Benin', address: 'Cotonou, Littoral, Benin', to: '/countries/benin', disabled: true },
+  { country: 'Benin', address: 'Cotonou, Littoral, Benin', to: '/benin', disabled: true },
 ];
 
 export const HomePage: React.FC = () => {
