@@ -590,6 +590,7 @@ This document is the **single source of truth** for every feature implemented in
     - `ItemList` (`SiteNavigationElement`): Sitelinks directly pointing Google Search bots to Payment Processing, POS Solutions, Bulk SMS, Rwanda, Kenya, Tanzania, and Contact.
   - **Dynamic Route-Level `<SEO>` Component**: Engineered a reactive React component that synchronizes `document.title`, description, canonical link, Open Graph tags, Twitter card tags, and custom page schemas (`FinancialProduct`, `Product`, `Service`, `LocalBusiness`, `ContactPage`) during in-app navigation and for search engine web rendering crawlers.
   - **Production Deployment Domain Scoping**: Removed `avadapay.rw` from `VIRTUAL_HOST` and `LETSENCRYPT_HOST` in `docker-compose.yml` to focus all production deployment and SSL provisioning purely on `avadapay.com` and `www.avadapay.com`.
+  - **OptimizedImage Full-Height Stretched Rendering Fix**: Enforced `w-full h-full` on the container `div` and `w-full h-full block` on the `<picture>` wrapper in `OptimizedImage.tsx`, preventing vertical collapse inside aspect-ratio cards and ensuring image fills 100% of the container without exposing underlying card placeholder backgrounds.
 
 
 

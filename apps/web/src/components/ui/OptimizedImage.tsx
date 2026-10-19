@@ -24,8 +24,8 @@ export const OptimizedImage: React.FC<OptimizedImageProps> = ({
   const resolvedWebpSrc = webpSrc || (src.match(/\.(jpg|jpeg|png)$/i) ? src.replace(/\.(jpg|jpeg|png)$/i, '.webp') : undefined);
 
   return (
-    <div className={`relative overflow-hidden ${containerClassName}`}>
-      <picture>
+    <div className={`relative overflow-hidden w-full h-full ${containerClassName}`}>
+      <picture className="w-full h-full block">
         {resolvedWebpSrc && (
           <source srcSet={resolvedWebpSrc} type="image/webp" />
         )}
@@ -34,9 +34,9 @@ export const OptimizedImage: React.FC<OptimizedImageProps> = ({
           alt={alt}
           loading={priority ? 'eager' : 'lazy'}
           decoding="async"
-          {...(priority ? { fetchpriority: 'high' } as Record<string, string> : {})}
+          {...(priority ? ({ fetchpriority: 'high' } as Record<string, string>) : {})}
           onLoad={() => setIsLoaded(true)}
-          className={`transition-all duration-500 ease-out ${
+          className={`w-full h-full object-cover block transition-all duration-500 ease-out ${
             isLoaded ? 'opacity-100 blur-0 scale-100' : 'opacity-0 blur-sm scale-[1.02]'
           } ${className}`}
           {...props}

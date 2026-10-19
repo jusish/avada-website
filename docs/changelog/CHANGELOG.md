@@ -18,6 +18,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - **Production Multi-Tenant Deployment Scoping**: Removed `avadapay.rw` and `www.avadapay.rw` from `VIRTUAL_HOST` and `LETSENCRYPT_HOST` in `docker-compose.yml`, focusing all live routing, SSL certificates, and SEO indexing exclusively on `avadapay.com` and `www.avadapay.com`.
 
+### Fixed
+- **OptimizedImage Full-Height Stretched Rendering**: Resolved height collapse on the 6 payment method cards in `PaymentProcessingPage.tsx` and all product card grids by enforcing `w-full h-full` on the container `div` and `w-full h-full block` on the inner `<picture>` element in `OptimizedImage.tsx`, eliminating the exposed bottom grey background (`bg-gray-100`) and ensuring images seamlessly cover 100% of their aspect-ratio containers.
+
 ---
 
 ## [1.11.0] - 2026-10-19
