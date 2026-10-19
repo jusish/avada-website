@@ -3,6 +3,8 @@ import { CodeXml, FileSignature, MapPinned, Smartphone, CheckCircle2, User } fro
 import { Marquee } from '@/components/Marquee';
 import { ROW_ONE, ROW_TWO } from '@/components/home/PartnerLogos';
 import { AccordionList, G, ProductHero, SectionTitle } from '@/components/product/shared';
+import { FadeIn, StaggerContainer, StaggerItem, HoverScale } from '@/components/motion/Motion';
+import { OptimizedImage } from '@/components/ui/OptimizedImage';
 
 /* ------------------------------------------------------------------ */
 /* Content                                                             */
@@ -245,75 +247,94 @@ export const PaymentProcessingPage: React.FC = () => (
 
     {/* One connection */}
     <section className="bg-[#3BBA93] text-white py-14 sm:py-16 px-4 text-center">
-      <h2 className="font-extrabold tracking-tight leading-[1.15] text-3xl sm:text-4xl md:text-[46px]">
-        One connection.
-        <br />
-        Every way Africa pays
-      </h2>
-      <p className="mt-8 mx-auto max-w-[56rem] text-base sm:text-lg font-medium leading-relaxed">
-        Customers in Nairobi pay through M-Pesa. Customers in Kinshasa pay through Vodacom, Orange
-        or Airtel. Customers in Lagos pay through PayAttitude, Opay or Palmpay. AvadaPay handles
-        the operator-by-operator complexity so your team handles one integration and one set of
-        reports.
-      </p>
+      <FadeIn>
+        <h2 className="font-extrabold tracking-tight leading-[1.15] text-3xl sm:text-4xl md:text-[46px]">
+          One connection.
+          <br />
+          Every way Africa pays
+        </h2>
+        <p className="mt-8 mx-auto max-w-[56rem] text-base sm:text-lg font-medium leading-relaxed">
+          Customers in Nairobi pay through M-Pesa. Customers in Kinshasa pay through Vodacom, Orange
+          or Airtel. Customers in Lagos pay through PayAttitude, Opay or Palmpay. AvadaPay handles
+          the operator-by-operator complexity so your team handles one integration and one set of
+          reports.
+        </p>
+      </FadeIn>
     </section>
 
     {/* How it works */}
     <section className="pt-16 sm:pt-20 px-4">
-      <SectionTitle>
-        How does <G>AvadaPay</G>
-        <br />
-        <G>payment processing</G> work?
-      </SectionTitle>
+      <FadeIn>
+        <SectionTitle>
+          How does <G>AvadaPay</G>
+          <br />
+          <G>payment processing</G> work?
+        </SectionTitle>
+      </FadeIn>
 
-      <div className="mt-12 mx-auto max-w-[67rem] grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-12">
+      <StaggerContainer className="mt-12 mx-auto max-w-[67rem] grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-12">
         {METHODS.map((m) => (
-          <article key={m.title}>
-            <div className="aspect-[1.22/1] overflow-hidden rounded-2xl bg-gray-100">
-              <img
-                src={m.img}
-                alt={m.title}
-                loading="lazy"
-                className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
-              />
-            </div>
-            <h3 className="mt-6 px-1 text-xl font-extrabold">{m.title}</h3>
-            <p className="mt-2 px-1 text-lg leading-[1.45] font-medium text-[#2A292D]/90">{m.body}</p>
-          </article>
+          <StaggerItem key={m.title}>
+            <HoverScale y={-6} className="h-full">
+              <article className="group h-full flex flex-col justify-between">
+                <div>
+                  <div className="aspect-[1.22/1] overflow-hidden rounded-2xl bg-gray-100 shadow-md">
+                    <OptimizedImage
+                      src={m.img}
+                      alt={m.title}
+                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                    />
+                  </div>
+                  <h3 className="mt-6 px-1 text-xl font-extrabold">{m.title}</h3>
+                  <p className="mt-2 px-1 text-base leading-[1.5] font-medium text-[#2A292D]/85">{m.body}</p>
+                </div>
+              </article>
+            </HoverScale>
+          </StaggerItem>
         ))}
-      </div>
+      </StaggerContainer>
     </section>
 
     {/* Industries */}
     <section className="pt-20 sm:pt-24 px-4">
-      <SectionTitle>
-        Built for the businesses
-        <br />
-        already using <G>AvadaPay</G>
-      </SectionTitle>
-      <AccordionList className="mt-12" items={INDUSTRIES} />
+      <FadeIn>
+        <SectionTitle>
+          Built for the businesses
+          <br />
+          already using <G>AvadaPay</G>
+        </SectionTitle>
+      </FadeIn>
+      <FadeIn delay={0.1}>
+        <AccordionList className="mt-12" items={INDUSTRIES} />
+      </FadeIn>
     </section>
 
     {/* Steps */}
     <section className="pt-20 sm:pt-24 px-4">
-      <div className="mx-auto max-w-[67rem] grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-12">
+      <StaggerContainer className="mt-6 mx-auto max-w-[67rem] grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-12">
         {STEPS.map(({ Visual, title, body }) => (
-          <article key={title}>
-            <Visual />
-            <h3 className="mt-6 px-2 text-xl font-extrabold">{title}</h3>
-            <p className="mt-2 px-2 text-lg leading-[1.45] font-medium text-[#2A292D]/90">{body}</p>
-          </article>
+          <StaggerItem key={title}>
+            <HoverScale y={-4} className="h-full">
+              <article className="h-full flex flex-col">
+                <Visual />
+                <h3 className="mt-6 px-2 text-xl font-extrabold">{title}</h3>
+                <p className="mt-2 px-2 text-base leading-[1.45] font-medium text-[#2A292D]/85">{body}</p>
+              </article>
+            </HoverScale>
+          </StaggerItem>
         ))}
-      </div>
+      </StaggerContainer>
     </section>
 
     {/* Networks */}
     <section className="pt-20 sm:pt-24">
-      <SectionTitle>
-        <G>The networks and</G>
-        <br />
-        <G>schemes</G> we connect
-      </SectionTitle>
+      <FadeIn>
+        <SectionTitle>
+          <G>The networks and</G>
+          <br />
+          <G>schemes</G> we connect
+        </SectionTitle>
+      </FadeIn>
       <div className="mt-10 border-y border-[#3BBA93]/15">
         <div className="py-6">
           <Marquee animation="animate-marquee-slow">
@@ -338,23 +359,28 @@ export const PaymentProcessingPage: React.FC = () => (
 
     {/* Why AvadaPay */}
     <section className="pt-20 sm:pt-24 pb-20 sm:pb-24 px-4">
-      <SectionTitle>
-        Why AvadaPay for
-        <br />
-        <G>payments</G>
-      </SectionTitle>
-      <div className="mt-12 mx-auto max-w-[69rem] grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      <FadeIn>
+        <SectionTitle>
+          Why AvadaPay for
+          <br />
+          <G>payments</G>
+        </SectionTitle>
+      </FadeIn>
+      <StaggerContainer className="mt-12 mx-auto max-w-[69rem] grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         {WHY.map(({ Icon, title, body }) => (
-          <article
-            key={title}
-            className="rounded-2xl border border-[#3BBA93]/45 bg-white p-7 shadow-[0_10px_20px_rgba(0,0,0,0.08)] transition-all duration-200 hover:-translate-y-0.5 hover:border-[#3BBA93] hover:shadow-[0_14px_26px_rgba(59,186,147,0.22)]"
-          >
-            <Icon className="w-10 h-10 text-[#3BBA93]" strokeWidth={1.6} />
-            <h3 className="mt-5 text-xl font-extrabold leading-snug">{title}</h3>
-            <p className="mt-2 text-lg leading-[1.45] font-medium text-[#2A292D]/90">{body}</p>
-          </article>
+          <StaggerItem key={title}>
+            <HoverScale y={-4} className="h-full">
+              <article
+                className="h-full rounded-2xl border border-[#3BBA93]/45 bg-white p-7 shadow-[0_10px_20px_rgba(0,0,0,0.08)] transition-all duration-300 hover:border-[#3BBA93] hover:shadow-[0_14px_26px_rgba(59,186,147,0.22)]"
+              >
+                <Icon className="w-10 h-10 text-[#3BBA93]" strokeWidth={1.6} />
+                <h3 className="mt-5 text-xl font-extrabold leading-snug">{title}</h3>
+                <p className="mt-2 text-base leading-[1.45] font-medium text-[#2A292D]/85">{body}</p>
+              </article>
+            </HoverScale>
+          </StaggerItem>
         ))}
-      </div>
+      </StaggerContainer>
     </section>
   </div>
 );

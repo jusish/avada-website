@@ -10,6 +10,8 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { CountryFlag } from '@/components/CountryFlag';
+import { FadeIn, StaggerContainer, StaggerItem, HoverScale } from '@/components/motion/Motion';
+import { OptimizedImage } from '@/components/ui/OptimizedImage';
 
 /* ------------------------------------------------------------------ */
 /* Hero Visual Component                                               */
@@ -248,26 +250,27 @@ export const TanzaniaPage: React.FC = () => {
         </div>
 
         {/* Coastal Tanzania Image Banner */}
-        <div className="w-full max-w-5xl mx-auto overflow-hidden rounded-2xl border border-gray-100 shadow-md">
-          <img
+        <FadeIn className="w-full max-w-5xl mx-auto overflow-hidden rounded-2xl border border-gray-100 shadow-xl">
+          <OptimizedImage
             src="/media/tanzania-coast.jpg"
             alt="Dar es Salaam coastal cityscape with blue ocean"
+            priority={true}
             className="w-full h-auto object-cover max-h-[500px]"
           />
-        </div>
+        </FadeIn>
       </section>
 
       {/* 3 — 4 TELCOS ROW & 3 NUMBERED CARDS */}
       <section className="py-14 sm:py-18 px-4 max-w-7xl mx-auto">
-        <div className="text-center max-w-3xl mx-auto mb-10 sm:mb-12">
+        <FadeIn className="text-center max-w-3xl mx-auto mb-10 sm:mb-12">
           <h2 className="font-extrabold tracking-tight leading-[1.15] text-3xl sm:text-4xl md:text-[44px] text-[#2A292D]">
             <span className="text-[#3BBA93]">One Platform</span> for all your <br />
             payment needs
           </h2>
-        </div>
+        </FadeIn>
 
         {/* Telecom Operator Logos Row */}
-        <div className="max-w-4xl mx-auto mb-14 px-4">
+        <FadeIn delay={0.1} className="max-w-4xl mx-auto mb-14 px-4">
           <div className="flex flex-wrap items-center justify-center gap-8 sm:gap-12 md:gap-16 py-3">
             {/* 1: Airtel */}
             <div className="flex items-center gap-2.5 transition-transform hover:scale-105 duration-200">
@@ -323,34 +326,37 @@ export const TanzaniaPage: React.FC = () => {
               </svg>
             </div>
           </div>
-        </div>
+        </FadeIn>
 
         {/* 3 Numbered White Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-7 max-w-6xl mx-auto">
+        <StaggerContainer className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-7 max-w-6xl mx-auto">
           {threeCards.map((card) => (
-            <div
-              key={card.n}
-              className="bg-white rounded-3xl p-7 sm:p-8 border border-gray-100 shadow-[0_6px_20px_rgba(0,0,0,0.04)] flex flex-col justify-between hover:border-[#3BBA93]/40 transition-colors"
-            >
-              <div>
-                <div className="w-10 h-10 rounded-xl bg-[#E3F5EE] text-[#3BBA93] flex items-center justify-center font-black text-base mb-6">
-                  {card.n}
+            <StaggerItem key={card.n}>
+              <HoverScale y={-6} className="h-full">
+                <div
+                  className="bg-white rounded-3xl p-7 sm:p-8 border border-gray-100 shadow-[0_6px_20px_rgba(0,0,0,0.04)] flex flex-col justify-between hover:border-[#3BBA93]/40 hover:shadow-xl transition-all duration-300 h-full"
+                >
+                  <div>
+                    <div className="w-10 h-10 rounded-xl bg-[#E3F5EE] text-[#3BBA93] flex items-center justify-center font-black text-base mb-6">
+                      {card.n}
+                    </div>
+                    <h3 className="font-extrabold text-xl sm:text-[22px] leading-snug text-[#2A292D]">
+                      {card.title}
+                    </h3>
+                    <ul className="mt-6 space-y-3 text-sm sm:text-base font-semibold text-[#2A292D]/85">
+                      {card.points.map((pt, pIdx) => (
+                        <li key={pIdx} className="flex items-start space-x-2.5">
+                          <span className="w-1.5 h-1.5 rounded-full bg-[#3BBA93] mt-2 shrink-0" />
+                          <span>{pt}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
                 </div>
-                <h3 className="font-extrabold text-xl sm:text-[22px] leading-snug text-[#2A292D]">
-                  {card.title}
-                </h3>
-                <ul className="mt-6 space-y-3 text-sm sm:text-base font-semibold text-[#2A292D]/85">
-                  {card.points.map((pt, pIdx) => (
-                    <li key={pIdx} className="flex items-start space-x-2.5">
-                      <span className="w-1.5 h-1.5 rounded-full bg-[#3BBA93] mt-2 shrink-0" />
-                      <span>{pt}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </div>
+              </HoverScale>
+            </StaggerItem>
           ))}
-        </div>
+        </StaggerContainer>
       </section>
 
       {/* 4 — REAL-TIME VISIBILITY FOR EVERY PAYMENT FLOW */}

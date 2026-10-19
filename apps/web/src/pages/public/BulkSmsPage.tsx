@@ -19,6 +19,8 @@ import {
   CircleRwanda,
   CircleUganda,
 } from '@/components/home/CircleFlags';
+import { FadeIn, StaggerContainer, StaggerItem, HoverScale } from '@/components/motion/Motion';
+import { OptimizedImage } from '@/components/ui/OptimizedImage';
 
 /* ------------------------------------------------------------------ */
 /* 6 Types of Messages                                                */
@@ -291,49 +293,61 @@ export const BulkSmsPage: React.FC = () => {
 
       {/* 3 — WHY TEAMS USE AVADAPAY SMS */}
       <section className="pt-20 sm:pt-24 px-4">
-        <SectionTitle>
-          Why teams use <G>AvadaPay SMS</G>
-        </SectionTitle>
+        <FadeIn>
+          <SectionTitle>
+            Why teams use <G>AvadaPay SMS</G>
+          </SectionTitle>
+        </FadeIn>
 
         {/* Row 1: 3 Photo Cards */}
-        <div className="mt-12 mx-auto max-w-[69rem] grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8">
+        <StaggerContainer className="mt-12 mx-auto max-w-[69rem] grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8">
           {WHY_CARDS.slice(0, 3).map((card) => (
-            <article key={card.title} className="group">
-              <div className="aspect-[1.3/1] rounded-2xl overflow-hidden bg-gray-100 shadow-sm relative">
-                <img
-                  src={card.img}
-                  alt={card.title}
-                  loading="lazy"
-                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                />
-              </div>
-              <h3 className="mt-5 text-xl font-extrabold text-[#2A292D]">{card.title}</h3>
-              <p className="mt-2 text-base leading-relaxed font-medium text-[#2A292D]/85">
-                {card.body}
-              </p>
-            </article>
+            <StaggerItem key={card.title}>
+              <HoverScale y={-6} className="h-full">
+                <article className="group h-full flex flex-col justify-between">
+                  <div>
+                    <div className="aspect-[1.3/1] rounded-2xl overflow-hidden bg-gray-100 shadow-md relative">
+                      <OptimizedImage
+                        src={card.img}
+                        alt={card.title}
+                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                      />
+                    </div>
+                    <h3 className="mt-5 text-xl font-extrabold text-[#2A292D]">{card.title}</h3>
+                    <p className="mt-2 text-base leading-relaxed font-medium text-[#2A292D]/85">
+                      {card.body}
+                    </p>
+                  </div>
+                </article>
+              </HoverScale>
+            </StaggerItem>
           ))}
-        </div>
+        </StaggerContainer>
 
         {/* Row 2: 2 Photo Cards Centered */}
-        <div className="mt-10 mx-auto max-w-[46rem] grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
+        <StaggerContainer className="mt-10 mx-auto max-w-[46rem] grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
           {WHY_CARDS.slice(3, 5).map((card) => (
-            <article key={card.title} className="group">
-              <div className="aspect-[1.3/1] rounded-2xl overflow-hidden bg-gray-100 shadow-sm relative">
-                <img
-                  src={card.img}
-                  alt={card.title}
-                  loading="lazy"
-                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                />
-              </div>
-              <h3 className="mt-5 text-xl font-extrabold text-[#2A292D]">{card.title}</h3>
-              <p className="mt-2 text-base leading-relaxed font-medium text-[#2A292D]/85">
-                {card.body}
-              </p>
-            </article>
+            <StaggerItem key={card.title}>
+              <HoverScale y={-6} className="h-full">
+                <article className="group h-full flex flex-col justify-between">
+                  <div>
+                    <div className="aspect-[1.3/1] rounded-2xl overflow-hidden bg-gray-100 shadow-md relative">
+                      <OptimizedImage
+                        src={card.img}
+                        alt={card.title}
+                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                      />
+                    </div>
+                    <h3 className="mt-5 text-xl font-extrabold text-[#2A292D]">{card.title}</h3>
+                    <p className="mt-2 text-base leading-relaxed font-medium text-[#2A292D]/85">
+                      {card.body}
+                    </p>
+                  </div>
+                </article>
+              </HoverScale>
+            </StaggerItem>
           ))}
-        </div>
+        </StaggerContainer>
       </section>
 
       {/* 4 — USE CASES BY INDUSTRY */}

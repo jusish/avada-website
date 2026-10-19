@@ -14,6 +14,8 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { CountryFlag } from '@/components/CountryFlag';
+import { FadeIn, StaggerContainer, StaggerItem, HoverScale } from '@/components/motion/Motion';
+import { OptimizedImage } from '@/components/ui/OptimizedImage';
 
 /* ------------------------------------------------------------------ */
 /* Accordion component                                                 */
@@ -241,46 +243,50 @@ export const KenyaPage: React.FC = () => {
         </div>
 
         {/* Nairobi Skyline Banner */}
-        <div className="w-full max-w-5xl mx-auto overflow-hidden rounded-2xl border border-gray-100 shadow-md">
-          <img
+        <FadeIn className="w-full max-w-5xl mx-auto overflow-hidden rounded-2xl border border-gray-100 shadow-xl">
+          <OptimizedImage
             src="/media/nairobi-skyline.jpg"
             alt="Nairobi City Skyline"
+            priority={true}
             className="w-full h-auto object-cover max-h-[460px]"
           />
-        </div>
+        </FadeIn>
       </section>
 
       {/* 3 — COLLECT PAYMENTS PILLS SECTION */}
       <section className="py-14 sm:py-18 px-4 max-w-7xl mx-auto">
-        <div className="text-center max-w-3xl mx-auto mb-12 sm:mb-14">
+        <FadeIn className="text-center max-w-3xl mx-auto mb-12 sm:mb-14">
           <h2 className="font-extrabold tracking-tight leading-[1.15] text-3xl sm:text-4xl md:text-[44px] text-[#2A292D]">
             <span className="text-[#3BBA93]">Collect payments</span> every way <br />
             your customers want to pay
           </h2>
-        </div>
+        </FadeIn>
 
         {/* 6 Pills (2 rows of 3 on desktop) */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 max-w-5xl mx-auto">
+        <StaggerContainer className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 max-w-5xl mx-auto">
           {paymentPills.map((pill, idx) => (
-            <div
-              key={idx}
-              className="flex items-center space-x-3.5 bg-white rounded-2xl sm:rounded-full border border-gray-100 px-5 py-3.5 shadow-[0_4px_16px_rgba(0,0,0,0.06)] hover:border-[#3BBA93]/40 transition-colors"
-            >
-              {pill.icon}
-              <div className="text-sm font-bold text-[#2A292D] leading-snug">
-                <div>{pill.title}</div>
-                <div className="text-gray-500 font-semibold">{pill.subtitle}</div>
-              </div>
-            </div>
+            <StaggerItem key={idx}>
+              <HoverScale y={-3}>
+                <div
+                  className="flex items-center space-x-3.5 bg-white rounded-2xl sm:rounded-full border border-gray-100 px-5 py-3.5 shadow-[0_4px_16px_rgba(0,0,0,0.06)] hover:border-[#3BBA93]/40 transition-colors"
+                >
+                  {pill.icon}
+                  <div className="text-sm font-bold text-[#2A292D] leading-snug">
+                    <div>{pill.title}</div>
+                    <div className="text-gray-500 font-semibold">{pill.subtitle}</div>
+                  </div>
+                </div>
+              </HoverScale>
+            </StaggerItem>
           ))}
-        </div>
+        </StaggerContainer>
 
         {/* 2 Feature Cards Side-by-Side */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12 max-w-5xl mx-auto mt-16 sm:mt-20">
           {/* Card 1: Pay agents */}
-          <div className="bg-white rounded-3xl border border-gray-100 shadow-[0_6px_20px_rgba(0,0,0,0.05)] overflow-hidden flex flex-col">
+          <FadeIn direction="left" className="bg-white rounded-3xl border border-gray-100 shadow-[0_6px_20px_rgba(0,0,0,0.05)] overflow-hidden flex flex-col hover:shadow-xl transition-shadow duration-300">
             <div className="overflow-hidden bg-gray-100">
-              <img
+              <OptimizedImage
                 src="/media/kenya-pay-agents.jpg"
                 alt="Pay agents and suppliers"
                 className="w-full h-[280px] sm:h-[320px] object-cover hover:scale-105 transition-transform duration-500"
@@ -312,12 +318,12 @@ export const KenyaPage: React.FC = () => {
                 </ul>
               </div>
             </div>
-          </div>
+          </FadeIn>
 
           {/* Card 2: Bulk SMS */}
-          <div className="bg-white rounded-3xl border border-gray-100 shadow-[0_6px_20px_rgba(0,0,0,0.05)] overflow-hidden flex flex-col">
+          <FadeIn direction="right" className="bg-white rounded-3xl border border-gray-100 shadow-[0_6px_20px_rgba(0,0,0,0.05)] overflow-hidden flex flex-col hover:shadow-xl transition-shadow duration-300">
             <div className="overflow-hidden bg-gray-100">
-              <img
+              <OptimizedImage
                 src="/media/kenya-sms-comm.jpg"
                 alt="Communicate with customers via Bulk SMS"
                 className="w-full h-[280px] sm:h-[320px] object-cover hover:scale-105 transition-transform duration-500"
@@ -349,7 +355,7 @@ export const KenyaPage: React.FC = () => {
                 </ul>
               </div>
             </div>
-          </div>
+          </FadeIn>
         </div>
       </section>
 

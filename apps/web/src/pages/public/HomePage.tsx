@@ -1,10 +1,13 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight, ChevronUp, ExternalLink } from 'lucide-react';
+import { motion } from 'framer-motion';
 import { CIRCLE_FLAGS } from '@/components/home/CircleFlags';
 import { ROW_ONE, ROW_TWO } from '@/components/home/PartnerLogos';
 import { Marquee } from '@/components/Marquee';
-import heroBg from '@/assets/hero-bg.jpg';
+import { FadeIn, StaggerContainer, StaggerItem, HoverScale, easeOutQuint } from '@/components/motion/Motion';
+import heroBgWebp from '@/assets/hero-bg.webp';
+import heroBgJpg from '@/assets/hero-bg.jpg';
 
 const GREEN = '#3BBA93';
 
@@ -145,22 +148,38 @@ export const HomePage: React.FC = () => {
       {/* 1 — HERO SECTION */}
       <section className="relative isolate flex flex-col min-h-[75vh] md:min-h-[82vh] text-white overflow-hidden">
         {/* Softly blurred background image with balanced ambient dark overlay */}
-        <div className="absolute inset-0 z-0 overflow-hidden">
-          <img
-            src={heroBg}
-            alt="AvadaPay Hero Background"
-            className="w-full h-full object-cover object-center scale-105 filter blur-[3.5px]"
-          />
+        <div className="absolute inset-0 z-0 overflow-hidden bg-[#0B132B]">
+          <picture>
+            <source srcSet={heroBgWebp} type="image/webp" />
+            <img
+              src={heroBgJpg}
+              alt="AvadaPay Hero Background"
+              loading="eager"
+              decoding="async"
+              {...({ fetchpriority: 'high' } as Record<string, string>)}
+              className="w-full h-full object-cover object-center scale-105 filter blur-[3.5px] transition-opacity duration-300"
+            />
+          </picture>
           <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-black/75" />
         </div>
 
         <div className="relative z-10 flex-1 flex flex-col items-center justify-center text-center px-4 pt-28 sm:pt-36 pb-12 max-w-5xl mx-auto">
-          <h1 className="font-extrabold tracking-tight leading-[1.12] text-3xl sm:text-5xl lg:text-[56px] max-w-4xl text-white">
+          <motion.h1
+            initial={{ opacity: 0, y: 22 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, ease: easeOutQuint }}
+            className="font-extrabold tracking-tight leading-[1.12] text-3xl sm:text-5xl lg:text-[56px] max-w-4xl text-white"
+          >
             Payments and customer<br className="hidden sm:inline" /> communication,{' '}
             <span className="text-[#3BBA93]">built for<br className="hidden sm:inline" /> African markets.</span>
-          </h1>
+          </motion.h1>
 
-          <div className="mt-8 sm:mt-12 flex flex-wrap items-center justify-center gap-6 sm:gap-12 text-sm sm:text-base font-semibold text-white/95">
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.65, delay: 0.2, ease: easeOutQuint }}
+            className="mt-8 sm:mt-12 flex flex-wrap items-center justify-center gap-6 sm:gap-12 text-sm sm:text-base font-semibold text-white/95"
+          >
             <div className="flex items-center space-x-2">
               <span className="w-2 h-2 rounded-full bg-[#3BBA93]" />
               <span>99.9% uptime</span>
@@ -173,11 +192,16 @@ export const HomePage: React.FC = () => {
               <span className="w-2 h-2 rounded-full bg-[#3BBA93]" />
               <span>Mobile money + card + POS</span>
             </div>
-          </div>
+          </motion.div>
         </div>
 
         {/* Sub-Banner Strip */}
-        <div className="relative z-10 bg-black/40 backdrop-blur-sm border-t border-white/10 py-4 sm:py-5">
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.35, ease: easeOutQuint }}
+          className="relative z-10 bg-black/40 backdrop-blur-sm border-t border-white/10 py-4 sm:py-5"
+        >
           <div className="max-w-4xl mx-auto px-6 text-center">
             <p className="text-xs sm:text-sm text-gray-200 font-normal leading-relaxed">
               AvadaPay is a pan-African payment gateway and SMS aggregator. Accept mobile money and
@@ -185,25 +209,27 @@ export const HomePage: React.FC = () => {
               connected platform live in 17+ markets.
             </p>
           </div>
-        </div>
+        </motion.div>
       </section>
 
       {/* 2 — INTRO SECTION & 3-ITEM MARQUEE */}
       <section className="bg-white pt-12 sm:pt-16 pb-14 sm:pb-20">
-        <Marquee animation="animate-marquee-slow">
-          <div className="flex items-center">
-            {UNDER_HERO_ITEMS.map((item, idx) => (
-              <div key={idx} className="flex items-center gap-3.5 sm:gap-4.5 pr-12 sm:pr-20 shrink-0">
-                <item.Icon className="w-8 sm:w-11 h-auto shrink-0" />
-                <span className="whitespace-nowrap font-extrabold tracking-tight text-[#2A292D] text-2xl sm:text-4xl md:text-[42px] leading-none">
-                  {item.text}
-                </span>
-              </div>
-            ))}
-          </div>
-        </Marquee>
+        <FadeIn delay={0.05}>
+          <Marquee animation="animate-marquee-slow">
+            <div className="flex items-center">
+              {UNDER_HERO_ITEMS.map((item, idx) => (
+                <div key={idx} className="flex items-center gap-3.5 sm:gap-4.5 pr-12 sm:pr-20 shrink-0">
+                  <item.Icon className="w-8 sm:w-11 h-auto shrink-0" />
+                  <span className="whitespace-nowrap font-extrabold tracking-tight text-[#2A292D] text-2xl sm:text-4xl md:text-[42px] leading-none">
+                    {item.text}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </Marquee>
+        </FadeIn>
 
-        <div className="max-w-3xl mx-auto px-6 mt-10 sm:mt-14 text-center text-sm sm:text-base md:text-[17px] leading-relaxed text-gray-600 space-y-5">
+        <FadeIn delay={0.15} className="max-w-3xl mx-auto px-6 mt-10 sm:mt-14 text-center text-sm sm:text-base md:text-[17px] leading-relaxed text-gray-600 space-y-5">
           <p>
             African businesses don’t operate in a single payment world. Customers pay through
             M-Pesa in Nairobi, Orange Money in Kinshasa, Tigo Pesa in Dar es Salaam, and cards
@@ -214,86 +240,96 @@ export const HomePage: React.FC = () => {
             through POS, and communicate every transaction through SMS, without stitching
             together five different providers per country.
           </p>
-        </div>
+        </FadeIn>
       </section>
 
       {/* 3 — FOUR WAYS SECTION */}
       <section className="bg-[#3BBA93] py-16 sm:py-20 px-4 text-white">
         <div className="max-w-5xl mx-auto">
-          <h2 className="text-center font-extrabold tracking-tight leading-[1.18] text-2xl sm:text-3xl md:text-4xl text-white max-w-2xl mx-auto">
-            Four ways AvadaPay powers your business
-          </h2>
-          <p className="text-white/85 text-center mt-3 text-sm sm:text-base font-normal">
-            Everything required to orchestrate money and communication across Africa.
-          </p>
+          <FadeIn>
+            <h2 className="text-center font-extrabold tracking-tight leading-[1.18] text-2xl sm:text-3xl md:text-4xl text-white max-w-2xl mx-auto">
+              Four ways AvadaPay powers your business
+            </h2>
+            <p className="text-white/85 text-center mt-3 text-sm sm:text-base font-normal">
+              Everything required to orchestrate money and communication across Africa.
+            </p>
+          </FadeIn>
 
-          <div className="mt-10 sm:mt-12 grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
+          <StaggerContainer className="mt-10 sm:mt-12 grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
             {WAYS.map((w) => (
-              <article
-                key={w.n}
-                className="bg-white rounded-2xl p-6 sm:p-7 shadow-md flex flex-col justify-between text-[#2A292D]"
-              >
-                <div>
-                  <span className="inline-flex items-center justify-center w-10 h-10 rounded-xl bg-[#3BBA93]/15 text-[#3BBA93] text-base font-bold">
-                    {w.n}
-                  </span>
-                  <h3 className="mt-4 text-lg sm:text-xl font-extrabold text-gray-900">{w.title}</h3>
-                  <p className="mt-2 text-xs sm:text-sm leading-relaxed text-gray-600 font-normal">
-                    {w.body}
-                  </p>
-                </div>
-                <Link to={w.link} className="mt-5 inline-flex items-center text-xs font-bold text-[#3BBA93] hover:underline">
-                  <span>Learn more</span>
-                  <ArrowRight className="w-3.5 h-3.5 ml-1" />
-                </Link>
-              </article>
+              <StaggerItem key={w.n}>
+                <HoverScale y={-5} className="h-full">
+                  <article className="bg-white rounded-2xl p-6 sm:p-7 shadow-md flex flex-col justify-between text-[#2A292D] h-full hover:shadow-xl transition-shadow duration-300">
+                    <div>
+                      <span className="inline-flex items-center justify-center w-10 h-10 rounded-xl bg-[#3BBA93]/15 text-[#3BBA93] text-base font-bold">
+                        {w.n}
+                      </span>
+                      <h3 className="mt-4 text-lg sm:text-xl font-extrabold text-gray-900">{w.title}</h3>
+                      <p className="mt-2 text-xs sm:text-sm leading-relaxed text-gray-600 font-normal">
+                        {w.body}
+                      </p>
+                    </div>
+                    <Link to={w.link} className="mt-5 inline-flex items-center text-xs font-bold text-[#3BBA93] hover:underline">
+                      <span>Learn more</span>
+                      <ArrowRight className="w-3.5 h-3.5 ml-1" />
+                    </Link>
+                  </article>
+                </HoverScale>
+              </StaggerItem>
             ))}
-          </div>
+          </StaggerContainer>
         </div>
       </section>
 
       {/* 4 — WHY TEAMS BUILD */}
       <section className="bg-white pt-16 sm:pt-20 px-4">
         <div className="max-w-5xl mx-auto">
-          <TwoToneHeading green="Why teams build" dark="on AvadaPay" />
-          <p className="mt-4 mx-auto max-w-2xl text-center text-sm sm:text-base text-gray-600 leading-relaxed font-normal">
-            Go live across Africa in days, not months, with one API, mobile money plus card rails,
-            next-day local-currency payouts, and SMS tied to every transaction.
-          </p>
+          <FadeIn>
+            <TwoToneHeading green="Why teams build" dark="on AvadaPay" />
+            <p className="mt-4 mx-auto max-w-2xl text-center text-sm sm:text-base text-gray-600 leading-relaxed font-normal">
+              Go live across Africa in days, not months, with one API, mobile money plus card rails,
+              next-day local-currency payouts, and SMS tied to every transaction.
+            </p>
+          </FadeIn>
 
-          <div className="mt-10 grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
+          <StaggerContainer className="mt-10 grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
             {WHY.map((w, i) => (
-              <Link
-                key={i}
-                to={w.to}
-                className="group flex flex-col justify-between rounded-2xl border border-[#3BBA93]/30 bg-white p-6 sm:p-7 shadow-xs hover:border-[#3BBA93] hover:shadow-md transition-all duration-200"
-              >
-                <h3 className="text-xl sm:text-2xl font-extrabold leading-snug text-gray-900">
-                  {w.title.map((line, li) => (
-                    <React.Fragment key={li}>
-                      {li > 0 && <br />}
-                      {line}
-                    </React.Fragment>
-                  ))}
-                </h3>
-                <div className="mt-6 flex items-center justify-between">
-                  <span className="text-xs font-bold text-[#3BBA93] group-hover:underline">Explore solution</span>
-                  <span className="w-10 h-10 rounded-full bg-[#3BBA93] text-white flex items-center justify-center transition-transform duration-200 group-hover:translate-x-1 shadow-sm">
-                    <ArrowRight className="w-5 h-5" strokeWidth={2.5} />
-                  </span>
-                </div>
-              </Link>
+              <StaggerItem key={i}>
+                <HoverScale y={-4} className="h-full">
+                  <Link
+                    to={w.to}
+                    className="group flex flex-col justify-between rounded-2xl border border-[#3BBA93]/30 bg-white p-6 sm:p-7 shadow-xs hover:border-[#3BBA93] hover:shadow-lg transition-all duration-300 h-full"
+                  >
+                    <h3 className="text-xl sm:text-2xl font-extrabold leading-snug text-gray-900">
+                      {w.title.map((line, li) => (
+                        <React.Fragment key={li}>
+                          {li > 0 && <br />}
+                          {line}
+                        </React.Fragment>
+                      ))}
+                    </h3>
+                    <div className="mt-6 flex items-center justify-between">
+                      <span className="text-xs font-bold text-[#3BBA93] group-hover:underline">Explore solution</span>
+                      <span className="w-10 h-10 rounded-full bg-[#3BBA93] text-white flex items-center justify-center transition-transform duration-200 group-hover:translate-x-1 shadow-sm">
+                        <ArrowRight className="w-5 h-5" strokeWidth={2.5} />
+                      </span>
+                    </div>
+                  </Link>
+                </HoverScale>
+              </StaggerItem>
             ))}
-          </div>
+          </StaggerContainer>
         </div>
       </section>
 
       {/* 5 — INDUSTRIES ACCORDION */}
       <section className="bg-white pt-16 sm:pt-20 px-4">
         <div className="max-w-3xl mx-auto">
-          <TwoToneHeading green="Built for the businesses that" dark="move African economies" />
+          <FadeIn>
+            <TwoToneHeading green="Built for the businesses that" dark="move African economies" />
+          </FadeIn>
 
-          <div className="mt-8 space-y-3.5">
+          <FadeIn delay={0.1} className="mt-8 space-y-3.5">
             {INDUSTRIES.map((item, i) => {
               const open = openIndex === i;
               return (
@@ -326,13 +362,13 @@ export const HomePage: React.FC = () => {
                 </div>
               );
             })}
-          </div>
+          </FadeIn>
         </div>
       </section>
 
       {/* 6 — FLAGS + OFFICES */}
       <section className="bg-white pt-14 sm:pt-16 pb-16 sm:pb-20">
-        <div className="relative">
+        <FadeIn delay={0.05} className="relative">
           {/* Subtle Carousel Tab Lead */}
           <div className="absolute left-0 top-1/2 -translate-y-1/2 z-10 h-16 w-16 sm:w-20 rounded-r-2xl bg-[#E3F5EE] flex items-center justify-center pl-1 sm:pl-2 shadow-xs">
             <span className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-[#3BBA93] text-white shadow-xs">
@@ -346,10 +382,10 @@ export const HomePage: React.FC = () => {
               ))}
             </div>
           </Marquee>
-        </div>
+        </FadeIn>
 
         {/* Dubai Map */}
-        <div className="mt-12 max-w-4xl mx-auto px-4">
+        <FadeIn delay={0.1} className="mt-12 max-w-4xl mx-auto px-4">
           <div className="overflow-hidden rounded-2xl bg-gray-100 h-60 sm:h-72 border border-gray-200 shadow-xs">
             <iframe
               title="AvadaPay headquarters — SORP Business Centre, Dubai"
@@ -367,55 +403,60 @@ export const HomePage: React.FC = () => {
               Emirates (UAE)
             </p>
           </div>
-        </div>
+        </FadeIn>
 
         {/* Country Offices */}
-        <div className="mt-8 max-w-4xl mx-auto px-4 space-y-3">
+        <StaggerContainer className="mt-8 max-w-4xl mx-auto px-4 space-y-3">
           {OFFICES.map((o) => (
-            <div
-              key={o.country}
-              className={`flex flex-col sm:flex-row sm:items-center justify-between gap-3 rounded-xl border bg-white px-6 py-4 shadow-xs transition-colors ${
-                o.disabled ? 'border-gray-200 opacity-75' : 'border-[#3BBA93]/30 hover:border-[#3BBA93]'
-              }`}
-            >
-              <p className="text-xs sm:text-sm text-gray-800 leading-snug">
-                <span className="font-bold text-gray-900 mr-3">{o.country}</span>
-                <span className="text-gray-600">{o.address}</span>
-              </p>
-              {o.disabled ? (
-                <span className="inline-flex shrink-0 items-center justify-center h-9 px-4 rounded-md bg-gray-100 text-gray-500 font-semibold text-xs border border-gray-200 cursor-not-allowed select-none">
-                  Coming Soon
-                </span>
-              ) : o.to.startsWith('http') ? (
-                <a
-                  href={o.to}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex shrink-0 items-center justify-center gap-1.5 h-9 px-4 rounded-md bg-[#3BBA93] text-white font-semibold text-xs transition-colors hover:bg-[#32a481] active:scale-[0.98] shadow-xs"
+            <StaggerItem key={o.country}>
+              <HoverScale y={-2}>
+                <div
+                  className={`flex flex-col sm:flex-row sm:items-center justify-between gap-3 rounded-xl border bg-white px-6 py-4 shadow-xs transition-colors ${
+                    o.disabled ? 'border-gray-200 opacity-75' : 'border-[#3BBA93]/30 hover:border-[#3BBA93]'
+                  }`}
                 >
-                  <span>{o.country} services</span>
-                  <ExternalLink className="w-3.5 h-3.5" />
-                </a>
-              ) : (
-                <Link
-                  to={o.to}
-                  className="inline-flex shrink-0 items-center justify-center gap-1.5 h-9 px-4 rounded-md bg-[#3BBA93] text-white font-semibold text-xs transition-colors hover:bg-[#32a481] active:scale-[0.98] shadow-xs"
-                >
-                  <span>{o.country} services</span>
-                  <ArrowRight className="w-3.5 h-3.5" strokeWidth={2.5} />
-                </Link>
-              )}
-            </div>
+                  <p className="text-xs sm:text-sm text-gray-800 leading-snug">
+                    <span className="font-bold text-gray-900 mr-3">{o.country}</span>
+                    <span className="text-gray-600">{o.address}</span>
+                  </p>
+                  {o.disabled ? (
+                    <span className="inline-flex shrink-0 items-center justify-center h-9 px-4 rounded-md bg-gray-100 text-gray-500 font-semibold text-xs border border-gray-200 cursor-not-allowed select-none">
+                      Coming Soon
+                    </span>
+                  ) : o.to.startsWith('http') ? (
+                    <a
+                      href={o.to}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex shrink-0 items-center justify-center gap-1.5 h-9 px-4 rounded-md bg-[#3BBA93] text-white font-semibold text-xs transition-colors hover:bg-[#32a481] active:scale-[0.98] shadow-xs"
+                    >
+                      <span>{o.country} services</span>
+                      <ExternalLink className="w-3.5 h-3.5" />
+                    </a>
+                  ) : (
+                    <Link
+                      to={o.to}
+                      className="inline-flex shrink-0 items-center justify-center gap-1.5 h-9 px-4 rounded-md bg-[#3BBA93] text-white font-semibold text-xs transition-colors hover:bg-[#32a481] active:scale-[0.98] shadow-xs"
+                    >
+                      <span>{o.country} services</span>
+                      <ArrowRight className="w-3.5 h-3.5" strokeWidth={2.5} />
+                    </Link>
+                  )}
+                </div>
+              </HoverScale>
+            </StaggerItem>
           ))}
-        </div>
+        </StaggerContainer>
       </section>
 
       {/* 7 — NETWORKS & PARTNERS */}
       <section className="bg-white pb-16 sm:pb-20 px-0">
-        <TwoToneHeading
-          green="The networks and"
-          dark="partners we plug into"
-        />
+        <FadeIn>
+          <TwoToneHeading
+            green="The networks and"
+            dark="partners we plug into"
+          />
+        </FadeIn>
         <div className="mt-8 space-y-4">
           <Marquee animation="animate-marquee-slow">
             {[...ROW_ONE, ...ROW_ONE].map((logo, i) => (

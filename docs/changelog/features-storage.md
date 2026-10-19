@@ -28,6 +28,7 @@ This document is the **single source of truth** for every feature implemented in
 20. [FEAT-020: Pixel-Perfect Dedicated Country Pages (Kenya, Rwanda, and Tanzania)](#feat-020-pixel-perfect-dedicated-country-pages-kenya-rwanda-and-tanzania)
 21. [FEAT-021: Enterprise CMS Platform, Visual RBAC Matrix, Real-Time Security Telemetry & Shadcn UI Standardization](#feat-021-enterprise-cms-platform-visual-rbac-matrix-real-time-security-telemetry--shadcn-ui-standardization)
 22. [FEAT-022: Direct Country Permalinks, Rwanda BHC Office Location & Country-Specific Footer Scoping](#feat-022-direct-country-permalinks-rwanda-bhc-office-location--country-specific-footer-scoping)
+23. [FEAT-023: Global WebP Image Optimization Pipeline, Critical Hero Preloading & Framer Motion Scroll Suite](#feat-023-global-webp-image-optimization-pipeline-critical-hero-preloading--framer-motion-scroll-suite)
 
 ---
 
@@ -500,6 +501,46 @@ This document is the **single source of truth** for every feature implemented in
   - **Rwanda Office Location Modernization**: Updated Rwanda office location to `BHC Building, KG 7 Ave Kacyiru, Gasabo, Kigali, Rwanda` on `HomePage.tsx` (Regional Presence office directory) and `RwandaPage.tsx` (dedicated office section and Google Maps embed `src`). Synchronized Prisma database seeder (`apps/api/prisma/seed.ts`) with updated location coordinates and map embed links.
   - **Clean Country Permalinks (`/kenya`, `/rwanda`, `/tanzania`)**: Replaced all `/countries/:countrySlug` routes with clean top-level permalinks (`/:countrySlug`) in React Router v6. Added an automatic `CountryRedirect` component that seamlessly navigates legacy `/countries/:countrySlug` deep links to the new permalinks without 404 errors. Updated Navbar country dropdown links, HomePage office action buttons, and Admin CMS public preview links.
   - **Context-Aware Footer Scoping**: Reconfigured `Footer.tsx` so global contact information (Dubai HQ address, global phone) appears exclusively on the Home page (`/`). Country pages (`/kenya`, `/rwanda`, `/tanzania`, or dynamic CMS markets) dynamically render that country's dedicated office credentials. Generic solution pages (`/payment-processing`, `/pos`, `/bulk-sms`), contact, and legal policy pages omit the global contact column and smoothly format into a clean two-column layout (`Useful links` and `Legal & Compliance`).
+
+---
+
+## FEAT-023: Global WebP Image Optimization Pipeline, Critical Hero Preloading & Framer Motion Scroll Suite
+- **ID**: `FEAT-023`
+- **Status**: Completed
+- **Created**: 2026-10-19
+- **Description**: Implemented an automated WebP image conversion and optimization pipeline reducing total media payload by 88% (from 10.97 MB to 1.36 MB, with hero background slashed from 595 KB to 35.7 KB), added critical hero image preloading with background fallback in index.html, introduced reusable `<OptimizedImage>` with smooth fade-in and WebP fallbacks, and engineered a complete Framer Motion suite (`FadeIn`, `StaggerContainer`, `StaggerItem`, `HoverScale`) across all marketing and country landing pages to eliminate boring static scrolling and deliver fluid, responsive micro-interactions.
+- **Files Involved**:
+  - [`apps/web/scripts/optimize-images.mjs`](../../apps/web/scripts/optimize-images.mjs)
+  - [`apps/web/package.json`](../../apps/web/package.json)
+  - [`apps/web/index.html`](../../apps/web/index.html)
+  - [`apps/web/src/components/ui/OptimizedImage.tsx`](../../apps/web/src/components/ui/OptimizedImage.tsx)
+  - [`apps/web/src/components/motion/Motion.tsx`](../../apps/web/src/components/motion/Motion.tsx)
+  - [`apps/web/src/pages/public/HomePage.tsx`](../../apps/web/src/pages/public/HomePage.tsx)
+  - [`apps/web/src/components/product/shared.tsx`](../../apps/web/src/components/product/shared.tsx)
+  - [`apps/web/src/pages/public/PaymentProcessingPage.tsx`](../../apps/web/src/pages/public/PaymentProcessingPage.tsx)
+  - [`apps/web/src/pages/public/PosPage.tsx`](../../apps/web/src/pages/public/PosPage.tsx)
+  - [`apps/web/src/pages/public/BulkSmsPage.tsx`](../../apps/web/src/pages/public/BulkSmsPage.tsx)
+  - [`apps/web/src/pages/public/KenyaPage.tsx`](../../apps/web/src/pages/public/KenyaPage.tsx)
+  - [`apps/web/src/pages/public/RwandaPage.tsx`](../../apps/web/src/pages/public/RwandaPage.tsx)
+  - [`apps/web/src/pages/public/TanzaniaPage.tsx`](../../apps/web/src/pages/public/TanzaniaPage.tsx)
+  - [`docs/changelog/CHANGELOG.md`](../../docs/changelog/CHANGELOG.md)
+  - [`docs/changelog/features-storage.md`](../../docs/changelog/features-storage.md)
+- **Implementation Details**:
+  - **Automated WebP Conversion Pipeline (`optimize-images.mjs`)**: Script utilizing `sharp` to traverse all raster imagery in `public/media/`, `public/`, and `src/assets/`, generating high-quality modern WebP equivalents (`effort: 6`, `quality: 80-82`). Slashed public media payload from 10.97 MB down to 1.36 MB (-88%), while reducing the hero background image from 595 KB down to 35.7 KB (-94%).
+  - **Zero-Latency Hero Rendering & Preload**: Configured `<link rel="preload" as="image" href="/hero-bg.webp" type="image/webp" fetchpriority="high" />` in `index.html` and pinned `#0B132B` background fallback to eliminate any white flash or delayed image rendering on page load.
+  - **Reusable `<OptimizedImage>` Component**: Encapsulates `<picture>` with WebP sources, standard fallback `src`, `loading="lazy"` / `loading="eager"`, `fetchpriority="high"`, and smooth opacity transition upon load to prevent layout shifts.
+  - **Framer Motion Integration Suite (`Motion.tsx`)**: Built modular animation primitives:
+    - `FadeIn`: Scroll-triggered directional reveals (up, down, left, right) utilizing standard custom cubic-bezier easing (`easeOutQuint: [0.22, 1, 0.36, 1]`) and `viewport={{ once: true, margin: '-60px' }}`.
+    - `StaggerContainer` & `StaggerItem`: Orchestrated staggered entrance animations for grids, card lists, badges, and pillars.
+    - `HoverScale`: Interactive elevation micro-interactions on interactive cards and containers.
+  - **Public Page Transitions & Scroll Polish**:
+    - `HomePage.tsx`: Added entrance choreography for the headline, sub-banner, metrics, staggered 4-pillars grid, reasons cards, FAQ accordion items, and regional offices.
+    - `ProductHero` (`shared.tsx`): Integrated scroll reveal across all product hero sections (`PaymentProcessingPage`, `PosPage`, `BulkSmsPage`).
+    - `PaymentProcessingPage.tsx`: Animated payment method cards, integration workflow steps, and value proposition cards.
+    - `PosPage.tsx`: Staggered POS hardware modes, interactive reader preview with WebP asset, and timeline deployment cards.
+    - `BulkSmsPage.tsx`: Motion-enhanced SMS feature highlights, SMS cost calculator card, and telecommunications network badges.
+    - `KenyaPage.tsx`, `RwandaPage.tsx`, `TanzaniaPage.tsx`: Priority-loaded skyline graphics, staggered national payment rails, strategic pillars, and localized contact offices.
+
 
 
 

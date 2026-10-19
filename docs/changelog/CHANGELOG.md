@@ -5,6 +5,19 @@ All notable changes to the Avada Website and CMS project will be documented in t
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.11.0] - 2026-10-19
+
+### Added
+- **Global Image Optimization Pipeline**: Converted all images across `apps/web/public/media/` and `apps/web/src/assets/` to high-performance WebP using `sharp`, reducing total image payload from 10.97 MB down to 1.36 MB (**-88% bandwidth reduction**).
+- **Reusable `OptimizedImage` Component (`apps/web/src/components/ui/OptimizedImage.tsx`)**: Automated `<picture>` WebP source resolution, priority loading (`fetchpriority="high"`, `decoding="async"`), and buttery-smooth zero-layout-shift blur/fade-in transitions.
+- **Critical Hero Background Preloading**: Inlined `<link rel="preload" as="image" href="/hero-bg.webp" type="image/webp" fetchpriority="high">` in `index.html` with a matched `#0B132B` backdrop, eliminating hero pop-in delays and white flashes on first paint.
+- **Fluid Scroll & Micro-Interaction Motion Suite (`apps/web/src/components/motion/Motion.tsx`)**: Integrated `framer-motion` across the landing page and all solution pages (`/payment-processing`, `/pos`, `/bulk-sms`, `/kenya`, `/rwanda`, `/tanzania`), featuring scroll-triggered reveals (`FadeIn`), choreographed grid cascades (`StaggerContainer` + `StaggerItem`), interactive card hover elevations (`HoverScale`), and polished hero entrances.
+
+### Changed
+- **Solution Page Visuals**: Replaced raw `<img>` tags across `PaymentProcessingPage`, `PosPage`, `BulkSmsPage`, `KenyaPage`, `RwandaPage`, and `TanzaniaPage` with `<OptimizedImage>` and Framer Motion scroll wrappers.
+
+---
+
 ## [1.10.0] - 2026-10-16
 
 ### Changed

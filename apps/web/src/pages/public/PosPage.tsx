@@ -14,6 +14,8 @@ import {
 import { Marquee } from '@/components/Marquee';
 import { AccordionList, G, ProductHero, SectionTitle } from '@/components/product/shared';
 import { Button } from '@/components/ui/button';
+import { FadeIn, StaggerContainer, StaggerItem, HoverScale } from '@/components/motion/Motion';
+import { OptimizedImage } from '@/components/ui/OptimizedImage';
 
 /* ------------------------------------------------------------------ */
 /* POS Payment Methods Sub-Strip                                       */
@@ -237,62 +239,66 @@ export const PosPage: React.FC = () => {
 
       {/* 2 — THREE WAYS TO TAKE PAYMENTS */}
       <section className="pt-16 sm:pt-20 px-4">
-        <SectionTitle>
-          Three ways to take
-          <br />
-          payments. <G>One platform</G>
-          <br />
-          <G>behind all of them</G>
-        </SectionTitle>
+        <FadeIn>
+          <SectionTitle>
+            Three ways to take
+            <br />
+            payments. <G>One platform</G>
+            <br />
+            <G>behind all of them</G>
+          </SectionTitle>
+        </FadeIn>
 
-        <div className="mt-12 mx-auto max-w-[69rem] grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8">
+        <StaggerContainer className="mt-12 mx-auto max-w-[69rem] grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8">
           {POS_MODES.map((mode) => (
-            <article
-              key={mode.title}
-              className="group rounded-3xl border border-[#3BBA93]/35 bg-white p-6 shadow-[0_10px_24px_rgba(0,0,0,0.06)] flex flex-col justify-between transition-all duration-300 hover:-translate-y-1 hover:border-[#3BBA93] hover:shadow-[0_14px_30px_rgba(59,186,147,0.18)]"
-            >
-              <div>
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-xl font-extrabold text-[#2A292D] flex items-center gap-1.5">
-                    <span>{mode.title}</span>
-                    <mode.hrefIcon className="w-4 h-4 text-[#3BBA93] transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
-                  </h3>
-                  <span className="text-[11px] font-bold text-[#3BBA93] bg-[#E3F5EE] px-2.5 py-1 rounded-full">
-                    {mode.badge}
-                  </span>
-                </div>
+            <StaggerItem key={mode.title}>
+              <HoverScale y={-6} className="h-full">
+                <article
+                  className="group rounded-3xl border border-[#3BBA93]/35 bg-white p-6 shadow-[0_10px_24px_rgba(0,0,0,0.06)] flex flex-col justify-between transition-all duration-300 hover:border-[#3BBA93] hover:shadow-[0_14px_30px_rgba(59,186,147,0.18)] h-full"
+                >
+                  <div>
+                    <div className="flex items-center justify-between mb-4">
+                      <h3 className="text-xl font-extrabold text-[#2A292D] flex items-center gap-1.5">
+                        <span>{mode.title}</span>
+                        <mode.hrefIcon className="w-4 h-4 text-[#3BBA93] transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                      </h3>
+                      <span className="text-[11px] font-bold text-[#3BBA93] bg-[#E3F5EE] px-2.5 py-1 rounded-full">
+                        {mode.badge}
+                      </span>
+                    </div>
 
-                <div className="aspect-[1.3/1] rounded-2xl overflow-hidden bg-gray-100 mb-6 relative">
-                  <img
-                    src={mode.img}
-                    alt={mode.title}
-                    loading="lazy"
-                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                  />
-                </div>
+                    <div className="aspect-[1.3/1] rounded-2xl overflow-hidden bg-gray-100 mb-6 relative shadow-inner">
+                      <OptimizedImage
+                        src={mode.img}
+                        alt={mode.title}
+                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                      />
+                    </div>
 
-                <p className="text-sm leading-relaxed font-semibold text-[#2A292D]/90">
-                  {mode.description}
-                </p>
+                    <p className="text-sm leading-relaxed font-semibold text-[#2A292D]/90">
+                      {mode.description}
+                    </p>
 
-                <p className="mt-4 text-xs font-medium text-gray-500 italic">
-                  {mode.bestFor}
-                </p>
-              </div>
+                    <p className="mt-4 text-xs font-medium text-gray-500 italic">
+                      {mode.bestFor}
+                    </p>
+                  </div>
 
-              <div className="mt-8 pt-5 border-t border-gray-100">
-                <Link to={mode.to}>
-                  <Button
-                    variant="outline"
-                    className="w-full border-[#3BBA93]/50 text-[#3BBA93] hover:bg-[#3BBA93] hover:text-white font-bold text-xs h-10 rounded-xl transition-colors"
-                  >
-                    {mode.actionLabel}
-                  </Button>
-                </Link>
-              </div>
-            </article>
+                  <div className="mt-8 pt-5 border-t border-gray-100">
+                    <Link to={mode.to}>
+                      <Button
+                        variant="outline"
+                        className="w-full border-[#3BBA93]/50 text-[#3BBA93] hover:bg-[#3BBA93] hover:text-white font-bold text-xs h-10 rounded-xl transition-colors"
+                      >
+                        {mode.actionLabel}
+                      </Button>
+                    </Link>
+                  </div>
+                </article>
+              </HoverScale>
+            </StaggerItem>
           ))}
-        </div>
+        </StaggerContainer>
       </section>
 
       {/* 3 — HOW AFRICAN BUSINESSES USE AVADAPAY POS */}
@@ -444,26 +450,27 @@ export const PosPage: React.FC = () => {
 
       {/* 6 — PHOTO BANNER */}
       <section className="pt-16 sm:pt-20 px-4">
-        <div className="mx-auto max-w-[69rem] aspect-[2.3/1] rounded-3xl overflow-hidden shadow-lg border border-gray-200">
-          <img
+        <FadeIn className="mx-auto max-w-[69rem] aspect-[2.3/1] rounded-3xl overflow-hidden shadow-xl border border-gray-200">
+          <OptimizedImage
             src="/media/report_reader.jpg"
             alt="AvadaPay Merchant Reviewing Reports"
-            loading="lazy"
             className="w-full h-full object-cover"
           />
-        </div>
+        </FadeIn>
       </section>
 
       {/* 7 — HOW FAST CAN YOU GO LIVE */}
       <section className="pt-20 sm:pt-24 px-4">
         <div className="mx-auto max-w-[69rem]">
-          <h2 className="text-2xl sm:text-3xl font-extrabold text-[#3BBA93] mb-8">
-            How fast can you go live with AvadaPay POS?
-          </h2>
+          <FadeIn>
+            <h2 className="text-2xl sm:text-3xl font-extrabold text-[#3BBA93] mb-8">
+              How fast can you go live with AvadaPay POS?
+            </h2>
+          </FadeIn>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 border border-[#3BBA93]/30 rounded-2xl overflow-hidden divide-y md:divide-y-0 md:divide-x divide-[#3BBA93]/30">
+          <StaggerContainer className="grid grid-cols-1 md:grid-cols-3 border border-[#3BBA93]/30 rounded-2xl overflow-hidden divide-y md:divide-y-0 md:divide-x divide-[#3BBA93]/30 shadow-md">
             {TIMELINES.map((t) => (
-              <div
+              <StaggerItem
                 key={t.title}
                 className={`p-8 flex flex-col justify-between ${
                   t.highlight ? 'bg-[#E3F5EE]/40' : 'bg-white'
@@ -478,9 +485,9 @@ export const PosPage: React.FC = () => {
                     {t.desc}
                   </p>
                 </div>
-              </div>
+              </StaggerItem>
             ))}
-          </div>
+          </StaggerContainer>
         </div>
       </section>
 

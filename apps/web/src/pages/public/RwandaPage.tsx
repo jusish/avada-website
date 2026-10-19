@@ -10,6 +10,8 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { CountryFlag } from '@/components/CountryFlag';
+import { FadeIn, StaggerContainer, StaggerItem, HoverScale } from '@/components/motion/Motion';
+import { OptimizedImage } from '@/components/ui/OptimizedImage';
 
 /* ------------------------------------------------------------------ */
 /* Hero Visual Component                                               */
@@ -227,26 +229,27 @@ export const RwandaPage: React.FC = () => {
         </div>
 
         {/* Kigali Convention Centre Banner */}
-        <div className="w-full max-w-5xl mx-auto overflow-hidden rounded-2xl border border-gray-100 shadow-md">
-          <img
+        <FadeIn className="w-full max-w-5xl mx-auto overflow-hidden rounded-2xl border border-gray-100 shadow-xl">
+          <OptimizedImage
             src="/media/kigali-skyline.jpg"
             alt="Kigali Convention Centre glowing at night"
+            priority={true}
             className="w-full h-auto object-cover max-h-[460px]"
           />
-        </div>
+        </FadeIn>
       </section>
 
       {/* 3 — TIMELINE: FROM PAYMENT TO CONFIRMATION */}
       <section className="py-16 sm:py-22 px-4 max-w-4xl mx-auto">
-        <div className="text-center mb-14 sm:mb-18">
+        <FadeIn className="text-center mb-14 sm:mb-18">
           <h2 className="font-extrabold tracking-tight leading-[1.15] text-3xl sm:text-4xl md:text-[44px] text-[#2A292D]">
             From payment to confirmation, <br />
             <span className="text-[#3BBA93]">without the guesswork</span>
           </h2>
-        </div>
+        </FadeIn>
 
         {/* Vertical Timeline */}
-        <div className="relative py-4">
+        <FadeIn delay={0.1} className="relative py-4">
           {/* Central Vertical Line */}
           <div className="absolute left-1/2 top-0 bottom-0 w-0.5 -translate-x-1/2 bg-gray-200" />
 
@@ -291,32 +294,35 @@ export const RwandaPage: React.FC = () => {
               );
             })}
           </div>
-        </div>
+        </FadeIn>
       </section>
 
       {/* 4 — TEAL BACKGROUND 6 NUMBERED PILLARS */}
       <section className="bg-[#3BBA93] py-20 sm:py-24 lg:py-28 px-4 sm:px-6 lg:px-8 text-white">
         <div className="max-w-6xl mx-auto">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-7 lg:gap-8">
+          <StaggerContainer className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-7 lg:gap-8">
             {pillarCards.map((card) => (
-              <div
-                key={card.n}
-                className="bg-white rounded-3xl p-7 sm:p-8 text-[#2A292D] shadow-[0_10px_30px_rgba(0,0,0,0.08)] flex flex-col justify-start h-full min-h-[220px]"
-              >
-                <div>
-                  <div className="w-10 h-10 rounded-xl bg-[#E3F5EE] text-[#3BBA93] flex items-center justify-center font-black text-base mb-6">
-                    {card.n}
+              <StaggerItem key={card.n}>
+                <HoverScale y={-6} className="h-full">
+                  <div
+                    className="bg-white rounded-3xl p-7 sm:p-8 text-[#2A292D] shadow-[0_10px_30px_rgba(0,0,0,0.08)] flex flex-col justify-start h-full min-h-[220px] hover:shadow-2xl transition-shadow duration-300"
+                  >
+                    <div>
+                      <div className="w-10 h-10 rounded-xl bg-[#E3F5EE] text-[#3BBA93] flex items-center justify-center font-black text-base mb-6">
+                        {card.n}
+                      </div>
+                      <h3 className="font-extrabold text-xl sm:text-2xl text-[#2A292D]">
+                        {card.title}
+                      </h3>
+                      <p className="mt-3 text-sm sm:text-base font-semibold text-[#2A292D]/80 leading-relaxed">
+                        {card.body}
+                      </p>
+                    </div>
                   </div>
-                  <h3 className="font-extrabold text-xl sm:text-2xl text-[#2A292D]">
-                    {card.title}
-                  </h3>
-                  <p className="mt-3 text-sm sm:text-base font-semibold text-[#2A292D]/80 leading-relaxed">
-                    {card.body}
-                  </p>
-                </div>
-              </div>
+                </HoverScale>
+              </StaggerItem>
             ))}
-          </div>
+          </StaggerContainer>
         </div>
       </section>
 

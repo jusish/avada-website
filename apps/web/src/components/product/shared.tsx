@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ChevronUp } from 'lucide-react';
+import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 
 /* ------------------------------------------------------------------ */
@@ -49,9 +50,14 @@ export const ProductHero: React.FC<ProductHeroProps> = ({
   media,
   children,
 }) => (
-  <section className="bg-[#2A292D] text-white">
+  <section className="bg-[#2A292D] text-white overflow-hidden">
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 sm:pt-12 pb-16 sm:pb-24 grid lg:grid-cols-[1.3fr_1fr] gap-10 lg:gap-14 items-center">
-      <div className="lg:pl-8">
+      <motion.div
+        initial={{ opacity: 0, y: 24 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.65, ease: [0.22, 1, 0.36, 1] }}
+        className="lg:pl-8"
+      >
         <h1 className="font-extrabold tracking-tight leading-[1.1] text-[clamp(2.25rem,5vw,4.1rem)]">
           {title}
         </h1>
@@ -64,8 +70,8 @@ export const ProductHero: React.FC<ProductHeroProps> = ({
               <Button
                 className={
                   a.variant === 'solid'
-                    ? 'h-[3.1rem] px-6 rounded-md bg-[#3BBA93] hover:bg-[#32a481] text-white text-base font-bold shadow-none'
-                    : 'h-[3.1rem] px-6 rounded-md bg-transparent border border-[#3BBA93] text-[#3BBA93] hover:bg-[#3BBA93]/10 text-base font-bold shadow-none'
+                    ? 'h-[3.1rem] px-6 rounded-md bg-[#3BBA93] hover:bg-[#32a481] text-white text-base font-bold shadow-none transition-transform hover:-translate-y-0.5'
+                    : 'h-[3.1rem] px-6 rounded-md bg-transparent border border-[#3BBA93] text-[#3BBA93] hover:bg-[#3BBA93]/10 text-base font-bold shadow-none transition-transform hover:-translate-y-0.5'
                 }
               >
                 {a.label}
@@ -73,15 +79,18 @@ export const ProductHero: React.FC<ProductHeroProps> = ({
             </Link>
           ))}
         </div>
-      </div>
+      </motion.div>
 
       {/* Framed media panel (left empty by design until artwork is supplied) */}
-      <div
-        className="hidden lg:block aspect-[0.92/1] w-full max-w-[26rem] justify-self-end overflow-hidden rounded-3xl border border-[#3BBA93]/50"
+      <motion.div
+        initial={{ opacity: 0, scale: 0.94 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.7, delay: 0.15, ease: [0.22, 1, 0.36, 1] }}
+        className="hidden lg:block aspect-[0.92/1] w-full max-w-[26rem] justify-self-end overflow-hidden rounded-3xl border border-[#3BBA93]/50 shadow-2xl"
         aria-hidden={media ? undefined : true}
       >
         {media}
-      </div>
+      </motion.div>
     </div>
     {children}
   </section>
