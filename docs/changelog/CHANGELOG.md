@@ -5,6 +5,13 @@ All notable changes to the Avada Website and CMS project will be documented in t
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.13.0] - 2026-10-19
+
+### Fixed
+- **Google Search Console Sitemap Fetch Unblocking**: Diagnosed and resolved the "General HTTP error / Sitemap could not be read" issue in Google Search Console. Discovered that the legacy proxy server (`62.109.1.17`), which receives DNS traffic for `avadapay.com`, was serving a stale static `robots.txt` from February 2026 containing `Disallow: /` with a 1-year cache header (`Cache-Control: max-age=31536000`). This directive blocked Googlebot from crawling `/sitemap.xml` and internal site routes. Updated `robots.txt` directly on `62.109.1.17` to permit indexing (`Allow: /`) and reference `https://avadapay.com/sitemap.xml`.
+- **Legacy Proxy Asset Synchronization**: Synchronized all newly generated multi-resolution branded icons (`favicon-48x48.png`, `favicon-96x96.png`, `favicon-192x192.png`, `favicon-512x512.png`, `favicon.ico`, `apple-touch-icon.png`, `logo-512.png`, `manifest.json`, `sitemap.xml`, `robots.txt`) to the FastPanel web root (`/var/www/avadapay/data/www/avadapay.com/`) on `62.109.1.17`, replacing outdated June 2025 WordPress assets.
+- **Legacy Crawler Favicon.ico Compatibility**: Generated a multi-size embedded ICO (`favicon.ico`) with fallback linkage in `index.html` to guarantee instant brand logo indexing across legacy search crawlers and browser address bars.
+
 ## [1.12.0] - 2026-10-19
 
 ### Added

@@ -30,6 +30,7 @@ This document is the **single source of truth** for every feature implemented in
 22. [FEAT-022: Direct Country Permalinks, Rwanda BHC Office Location & Country-Specific Footer Scoping](#feat-022-direct-country-permalinks-rwanda-bhc-office-location--country-specific-footer-scoping)
 23. [FEAT-023: Global WebP Image Optimization Pipeline, Critical Hero Preloading & Framer Motion Scroll Suite](#feat-023-global-webp-image-optimization-pipeline-critical-hero-preloading--framer-motion-scroll-suite)
 24. [FEAT-024: Enterprise SEO Infrastructure, Sitelinks Schema, Multi-Res App Icons & Domain Scoping](#feat-024-enterprise-seo-infrastructure-sitelinks-schema-multi-res-app-icons--domain-scoping)
+25. [FEAT-025: Intermediate Proxy Robots.txt Resolution & Legacy Asset Synchronization](#feat-025-intermediate-proxy-robotstxt-resolution--legacy-asset-synchronization)
 
 ---
 
@@ -592,6 +593,29 @@ This document is the **single source of truth** for every feature implemented in
   - **Production Deployment Domain Scoping**: Removed `avadapay.rw` from `VIRTUAL_HOST` and `LETSENCRYPT_HOST` in `docker-compose.yml` to focus all production deployment and SSL provisioning purely on `avadapay.com` and `www.avadapay.com`.
   - **OptimizedImage Full-Height Stretched Rendering Fix**: Enforced `w-full h-full` on the container `div` and `w-full h-full block` on the `<picture>` wrapper in `OptimizedImage.tsx`, preventing vertical collapse inside aspect-ratio cards and ensuring image fills 100% of the container without exposing underlying card placeholder backgrounds.
   - **Payment Processing Hero Visual Component**: Implemented `PaymentProcessingHeroVisual` in `PaymentProcessingPage.tsx` to fill the previously blank right-hand hero frame with a live simulated multi-rail payment terminal showing real-time M-Pesa STK push, 3DS card checkout, MTN MoMo collections, and remote payment links alongside settlement currencies (USD, KES, RWF, TZS, CDF) and 256-bit TLS encryption indicators.
+
+---
+
+## FEAT-025: Intermediate Proxy Robots.txt Resolution & Legacy Asset Synchronization
+- **ID**: `FEAT-025`
+- **Status**: Completed
+- **Created**: 2026-10-19
+- **Description**: Resolved Google Search Console sitemap indexing failure ("General HTTP error / Sitemap could not be read") caused by stale crawler policies on the intermediate proxy server (`62.109.1.17`), and synchronized the latest high-resolution branding assets.
+- **Files Involved**:
+  - `apps/web/public/favicon.ico`
+  - `apps/web/index.html`
+  - `/var/www/avadapay/data/www/avadapay.com/robots.txt` (on `62.109.1.17`)
+  - `/var/www/avadapay/data/www/avadapay.com/*` (synced on `62.109.1.17`)
+- **Rationale**:
+  - `avadapay.com` DNS records resolve to legacy host `62.109.1.17`, which proxies web requests to the Contabo production VPS (`167.86.93.195`).
+  - FastPanel on `62.109.1.17` serves static `.txt`, `.png`, and `.ico` files directly from disk before proxying.
+  - A legacy `robots.txt` from February 2026 had `Disallow: /` and an aggressive 1-year cache directive (`Cache-Control: max-age=31536000`), instructing Googlebot to abort crawling all paths except `/`.
+- **Implementation Details**:
+  - **Direct SSH Remediation**: Connected to `62.109.1.17` via SSH as user `avadapay`, backed up the legacy file to `robots.txt.bak`, and replaced it with an open policy allowing public crawling while advertising `Sitemap: https://avadapay.com/sitemap.xml`.
+  - **Asset Synchronization**: Uploaded current multi-resolution icons (`favicon-48x48.png`, `favicon-96x96.png`, `favicon-192x192.png`, `favicon-512x512.png`, `apple-touch-icon.png`, `logo-512.png`, `manifest.json`, and `sitemap.xml`) to the proxy server root.
+  - **Legacy Favicon Creation & Head Linkage**: Generated an embedded ICO (`apps/web/public/favicon.ico`) and linked `<link rel="alternate icon" href="/favicon.ico" />` in `index.html` to guarantee logo recognition on legacy bots and browsers.
+  - **Live Verification**: Verified via proxy access logs that Google-InspectionTool and Googlebot re-fetched `/robots.txt` with HTTP 200 (189 bytes) and proceeded to inspect WebP images, JS bundles, and stylesheets.
+
 
 
 
