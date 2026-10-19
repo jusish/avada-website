@@ -4,8 +4,5 @@ Allow: /
 Disallow: /admin/
 Disallow: /api/
 
-# Host
-Host: https://avadapay.com
-
 # Sitemaps
 Sitemap: https://avadapay.com/sitemap.xml
