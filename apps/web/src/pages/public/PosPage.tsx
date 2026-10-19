@@ -16,6 +16,7 @@ import { AccordionList, G, ProductHero, SectionTitle } from '@/components/produc
 import { Button } from '@/components/ui/button';
 import { FadeIn, StaggerContainer, StaggerItem, HoverScale } from '@/components/motion/Motion';
 import { OptimizedImage } from '@/components/ui/OptimizedImage';
+import { SEO } from '@/components/seo/SEO';
 
 /* ------------------------------------------------------------------ */
 /* POS Payment Methods Sub-Strip                                       */
@@ -179,6 +180,27 @@ const SECURITY_ITEMS = [
 export const PosPage: React.FC = () => {
   return (
     <div className="bg-white text-[#2A292D] font-sans overflow-x-hidden">
+      <SEO
+        title="Smart POS Solutions & Android Terminals"
+        description="Turn any Android phone into a payment terminal with SoftPOS or deploy enterprise-grade handheld POS devices with Avadapay. Accept cards, mobile money, and contactless payments."
+        canonical="/pos"
+        keywords="POS terminal Rwanda, POS terminal Kenya, Android POS terminal East Africa, SoftPOS, card swipe terminal, tap to phone Africa"
+        structuredData={{
+          "@type": "Product",
+          "name": "Avadapay Smart POS Solutions",
+          "description": "Enterprise-grade point-of-sale hardware and SoftPOS application for retail merchant checkout across East Africa.",
+          "brand": {
+            "@type": "Brand",
+            "name": "Avadapay"
+          },
+          "offers": {
+            "@type": "Offer",
+            "priceCurrency": "USD",
+            "availability": "https://schema.org/InStock",
+            "url": "https://avadapay.com/pos"
+          }
+        }}
+      />
       {/* 1 — HERO SECTION */}
       <ProductHero
         title={

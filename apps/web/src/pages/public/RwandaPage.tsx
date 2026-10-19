@@ -12,6 +12,7 @@ import { Button } from '@/components/ui/button';
 import { CountryFlag } from '@/components/CountryFlag';
 import { FadeIn, StaggerContainer, StaggerItem, HoverScale } from '@/components/motion/Motion';
 import { OptimizedImage } from '@/components/ui/OptimizedImage';
+import { SEO } from '@/components/seo/SEO';
 
 /* ------------------------------------------------------------------ */
 /* Hero Visual Component                                               */
@@ -179,6 +180,26 @@ export const RwandaPage: React.FC = () => {
 
   return (
     <div className="bg-white text-[#2A292D] font-sans overflow-x-hidden">
+      <SEO
+        title="Avadapay Rwanda | National Payments & Mobile Money Gateway"
+        description="Accept MTN Mobile Money, Airtel Money, and card payments in Rwanda with Avadapay. Local presence at BHC Building, Kacyiru, Kigali with bank-grade reconciliation."
+        canonical="/rwanda"
+        keywords="Avadapay Rwanda, MTN MoMo Rwanda, Airtel Money Rwanda, payment gateway Kigali, POS Rwanda, bulk SMS Rwanda"
+        structuredData={{
+          "@type": "LocalBusiness",
+          "name": "Avadapay Rwanda",
+          "image": "https://avadapay.com/og-image.png",
+          "url": "https://avadapay.com/rwanda",
+          "telephone": "+250 788 000 000",
+          "address": {
+            "@type": "PostalAddress",
+            "streetAddress": "BHC Building, KG 7 Ave Kacyiru, Gasabo",
+            "addressLocality": "Kigali",
+            "addressCountry": "RW"
+          },
+          "priceRange": "$$"
+        }}
+      />
       {/* 1 — HERO SECTION */}
       <section className="bg-[#2A292D] text-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 sm:pt-12 pb-16 sm:pb-24 grid lg:grid-cols-[1.3fr_1fr] gap-10 lg:gap-14 items-center">

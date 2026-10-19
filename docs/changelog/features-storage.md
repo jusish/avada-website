@@ -29,6 +29,7 @@ This document is the **single source of truth** for every feature implemented in
 21. [FEAT-021: Enterprise CMS Platform, Visual RBAC Matrix, Real-Time Security Telemetry & Shadcn UI Standardization](#feat-021-enterprise-cms-platform-visual-rbac-matrix-real-time-security-telemetry--shadcn-ui-standardization)
 22. [FEAT-022: Direct Country Permalinks, Rwanda BHC Office Location & Country-Specific Footer Scoping](#feat-022-direct-country-permalinks-rwanda-bhc-office-location--country-specific-footer-scoping)
 23. [FEAT-023: Global WebP Image Optimization Pipeline, Critical Hero Preloading & Framer Motion Scroll Suite](#feat-023-global-webp-image-optimization-pipeline-critical-hero-preloading--framer-motion-scroll-suite)
+24. [FEAT-024: Enterprise SEO Infrastructure, Sitelinks Schema, Multi-Res App Icons & Domain Scoping](#feat-024-enterprise-seo-infrastructure-sitelinks-schema-multi-res-app-icons--domain-scoping)
 
 ---
 
@@ -540,6 +541,56 @@ This document is the **single source of truth** for every feature implemented in
     - `PosPage.tsx`: Staggered POS hardware modes, interactive reader preview with WebP asset, and timeline deployment cards.
     - `BulkSmsPage.tsx`: Motion-enhanced SMS feature highlights, SMS cost calculator card, and telecommunications network badges.
     - `KenyaPage.tsx`, `RwandaPage.tsx`, `TanzaniaPage.tsx`: Priority-loaded skyline graphics, staggered national payment rails, strategic pillars, and localized contact offices.
+
+---
+
+## FEAT-024: Enterprise SEO Infrastructure, Sitelinks Schema, Multi-Res App Icons & Domain Scoping
+- **ID**: `FEAT-024`
+- **Status**: Completed
+- **Created**: 2026-10-19
+- **Description**: Implemented end-to-end enterprise search engine optimization (SEO) architecture for `https://avadapay.com`. Standardized the brand title to "Avadapay", added Google Search Console domain verification `<meta>`, created a high-resolution automated app icon generation pipeline generating Google-compliant 48px multiple favicons and 1200x630 Open Graph banners, authored `robots.txt`, `sitemap.xml`, and web app manifest, built a dynamic per-route `<SEO>` component managing titles, canonical URLs, and specialized Schema.org structured data, embedded site-wide Organization, WebSite, and Sitelinks JSON-LD schemas, and scoped production container orchestration in `docker-compose.yml` to focus exclusively on `avadapay.com`.
+- **Files Involved**:
+  - [`apps/web/index.html`](../../apps/web/index.html)
+  - [`apps/web/scripts/generate-seo-assets.mjs`](../../apps/web/scripts/generate-seo-assets.mjs)
+  - [`apps/web/public/manifest.json`](../../apps/web/public/manifest.json)
+  - [`apps/web/public/robots.txt`](../../apps/web/public/robots.txt)
+  - [`apps/web/public/sitemap.xml`](../../apps/web/public/sitemap.xml)
+  - [`apps/web/public/favicon-48x48.png`](../../apps/web/public/favicon-48x48.png)
+  - [`apps/web/public/favicon-96x96.png`](../../apps/web/public/favicon-96x96.png)
+  - [`apps/web/public/favicon-192x192.png`](../../apps/web/public/favicon-192x192.png)
+  - [`apps/web/public/favicon-512x512.png`](../../apps/web/public/favicon-512x512.png)
+  - [`apps/web/public/apple-touch-icon.png`](../../apps/web/public/apple-touch-icon.png)
+  - [`apps/web/public/logo-512.png`](../../apps/web/public/logo-512.png)
+  - [`apps/web/public/logo-horizontal.png`](../../apps/web/public/logo-horizontal.png)
+  - [`apps/web/public/og-image.png`](../../apps/web/public/og-image.png)
+  - [`apps/web/src/components/seo/SEO.tsx`](../../apps/web/src/components/seo/SEO.tsx)
+  - [`apps/web/src/pages/public/HomePage.tsx`](../../apps/web/src/pages/public/HomePage.tsx)
+  - [`apps/web/src/pages/public/PaymentProcessingPage.tsx`](../../apps/web/src/pages/public/PaymentProcessingPage.tsx)
+  - [`apps/web/src/pages/public/PosPage.tsx`](../../apps/web/src/pages/public/PosPage.tsx)
+  - [`apps/web/src/pages/public/BulkSmsPage.tsx`](../../apps/web/src/pages/public/BulkSmsPage.tsx)
+  - [`apps/web/src/pages/public/RwandaPage.tsx`](../../apps/web/src/pages/public/RwandaPage.tsx)
+  - [`apps/web/src/pages/public/KenyaPage.tsx`](../../apps/web/src/pages/public/KenyaPage.tsx)
+  - [`apps/web/src/pages/public/TanzaniaPage.tsx`](../../apps/web/src/pages/public/TanzaniaPage.tsx)
+  - [`apps/web/src/pages/public/ContactPage.tsx`](../../apps/web/src/pages/public/ContactPage.tsx)
+  - [`apps/web/src/pages/public/LegalPolicyPage.tsx`](../../apps/web/src/pages/public/LegalPolicyPage.tsx)
+  - [`apps/web/src/pages/public/CountryPage.tsx`](../../apps/web/src/pages/public/CountryPage.tsx)
+  - [`docker-compose.yml`](../../docker-compose.yml)
+  - [`docs/changelog/CHANGELOG.md`](../../docs/changelog/CHANGELOG.md)
+  - [`docs/changelog/features-storage.md`](../../docs/changelog/features-storage.md)
+- **Implementation Details**:
+  - **Brand & Google Search Console Verification**: Updated the root `<title>` to `Avadapay | Global Financial Infrastructure & Technology` and added the domain verification token `<meta name="google-site-verification" content="Srp7mYBgNAKzIapbFT_FhIJ35vGpdhCHxNRiHbymPwA" />`.
+  - **Automated High-Resolution Asset Generation (`generate-seo-assets.mjs`)**: Leveraged `sharp` to compile vector SVG source files into raster PNG icons satisfying Google Search guidelines (including 48px multiples for Google search mobile/desktop snippets), Apple touch icons, square logo for Schema.org organization cards, and a branded 1200x630 Open Graph card with dark navy `#0B132B` backdrop and emerald `#3BBA93` accenting.
+  - **Search Engine Discovery Protocols**:
+    - Created `robots.txt` declaring open access to all public content while preventing indexing of administrative CRM and API endpoints, establishing `Host: https://avadapay.com` and referencing the sitemap.
+    - Created `sitemap.xml` listing all canonical public landing, solution, country, and legal compliance pages with accurate change frequencies and priorities.
+    - Created `manifest.json` defining progressive web application metadata with `#0B132B` theme and background colors.
+  - **Sitelinks & Rich Schema.org JSON-LD Suite**: Added complete structured data in `index.html` featuring:
+    - `Organization`: Canonical brand name, logo, horizontal wordmark, customer support endpoints, multilingual availability (English, French, Swahili, Kinyarwanda), and headquarters/offices in Dubai, Kigali, Nairobi, and Dar es Salaam.
+    - `WebSite`: Canonical URL and publisher relationship.
+    - `ItemList` (`SiteNavigationElement`): Sitelinks directly pointing Google Search bots to Payment Processing, POS Solutions, Bulk SMS, Rwanda, Kenya, Tanzania, and Contact.
+  - **Dynamic Route-Level `<SEO>` Component**: Engineered a reactive React component that synchronizes `document.title`, description, canonical link, Open Graph tags, Twitter card tags, and custom page schemas (`FinancialProduct`, `Product`, `Service`, `LocalBusiness`, `ContactPage`) during in-app navigation and for search engine web rendering crawlers.
+  - **Production Deployment Domain Scoping**: Removed `avadapay.rw` from `VIRTUAL_HOST` and `LETSENCRYPT_HOST` in `docker-compose.yml` to focus all production deployment and SSL provisioning purely on `avadapay.com` and `www.avadapay.com`.
+
 
 
 

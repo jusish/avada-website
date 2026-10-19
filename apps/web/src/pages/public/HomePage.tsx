@@ -6,6 +6,7 @@ import { CIRCLE_FLAGS } from '@/components/home/CircleFlags';
 import { ROW_ONE, ROW_TWO } from '@/components/home/PartnerLogos';
 import { Marquee } from '@/components/Marquee';
 import { FadeIn, StaggerContainer, StaggerItem, HoverScale, easeOutQuint } from '@/components/motion/Motion';
+import { SEO } from '@/components/seo/SEO';
 import heroBgWebp from '@/assets/hero-bg.webp';
 import heroBgJpg from '@/assets/hero-bg.jpg';
 
@@ -145,6 +146,12 @@ export const HomePage: React.FC = () => {
 
   return (
     <div className="flex flex-col bg-white text-[#2A292D] font-sans overflow-x-hidden">
+      <SEO
+        title="Avadapay | Global Financial Infrastructure & Technology"
+        description="Next-generation financial infrastructure, seamless payments, and global payout systems built for modern African enterprises and global businesses."
+        canonical="/"
+        keywords="Avadapay, payment gateway Africa, POS terminals Rwanda Kenya Tanzania, bulk SMS Africa, payment processing East Africa, mobile money integration"
+      />
       {/* 1 — HERO SECTION */}
       <section className="relative isolate flex flex-col min-h-[75vh] md:min-h-[82vh] text-white overflow-hidden">
         {/* Softly blurred background image with balanced ambient dark overlay */}

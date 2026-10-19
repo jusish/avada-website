@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { MapPin, Phone, Mail, CheckCircle2, Building, CreditCard, Radio } from 'lucide-react';
 import { CountryFlag } from '@/components/CountryFlag';
 import { Country } from '@avada/shared';
+import { SEO } from '@/components/seo/SEO';
 
 const makeFallback = (c: Omit<Country, 'displayOrder' | 'createdAt' | 'updatedAt'>): Country => ({
   ...c,
@@ -177,6 +178,12 @@ export const CountryPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-[#F8FAFC] text-[#2A292D] font-sans pb-24">
+      <SEO
+        title={`Avadapay ${country.name} | ${country.headline || 'Digital Payments & Telco Aggregator'}`}
+        description={country.description || `Accept payments, manage collections, and disburse payouts in ${country.name} with Avadapay.`}
+        canonical={`/${country.slug}`}
+        keywords={`Avadapay ${country.name}, payment gateway ${country.name}, mobile money ${country.name}`}
+      />
       {/* 1 — Top Hero */}
       <section className="bg-[#2A292D] text-white pt-24 sm:pt-32 pb-20 px-4 relative overflow-hidden">
         <div className="max-w-5xl mx-auto space-y-6">

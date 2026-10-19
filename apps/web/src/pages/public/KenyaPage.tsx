@@ -16,6 +16,7 @@ import { Button } from '@/components/ui/button';
 import { CountryFlag } from '@/components/CountryFlag';
 import { FadeIn, StaggerContainer, StaggerItem, HoverScale } from '@/components/motion/Motion';
 import { OptimizedImage } from '@/components/ui/OptimizedImage';
+import { SEO } from '@/components/seo/SEO';
 
 /* ------------------------------------------------------------------ */
 /* Accordion component                                                 */
@@ -194,6 +195,26 @@ export const KenyaPage: React.FC = () => {
 
   return (
     <div className="bg-white text-[#2A292D] font-sans overflow-x-hidden">
+      <SEO
+        title="Avadapay Kenya | M-Pesa, Card Payments & Carrier Bulk SMS"
+        description="Accept M-Pesa, Airtel Money, and card payments in Kenya with Avadapay. Send instant payouts to agents, automate bulk SMS, and scale your Kenyan business."
+        canonical="/kenya"
+        keywords="Avadapay Kenya, M-Pesa payment gateway, Airtel Money Kenya, STK Push Kenya, paybill Kenya, bulk SMS Kenya, Nairobi fintech"
+        structuredData={{
+          "@type": "LocalBusiness",
+          "name": "Avadapay Kenya",
+          "image": "https://avadapay.com/og-image.png",
+          "url": "https://avadapay.com/kenya",
+          "telephone": "+254 20 000 0000",
+          "address": {
+            "@type": "PostalAddress",
+            "streetAddress": "Westlands Commercial Center",
+            "addressLocality": "Nairobi",
+            "addressCountry": "KE"
+          },
+          "priceRange": "$$"
+        }}
+      />
       {/* 1 — HERO SECTION */}
       <section className="bg-[#2A292D] text-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 sm:pt-12 pb-16 sm:pb-24 grid lg:grid-cols-[1.3fr_1fr] gap-10 lg:gap-14 items-center">

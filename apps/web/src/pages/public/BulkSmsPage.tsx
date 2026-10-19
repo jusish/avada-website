@@ -21,6 +21,7 @@ import {
 } from '@/components/home/CircleFlags';
 import { FadeIn, StaggerContainer, StaggerItem, HoverScale } from '@/components/motion/Motion';
 import { OptimizedImage } from '@/components/ui/OptimizedImage';
+import { SEO } from '@/components/seo/SEO';
 
 /* ------------------------------------------------------------------ */
 /* 6 Types of Messages                                                */
@@ -178,6 +179,22 @@ export const BulkSmsPage: React.FC = () => {
 
   return (
     <div className="bg-white text-[#2A292D] font-sans overflow-x-hidden">
+      <SEO
+        title="High-Throughput Bulk SMS Platform & Carrier Gateway"
+        description="Deliver mission-critical OTPs, transactional alerts, and customer notifications across Africa with Avadapay. Direct telco carrier connections, sub-2s latency, and 99.9% delivery rate."
+        canonical="/bulk-sms"
+        keywords="bulk SMS Africa, transactional SMS, OTP SMS gateway Kenya Rwanda Tanzania, enterprise SMS API, telco aggregator SMS"
+        structuredData={{
+          "@type": "Service",
+          "name": "Avadapay Bulk SMS Platform",
+          "description": "Enterprise high-throughput transactional messaging and carrier aggregation across African mobile networks.",
+          "provider": {
+            "@type": "Organization",
+            "name": "Avadapay",
+            "url": "https://avadapay.com"
+          }
+        }}
+      />
       {/* 1 — HERO SECTION */}
       <ProductHero
         title={

@@ -5,6 +5,7 @@ import { ROW_ONE, ROW_TWO } from '@/components/home/PartnerLogos';
 import { AccordionList, G, ProductHero, SectionTitle } from '@/components/product/shared';
 import { FadeIn, StaggerContainer, StaggerItem, HoverScale } from '@/components/motion/Motion';
 import { OptimizedImage } from '@/components/ui/OptimizedImage';
+import { SEO } from '@/components/seo/SEO';
 
 /* ------------------------------------------------------------------ */
 /* Content                                                             */
@@ -235,6 +236,23 @@ const STEPS = [
 
 export const PaymentProcessingPage: React.FC = () => (
   <div className="bg-white text-[#2A292D] font-sans overflow-x-hidden">
+    <SEO
+      title="Payment Processing & Mobile Money Gateway"
+      description="Accept payments across Africa with Avadapay. Omni-channel card processing, mobile money (M-Pesa, MTN MoMo, Airtel), QR codes, and multi-currency settlement."
+      canonical="/payment-processing"
+      keywords="payment processing Africa, mobile money gateway, accept payments Rwanda Kenya Tanzania, STK Push, M-Pesa API, MTN MoMo API"
+      structuredData={{
+        "@type": "FinancialProduct",
+        "name": "Avadapay Payment Processing",
+        "description": "Omni-channel payment gateway and mobile money aggregation across African markets.",
+        "provider": {
+          "@type": "Organization",
+          "name": "Avadapay",
+          "url": "https://avadapay.com"
+        },
+        "areaServed": ["RW", "KE", "TZ", "UG", "CD", "GH", "NG"]
+      }}
+    />
     <ProductHero
       title={
         <>

@@ -12,6 +12,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { useSiteConfig } from '@/context/SiteConfigContext';
+import { SEO } from '@/components/seo/SEO';
 
 const FALLBACK_INQUIRY_TYPES = [
   { value: 'sms', label: 'SMS Pricing & Routing' },
@@ -122,6 +123,18 @@ export const ContactPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-white text-[#2A292D] font-sans pb-24">
+      <SEO
+        title="Contact & Technical Inquiries"
+        description="Speak with Avadapay's financial infrastructure experts. Inquire about payment processing, POS terminals, bulk SMS rates, or custom API integrations."
+        canonical="/contact"
+        keywords="contact Avadapay, Avadapay support, fintech partnership Africa, merchant account inquiry, POS terminal demo"
+        structuredData={{
+          "@type": "ContactPage",
+          "name": "Contact Avadapay",
+          "description": "Customer inquiry and technical support desk for Avadapay payments, POS, and SMS services.",
+          "url": "https://avadapay.com/contact"
+        }}
+      />
       {/* 1 — TOP HEADER SECTION */}
       <section className="pt-16 sm:pt-20 px-4 text-center max-w-3xl mx-auto">
         <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-[#3BBA93] text-white flex items-center justify-center mx-auto shadow-lg shadow-[#3BBA93]/25 mb-6">

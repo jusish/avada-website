@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { Shield, Clock, FileText, ChevronRight, Loader2, Mail } from 'lucide-react';
 import { LegalPolicy } from '@avada/shared';
 import { Button } from '@/components/ui/button';
+import { SEO } from '@/components/seo/SEO';
 
 interface LegalPolicyPageProps {
   slug: 'terms' | 'privacy' | 'cookies';
@@ -31,6 +32,12 @@ export const LegalPolicyPage: React.FC<LegalPolicyPageProps> = ({ slug, fallback
 
   return (
     <div className="min-h-screen bg-[#F8FAFC] text-[#2A292D] font-sans pb-24">
+      <SEO
+        title={policy?.title || fallbackTitle}
+        description={policy?.summary || `${fallbackTitle} for Avadapay financial infrastructure, payments, POS, and SMS services.`}
+        canonical={`/${slug}`}
+        keywords={`Avadapay ${fallbackTitle}, legal compliance, terms of service, privacy policy`}
+      />
       {/* Top Brand Banner */}
       <section className="bg-[#2A292D] text-white pt-24 sm:pt-32 pb-16 px-4">
         <div className="max-w-5xl mx-auto">

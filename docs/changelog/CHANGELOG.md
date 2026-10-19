@@ -5,6 +5,21 @@ All notable changes to the Avada Website and CMS project will be documented in t
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.12.0] - 2026-10-19
+
+### Added
+- **Enterprise SEO & Brand Standardization**: Updated the site title to `Avadapay | Global Financial Infrastructure & Technology` and injected Google Search Console domain verification `<meta name="google-site-verification" content="Srp7mYBgNAKzIapbFT_FhIJ35vGpdhCHxNRiHbymPwA" />`.
+- **Search Engine Sitelinks & Structured Data Suite**: Built and embedded comprehensive Schema.org JSON-LD definitions for `Organization` (brand logo, contact points, multilingual support, physical offices in Dubai, Kigali, Nairobi, Dar es Salaam), `WebSite`, and `ItemList` (`SiteNavigationElement` declaring sitelinks for Payment Processing, POS Solutions, Bulk SMS, Rwanda, Kenya, Tanzania, and Contact).
+- **High-Resolution App & Search Icons Pipeline (`generate-seo-assets.mjs`)**: Generated multi-resolution icons adhering strictly to Google Search guidelines (`favicon-48x48.png`, `favicon-96x96.png`, `favicon-192x192.png`, `favicon-512x512.png`, `apple-touch-icon.png` 180x180, `logo-512.png`, `logo-horizontal.png` 800px width, and a branded 1200x630 `og-image.png`).
+- **Web App Manifest (`apps/web/public/manifest.json`)**: Configured standalone PWA manifest with theme colors (`#0B132B`), masks, and icons.
+- **Search Engine Indexing Essentials**: Created `robots.txt` disallowing private administrative/API paths while linking to `sitemap.xml`, and authored a comprehensive XML sitemap covering all public marketing, solution, country, and legal routes on `https://avadapay.com`.
+- **Dynamic Per-Route `<SEO>` Component (`apps/web/src/components/seo/SEO.tsx`)**: Automated route-level head updates across all pages (`HomePage`, `PaymentProcessingPage`, `PosPage`, `BulkSmsPage`, `RwandaPage`, `KenyaPage`, `TanzaniaPage`, `ContactPage`, `LegalPolicyPage`, and dynamic `CountryPage`), providing tailored titles, descriptions, canonical URLs, and specialized schema markup (`FinancialProduct`, `Product`, `Service`, `LocalBusiness`, `ContactPage`).
+
+### Changed
+- **Production Multi-Tenant Deployment Scoping**: Removed `avadapay.rw` and `www.avadapay.rw` from `VIRTUAL_HOST` and `LETSENCRYPT_HOST` in `docker-compose.yml`, focusing all live routing, SSL certificates, and SEO indexing exclusively on `avadapay.com` and `www.avadapay.com`.
+
+---
+
 ## [1.11.0] - 2026-10-19
 
 ### Added

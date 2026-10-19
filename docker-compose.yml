@@ -47,8 +47,8 @@ services:
     depends_on:
       - api
     environment:
-      - VIRTUAL_HOST=avadapay.com,www.avadapay.com,avadapay.rw,www.avadapay.rw
-      - LETSENCRYPT_HOST=avadapay.com,www.avadapay.com,avadapay.rw,www.avadapay.rw
+      - VIRTUAL_HOST=avadapay.com,www.avadapay.com
+      - LETSENCRYPT_HOST=avadapay.com,www.avadapay.com
       - LETSENCRYPT_EMAIL=admin@avadapay.com
     networks:
       - default

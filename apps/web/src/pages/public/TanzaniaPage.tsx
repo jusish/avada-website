@@ -12,6 +12,7 @@ import { Button } from '@/components/ui/button';
 import { CountryFlag } from '@/components/CountryFlag';
 import { FadeIn, StaggerContainer, StaggerItem, HoverScale } from '@/components/motion/Motion';
 import { OptimizedImage } from '@/components/ui/OptimizedImage';
+import { SEO } from '@/components/seo/SEO';
 
 /* ------------------------------------------------------------------ */
 /* Hero Visual Component                                               */
@@ -161,6 +162,26 @@ export const TanzaniaPage: React.FC = () => {
 
   return (
     <div className="bg-white text-[#2A292D] font-sans overflow-x-hidden">
+      <SEO
+        title="Avadapay Tanzania | M-Pesa, Tigo Pesa, Airtel Money & Halopesa"
+        description="Unified mobile money and card payment gateway for Tanzanian businesses. Direct collections via M-Pesa, Tigo Pesa, Airtel Money, and Halopesa with local office in Dar es Salaam."
+        canonical="/tanzania"
+        keywords="Avadapay Tanzania, M-Pesa Tanzania, Tigo Pesa, Airtel Money Tanzania, Halopesa, payment gateway Dar es Salaam, bulk SMS Tanzania"
+        structuredData={{
+          "@type": "LocalBusiness",
+          "name": "Avadapay Tanzania",
+          "image": "https://avadapay.com/og-image.png",
+          "url": "https://avadapay.com/tanzania",
+          "telephone": "+255 22 000 0000",
+          "address": {
+            "@type": "PostalAddress",
+            "streetAddress": "Victoria Commercial Center, New Bagamoyo Road",
+            "addressLocality": "Dar es Salaam",
+            "addressCountry": "TZ"
+          },
+          "priceRange": "$$"
+        }}
+      />
       {/* 1 — HERO SECTION */}
       <section className="bg-[#2A292D] text-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 sm:pt-12 pb-16 sm:pb-24 grid lg:grid-cols-[1.3fr_1fr] gap-10 lg:gap-14 items-center">
