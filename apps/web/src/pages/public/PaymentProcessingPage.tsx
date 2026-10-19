@@ -1,5 +1,16 @@
 import React from 'react';
-import { CodeXml, FileSignature, MapPinned, Smartphone, CheckCircle2, User } from 'lucide-react';
+import {
+  CodeXml,
+  FileSignature,
+  MapPinned,
+  Smartphone,
+  CheckCircle2,
+  User,
+  CreditCard,
+  Link as LinkIcon,
+  ShieldCheck,
+  Zap,
+} from 'lucide-react';
 import { Marquee } from '@/components/Marquee';
 import { ROW_ONE, ROW_TWO } from '@/components/home/PartnerLogos';
 import { AccordionList, G, ProductHero, SectionTitle } from '@/components/product/shared';
@@ -231,6 +242,133 @@ const STEPS = [
 ];
 
 /* ------------------------------------------------------------------ */
+/* Hero Visual Component                                               */
+/* ------------------------------------------------------------------ */
+
+const PaymentProcessingHeroVisual: React.FC = () => (
+  <div className="w-full h-full p-6 flex flex-col justify-between bg-gradient-to-br from-[#232226] via-[#2A292D] to-[#1E1D21] text-white select-none">
+    {/* Top Terminal Header */}
+    <div className="flex items-center justify-between border-b border-white/10 pb-4">
+      <div className="flex items-center space-x-2.5">
+        <div className="w-7 h-7 rounded-lg bg-[#3BBA93]/20 flex items-center justify-center text-[#3BBA93]">
+          <Zap className="w-4 h-4" />
+        </div>
+        <div>
+          <span className="text-sm font-bold tracking-wide text-white">AvadaPay Unified API</span>
+          <p className="text-[10px] text-gray-400 font-mono">checkout.v2.live</p>
+        </div>
+      </div>
+      <span className="inline-flex items-center gap-1.5 text-[11px] font-semibold text-[#3BBA93] bg-[#3BBA93]/15 px-2.5 py-0.5 rounded-full">
+        <span className="w-1.5 h-1.5 rounded-full bg-[#3BBA93] animate-pulse" />
+        PCI-DSS · 99.99% SLA
+      </span>
+    </div>
+
+    {/* Live Simulated Multi-Rail Payment Stream */}
+    <div className="space-y-3 my-auto py-2">
+      {/* 1. M-Pesa STK Push */}
+      <div className="p-3.5 rounded-xl bg-white/5 border border-white/10 flex items-center justify-between transition-all hover:border-[#3BBA93]/50 hover:bg-white/[0.08]">
+        <div className="flex items-center space-x-3">
+          <div className="w-9 h-9 rounded-lg bg-[#00A34F]/20 text-[#00A34F] flex items-center justify-center font-black text-xs">
+            MPESA
+          </div>
+          <div>
+            <p className="text-xs font-bold text-white flex items-center gap-1.5">
+              <span>M-Pesa STK Push</span>
+              <span className="text-[9px] bg-white/10 px-1.5 py-0.2 rounded text-gray-300">KE</span>
+            </p>
+            <p className="text-[10px] text-gray-400 font-mono">Paybill 89201 · +254 712 ***</p>
+          </div>
+        </div>
+        <div className="text-right">
+          <p className="text-xs font-black text-white">KES 24,500.00</p>
+          <span className="text-[10px] text-[#3BBA93] font-bold flex items-center justify-end gap-1">
+            <CheckCircle2 className="w-3 h-3" /> Settled
+          </span>
+        </div>
+      </div>
+
+      {/* 2. Global Card 3DS Checkout */}
+      <div className="p-3.5 rounded-xl bg-white/5 border border-white/10 flex items-center justify-between transition-all hover:border-[#3BBA93]/50 hover:bg-white/[0.08]">
+        <div className="flex items-center space-x-3">
+          <div className="w-9 h-9 rounded-lg bg-[#2563EB]/20 text-[#60A5FA] flex items-center justify-center">
+            <CreditCard className="w-4 h-4" />
+          </div>
+          <div>
+            <p className="text-xs font-bold text-white flex items-center gap-1.5">
+              <span>Card Processing</span>
+              <span className="text-[9px] bg-white/10 px-1.5 py-0.2 rounded text-gray-300">3DS</span>
+            </p>
+            <p className="text-[10px] text-gray-400 font-mono">Visa / Mastercard · 4829 ****</p>
+          </div>
+        </div>
+        <div className="text-right">
+          <p className="text-xs font-black text-white">USD $185.00</p>
+          <span className="text-[10px] text-[#3BBA93] font-bold flex items-center justify-end gap-1">
+            <CheckCircle2 className="w-3 h-3" /> Approved
+          </span>
+        </div>
+      </div>
+
+      {/* 3. MTN MoMo Collection */}
+      <div className="p-3.5 rounded-xl bg-white/5 border border-white/10 flex items-center justify-between transition-all hover:border-[#3BBA93]/50 hover:bg-white/[0.08]">
+        <div className="flex items-center space-x-3">
+          <div className="w-9 h-9 rounded-lg bg-[#FFCC00]/20 text-[#FACC15] flex items-center justify-center font-black text-xs">
+            MTN
+          </div>
+          <div>
+            <p className="text-xs font-bold text-white flex items-center gap-1.5">
+              <span>MTN Mobile Money</span>
+              <span className="text-[9px] bg-white/10 px-1.5 py-0.2 rounded text-gray-300">RW</span>
+            </p>
+            <p className="text-[10px] text-gray-400 font-mono">Merchant Tap · +250 788 ***</p>
+          </div>
+        </div>
+        <div className="text-right">
+          <p className="text-xs font-black text-white">RWF 120,000</p>
+          <span className="text-[10px] text-[#3BBA93] font-bold flex items-center justify-end gap-1">
+            <CheckCircle2 className="w-3 h-3" /> Confirmed
+          </span>
+        </div>
+      </div>
+
+      {/* 4. Payment Link Instant Checkout */}
+      <div className="p-3.5 rounded-xl bg-white/5 border border-white/10 flex items-center justify-between transition-all hover:border-[#3BBA93]/50 hover:bg-white/[0.08]">
+        <div className="flex items-center space-x-3">
+          <div className="w-9 h-9 rounded-lg bg-[#8B5CF6]/20 text-[#A78BFA] flex items-center justify-center">
+            <LinkIcon className="w-4 h-4" />
+          </div>
+          <div>
+            <p className="text-xs font-bold text-white flex items-center gap-1.5">
+              <span>Payment Link</span>
+              <span className="text-[9px] bg-white/10 px-1.5 py-0.2 rounded text-gray-300">Remote</span>
+            </p>
+            <p className="text-[10px] text-gray-400 font-mono">pay.avada.link/inv-8492</p>
+          </div>
+        </div>
+        <div className="text-right">
+          <p className="text-xs font-black text-white">TZS 85,000</p>
+          <span className="text-[10px] text-[#3BBA93] font-bold flex items-center justify-end gap-1">
+            <CheckCircle2 className="w-3 h-3" /> Received
+          </span>
+        </div>
+      </div>
+    </div>
+
+    {/* Bottom Multi-Currency & Security Rail */}
+    <div className="pt-3 border-t border-white/10 text-[11px] text-gray-400 flex items-center justify-between">
+      <div className="flex items-center gap-1 text-[10px] font-mono text-gray-300">
+        <span className="text-[#3BBA93] font-bold">SETTLEMENT:</span>
+        <span>USD · KES · RWF · TZS · CDF</span>
+      </div>
+      <span className="inline-flex items-center gap-1 text-[10px] text-gray-400 font-mono">
+        <ShieldCheck className="w-3.5 h-3.5 text-[#3BBA93]" /> 256-Bit TLS
+      </span>
+    </div>
+  </div>
+);
+
+/* ------------------------------------------------------------------ */
 /* Page                                                                */
 /* ------------------------------------------------------------------ */
 
@@ -261,6 +399,7 @@ export const PaymentProcessingPage: React.FC = () => (
       }
       description="Mobile money, cards, payment links, and bank rails, across 17+ African markets, with one API, one dashboard, and one settlement flow."
       actions={[{ label: 'Contact Us', to: '/contact?inquiry=payments', variant: 'outline' }]}
+      media={<PaymentProcessingHeroVisual />}
     />
 
     {/* One connection */}
