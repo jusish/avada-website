@@ -31,6 +31,7 @@ This document is the **single source of truth** for every feature implemented in
 23. [FEAT-023: Global WebP Image Optimization Pipeline, Critical Hero Preloading & Framer Motion Scroll Suite](#feat-023-global-webp-image-optimization-pipeline-critical-hero-preloading--framer-motion-scroll-suite)
 24. [FEAT-024: Enterprise SEO Infrastructure, Sitelinks Schema, Multi-Res App Icons & Domain Scoping](#feat-024-enterprise-seo-infrastructure-sitelinks-schema-multi-res-app-icons--domain-scoping)
 25. [FEAT-025: Intermediate Proxy Robots.txt Resolution & Legacy Asset Synchronization](#feat-025-intermediate-proxy-robotstxt-resolution--legacy-asset-synchronization)
+26. [FEAT-026: Google Search Favicon Normalization & POS Service Schema Compliance](#feat-026-google-search-favicon-normalization--pos-service-schema-compliance)
 
 ---
 
@@ -615,6 +616,37 @@ This document is the **single source of truth** for every feature implemented in
   - **Asset Synchronization**: Uploaded current multi-resolution icons (`favicon-48x48.png`, `favicon-96x96.png`, `favicon-192x192.png`, `favicon-512x512.png`, `apple-touch-icon.png`, `logo-512.png`, `manifest.json`, and `sitemap.xml`) to the proxy server root.
   - **Legacy Favicon Creation & Head Linkage**: Generated an embedded ICO (`apps/web/public/favicon.ico`) and linked `<link rel="alternate icon" href="/favicon.ico" />` in `index.html` to guarantee logo recognition on legacy bots and browsers.
   - **Live Verification**: Verified via proxy access logs that Google-InspectionTool and Googlebot re-fetched `/robots.txt` with HTTP 200 (189 bytes) and proceeded to inspect WebP images, JS bundles, and stylesheets.
+
+---
+
+## FEAT-026: Google Search Favicon Normalization & POS Service Schema Compliance
+- **ID**: `FEAT-026`
+- **Status**: Completed
+- **Created**: 2026-10-20
+- **Description**: Resolved Google Search fallback globe icon display by enforcing a strict 1:1 aspect ratio vector favicon, generating multi-resolution raster icons (48x48, 96x96, 192x192, 512x512) and a 3-tier binary ICO (48x48, 32x32, 16x16), optimizing head linkage hierarchy for Googlebot-Image, and reclassifying the POS solution structured data from retail `Product` to B2B `Service` to eliminate Google Search Console critical pricing errors.
+- **Files Involved**:
+  - [`apps/web/public/favicon.svg`](../../apps/web/public/favicon.svg)
+  - [`apps/web/public/favicon.ico`](../../apps/web/public/favicon.ico)
+  - [`apps/web/public/favicon-48x48.png`](../../apps/web/public/favicon-48x48.png)
+  - [`apps/web/public/favicon-96x96.png`](../../apps/web/public/favicon-96x96.png)
+  - [`apps/web/public/favicon-192x192.png`](../../apps/web/public/favicon-192x192.png)
+  - [`apps/web/public/favicon-512x512.png`](../../apps/web/public/favicon-512x512.png)
+  - [`apps/web/public/apple-touch-icon.png`](../../apps/web/public/apple-touch-icon.png)
+  - [`apps/web/scripts/generate-seo-assets.mjs`](../../apps/web/scripts/generate-seo-assets.mjs)
+  - [`apps/web/index.html`](../../apps/web/index.html)
+  - [`apps/web/src/pages/public/PosPage.tsx`](../../apps/web/src/pages/public/PosPage.tsx)
+  - [`docs/changelog/CHANGELOG.md`](../../docs/changelog/CHANGELOG.md)
+  - [`docs/changelog/features-storage.md`](../../docs/changelog/features-storage.md)
+- **Rationale**:
+  - **Favicon Globe Fallback**: In Google Search results, a grey globe was displayed instead of the Avadapay logo. Investigation showed that `favicon.svg` had an aspect ratio of `119:111` (1.072), violating Google Search Central's strict 1:1 square requirement (`viewBox="0 0 128 128"`). Furthermore, the `<head>` in `index.html` declared `<link rel="icon" type="image/svg+xml">` first, causing Google's favicon crawler to fetch the non-square SVG (`Content-Location: https://avadapay.com/favicon.svg`) and fall back to the default globe placeholder.
+  - **POS Page URL Inspection Error**: Google Search Console URL Inspection for `https://avadapay.com/pos` flagged a critical issue: `Either 'price' or 'priceSpecification.price' should be specified`. The page was declared as `@type: "Product"` with an empty `offers` object, which Google reserves for retail e-commerce products with consumer price tags. Avadapay POS is a B2B financial solution with customized transaction-volume interchange and device leasing.
+- **Implementation Details**:
+  - **Vector Normalization**: Refactored `apps/web/public/favicon.svg` to a clean, square `128x128` canvas with `viewBox="0 0 128 128"` and centered geometry (`transform="translate(4.588, 8.946)"`).
+  - **Multi-Resolution Binary ICO Generation**: Enhanced `generate-seo-assets.mjs` with an automated binary ICO encoder (`createIco`) packing 48x48 (Google standard), 32x32 (standard tab), and 16x16 (legacy browser) raster PNG entries directly into `apps/web/public/favicon.ico`.
+  - **Apple Touch Icon Hardening**: Configured `apple-touch-icon.png` (180x180) with an opaque `#0B132B` brand background to conform to iOS Home Screen requirements.
+  - **Head Linkage Ordering**: Reordered `<head>` link tags in `apps/web/index.html` to prioritize `type="image/png" sizes="48x48" href="/favicon-48x48.png"`, followed by 96x96 and 192x192, followed by SVG and standard `<link rel="shortcut icon" href="/favicon.ico" />`.
+  - **Schema Reclassification**: Transformed `PosPage.tsx` structured data from `Product` to `Service` with `serviceType: "Point of Sale (POS) Solutions & SoftPOS"`, `provider` (Avadapay), and `areaServed` (RW, KE, TZ, UG, CD), removing the missing price error and aligning with `PaymentProcessingPage` and `BulkSmsPage`.
+
 
 
 

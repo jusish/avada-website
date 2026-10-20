@@ -12,6 +12,33 @@ const publicDir = path.resolve(webRoot, 'public');
 const faviconSvgPath = path.resolve(publicDir, 'favicon.svg');
 const logoSvgPath = path.resolve(publicDir, 'logo.svg');
 
+/**
+ * Creates a valid multi-image ICO binary buffer from an array of PNG buffers
+ */
+function createIco(pngEntries) {
+  const header = Buffer.alloc(6);
+  header.writeUInt16LE(0, 0); // Reserved
+  header.writeUInt16LE(1, 2); // 1 = ICO type
+  header.writeUInt16LE(pngEntries.length, 4); // Number of images
+
+  let offset = 6 + pngEntries.length * 16;
+  const directoryEntries = [];
+  for (const { buffer, width, height } of pngEntries) {
+    const entry = Buffer.alloc(16);
+    entry.writeUInt8(width >= 256 ? 0 : width, 0);
+    entry.writeUInt8(height >= 256 ? 0 : height, 1);
+    entry.writeUInt8(0, 2); // Color palette
+    entry.writeUInt8(0, 3); // Reserved
+    entry.writeUInt16LE(1, 4); // Color planes
+    entry.writeUInt16LE(32, 6); // Bits per pixel
+    entry.writeUInt32LE(buffer.length, 8); // Size of image data
+    entry.writeUInt32LE(offset, 12); // Offset of image data
+    directoryEntries.push(entry);
+    offset += buffer.length;
+  }
+  return Buffer.concat([header, ...directoryEntries, ...pngEntries.map((e) => e.buffer)]);
+}
+
 async function generateSeoAssets() {
   console.log('--- Generating High-Resolution SEO Assets for Avadapay ---');
 
@@ -27,11 +54,10 @@ async function generateSeoAssets() {
 
   // 1. Generate Favicon PNGs (48x48, 96x96, 192x192, 512x512)
   const iconSizes = [
-    { name: 'favicon-48x48.png', size: 48, padding: 4 },
-    { name: 'favicon-96x96.png', size: 96, padding: 8 },
-    { name: 'favicon-192x192.png', size: 192, padding: 16 },
-    { name: 'favicon-512x512.png', size: 512, padding: 40 },
-    { name: 'apple-touch-icon.png', size: 180, padding: 18 },
+    { name: 'favicon-48x48.png', size: 48, padding: 3 },
+    { name: 'favicon-96x96.png', size: 96, padding: 6 },
+    { name: 'favicon-192x192.png', size: 192, padding: 12 },
+    { name: 'favicon-512x512.png', size: 512, padding: 32 },
   ];
 
   for (const { name, size, padding } of iconSizes) {
@@ -55,7 +81,56 @@ async function generateSeoAssets() {
     console.log(`✓ Created ${name} (${size}x${size})`);
   }
 
-  // 2. Generate Organization Logo (Square 512x512 with dark rounded brand backdrop)
+  // 2. Generate Apple Touch Icon (180x180, opaque background #0B132B as per iOS specifications)
+  const appleTouchSize = 180;
+  const appleInnerSize = 130;
+  const appleInnerBuffer = await sharp(faviconSvg)
+    .resize(appleInnerSize, appleInnerSize, { fit: 'contain' })
+    .toBuffer();
+
+  await sharp({
+    create: {
+      width: appleTouchSize,
+      height: appleTouchSize,
+      channels: 4,
+      background: { r: 11, g: 19, b: 43, alpha: 1 }, // #0B132B
+    },
+  })
+    .composite([{ input: appleInnerBuffer, gravity: 'center' }])
+    .png()
+    .toFile(path.resolve(publicDir, 'apple-touch-icon.png'));
+  console.log('✓ Created apple-touch-icon.png (180x180, opaque #0B132B)');
+
+  // 3. Generate Multi-Resolution favicon.ico (48x48, 32x32, 16x16)
+  const icoSizes = [48, 32, 16];
+  const icoPngEntries = [];
+  for (const s of icoSizes) {
+    const p = Math.max(1, Math.round(s * 0.06));
+    const innerS = s - p * 2;
+    const inner = await sharp(faviconSvg)
+      .resize(innerS, innerS, { fit: 'contain' })
+      .toBuffer();
+
+    const pngBuffer = await sharp({
+      create: {
+        width: s,
+        height: s,
+        channels: 4,
+        background: { r: 0, g: 0, b: 0, alpha: 0 },
+      },
+    })
+      .composite([{ input: inner, gravity: 'center' }])
+      .png()
+      .toBuffer();
+
+    icoPngEntries.push({ buffer: pngBuffer, width: s, height: s });
+  }
+
+  const icoBuffer = createIco(icoPngEntries);
+  fs.writeFileSync(path.resolve(publicDir, 'favicon.ico'), icoBuffer);
+  console.log('✓ Created multi-resolution favicon.ico (48x48, 32x32, 16x16)');
+
+  // 4. Generate Organization Logo (Square 512x512 with dark rounded brand backdrop)
   const logoSquareSvg = `
     <svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
       <rect width="512" height="512" rx="104" fill="#0B132B"/>
@@ -68,14 +143,14 @@ async function generateSeoAssets() {
   await sharp(Buffer.from(logoSquareSvg)).png().toFile(path.resolve(publicDir, 'logo-512.png'));
   console.log('✓ Created logo-512.png (512x512)');
 
-  // 3. Generate Horizontal High-Res Wordmark Logo (apps/web/public/logo-horizontal.png)
+  // 5. Generate Horizontal High-Res Wordmark Logo (apps/web/public/logo-horizontal.png)
   await sharp(logoSvg)
     .resize(800, null, { fit: 'inside' })
     .png()
     .toFile(path.resolve(publicDir, 'logo-horizontal.png'));
   console.log('✓ Created logo-horizontal.png (800px width)');
 
-  // 4. Generate Open Graph / Twitter Card Image (1200x630)
+  // 6. Generate Open Graph / Twitter Card Image (1200x630)
   const ogSvg = `
     <svg width="1200" height="630" viewBox="0 0 1200 630" fill="none" xmlns="http://www.w3.org/2000/svg">
       <defs>

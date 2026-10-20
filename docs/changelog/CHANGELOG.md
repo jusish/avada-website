@@ -5,6 +5,12 @@ All notable changes to the Avada Website and CMS project will be documented in t
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.14.0] - 2026-10-20
+
+### Fixed
+- **Google Search Console POS Page Rich Snippet Schema Resolution**: Diagnosed and resolved the critical URL inspection error on `https://avadapay.com/pos` ("Either 'price' or 'priceSpecification.price' should be specified in offers"). Reclassified Avadapay Smart POS Solutions from consumer retail `@type: "Product"` to enterprise B2B `@type: "Service"` with `serviceType: "Point of Sale (POS) Solutions & SoftPOS"`. This accurately reflects Avadapay's quote-based and transaction-volume pricing model while eliminating all Product snippet warnings and errors in Google Search Console.
+- **Google Search Favicon 1:1 Aspect Ratio & Multi-Resolution ICO Compliance**: Resolved the root cause preventing Google Search results from displaying the Avadapay favicon (where a default fallback grey globe was shown). Normalized `apps/web/public/favicon.svg` from non-square 119x111 to a strict 1:1 square `128x128` vector (`viewBox="0 0 128 128"`), satisfying Google Search Central's mandatory 1:1 aspect ratio requirement. Reordered `<head>` icon declarations in `index.html` to prioritize standard 48px raster multiples (`favicon-48x48.png`, `favicon-96x96.png`, `favicon-192x192.png`), linked standard `<link rel="shortcut icon" href="/favicon.ico" />`, and updated `generate-seo-assets.mjs` to produce a true multi-resolution binary `favicon.ico` containing 48x48, 32x32, and 16x16 bitmaps alongside an opaque `#0B132B` Apple touch icon.
+
 ## [1.13.0] - 2026-10-19
 
 ### Fixed

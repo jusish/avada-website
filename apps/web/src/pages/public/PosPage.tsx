@@ -186,19 +186,16 @@ export const PosPage: React.FC = () => {
         canonical="/pos"
         keywords="POS terminal Rwanda, POS terminal Kenya, Android POS terminal East Africa, SoftPOS, card swipe terminal, tap to phone Africa"
         structuredData={{
-          "@type": "Product",
+          "@type": "Service",
           "name": "Avadapay Smart POS Solutions",
+          "serviceType": "Point of Sale (POS) Solutions & SoftPOS",
           "description": "Enterprise-grade point-of-sale hardware and SoftPOS application for retail merchant checkout across East Africa.",
-          "brand": {
-            "@type": "Brand",
-            "name": "Avadapay"
+          "provider": {
+            "@type": "Organization",
+            "name": "Avadapay",
+            "url": "https://avadapay.com"
           },
-          "offers": {
-            "@type": "Offer",
-            "priceCurrency": "USD",
-            "availability": "https://schema.org/InStock",
-            "url": "https://avadapay.com/pos"
-          }
+          "areaServed": ["RW", "KE", "TZ", "UG", "CD"]
         }}
       />
       {/* 1 — HERO SECTION */}
