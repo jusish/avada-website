@@ -32,6 +32,7 @@ This document is the **single source of truth** for every feature implemented in
 24. [FEAT-024: Enterprise SEO Infrastructure, Sitelinks Schema, Multi-Res App Icons & Domain Scoping](#feat-024-enterprise-seo-infrastructure-sitelinks-schema-multi-res-app-icons--domain-scoping)
 25. [FEAT-025: Intermediate Proxy Robots.txt Resolution & Legacy Asset Synchronization](#feat-025-intermediate-proxy-robotstxt-resolution--legacy-asset-synchronization)
 26. [FEAT-026: Google Search Favicon Normalization & POS Service Schema Compliance](#feat-026-google-search-favicon-normalization--pos-service-schema-compliance)
+27. [FEAT-027: Sitelinks Hierarchy Optimization, Semantic Heading Anchoring & Legal Exclusion](#feat-027-sitelinks-hierarchy-optimization-semantic-heading-anchoring--legal-exclusion)
 
 ---
 
@@ -646,6 +647,29 @@ This document is the **single source of truth** for every feature implemented in
   - **Apple Touch Icon Hardening**: Configured `apple-touch-icon.png` (180x180) with an opaque `#0B132B` brand background to conform to iOS Home Screen requirements.
   - **Head Linkage Ordering**: Reordered `<head>` link tags in `apps/web/index.html` to prioritize `type="image/png" sizes="48x48" href="/favicon-48x48.png"`, followed by 96x96 and 192x192, followed by SVG and standard `<link rel="shortcut icon" href="/favicon.ico" />`.
   - **Schema Reclassification**: Transformed `PosPage.tsx` structured data from `Product` to `Service` with `serviceType: "Point of Sale (POS) Solutions & SoftPOS"`, `provider` (Avadapay), and `areaServed` (RW, KE, TZ, UG, CD), removing the missing price error and aligning with `PaymentProcessingPage` and `BulkSmsPage`.
+
+---
+
+## FEAT-027: Sitelinks Hierarchy Optimization, Semantic Heading Anchoring & Legal Exclusion
+- **ID**: `FEAT-027`
+- **Status**: Completed
+- **Created**: 2026-10-23
+- **Description**: Optimized the internal linking hierarchy and search crawler signals to influence Google Search Sitelinks toward commercial product pillars (`/payment-processing`, `/pos`, `/bulk-sms`) and regional markets (`/rwanda`, `/kenya`, `/tanzania`), while systematically excluding low-intent legal policy pages (`/cookies`) from organic sitelink slots.
+- **Files Involved**:
+  - [`apps/web/src/pages/public/HomePage.tsx`](../../apps/web/src/pages/public/HomePage.tsx)
+  - [`apps/web/src/pages/public/LegalPolicyPage.tsx`](../../apps/web/src/pages/public/LegalPolicyPage.tsx)
+  - [`apps/web/public/sitemap.xml`](../../apps/web/public/sitemap.xml)
+  - [`docs/changelog/CHANGELOG.md`](../../docs/changelog/CHANGELOG.md)
+  - [`docs/changelog/features-storage.md`](../../docs/changelog/features-storage.md)
+- **Rationale**:
+  - Google's automated sitelinks algorithm selected `Cookie Policy` as a top-level sitelink because it was indexed early.
+  - Sitelinks cannot be manually reordered or pinned inside Google Search Console (manual demotion was removed by Google in 2016). Google determines sitelinks algorithmically using internal link weight, heading anchor text, click signals, and crawl priority.
+  - Commercial product pillars (`/payment-processing`, `/pos`, `/bulk-sms`) needed stronger internal linking signals from the homepage to displace non-converting utility links.
+- **Implementation Details**:
+  - **Legal Policy Noindex Flagging**: Injected `noindex={true}` into `LegalPolicyPage.tsx` (`<meta name="robots" content="noindex, follow">`), ensuring `/cookies`, `/privacy`, and `/terms` remain accessible to site visitors via footer navigation and retain link juice, but are explicitly removed from Google Search SERP snippets and sitelinks.
+  - **Semantic Heading Anchor Linking**: Converted product card titles in `HomePage.tsx` (`<h3>`) into direct clickable `<Link>` elements and updated generic "Learn more" buttons to descriptive anchor text ("Explore Payment Processing", "Explore POS Solutions", "Explore Bulk SMS").
+  - **Sitemap Priority Tuning**: Updated `sitemap.xml` with fresh `lastmod` timestamps, focusing exclusively on high-priority routes (`/`, `/payment-processing`, `/pos`, `/bulk-sms`, `/rwanda`, `/kenya`, `/tanzania`, and `/contact`).
+
 
 
 

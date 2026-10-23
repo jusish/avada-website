@@ -5,6 +5,13 @@ All notable changes to the Avada Website and CMS project will be documented in t
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.15.0] - 2026-10-23
+
+### Changed
+- **Sitelinks Search Architecture & Semantic Link Anchoring**: Updated `HomePage.tsx` to link product card headings (`<h3>`) directly to `/payment-processing`, `/pos`, and `/bulk-sms`, and replaced generic "Learn more" buttons with rich semantic anchor text ("Explore Payment Processing", "Explore POS Solutions", "Explore Bulk SMS"). This sends high-priority internal link graph signals to Googlebot to prioritize solution pillars in Google Sitelinks.
+- **Sitemap Optimization for Core Solutions**: Streamlined `sitemap.xml` to focus purely on high-value public pages (`/`, `/payment-processing`, `/pos`, `/bulk-sms`, `/rwanda`, `/kenya`, `/tanzania`, and `/contact`), removing non-converting policy routes.
+- **Legal Compliance Sitelink Exclusion**: Added `noindex={true}` (`<meta name="robots" content="noindex, follow">`) to `LegalPolicyPage.tsx` (`/cookies`, `/privacy`, `/terms`). This prevents utility legal pages (such as Cookie Policy) from occupying organic sitelink slots in Google Search snippets while preserving in-site user access and link equity.
+
 ## [1.14.0] - 2026-10-20
 
 ### Fixed

@@ -271,13 +271,21 @@ export const HomePage: React.FC = () => {
                       <span className="inline-flex items-center justify-center w-10 h-10 rounded-xl bg-[#3BBA93]/15 text-[#3BBA93] text-base font-bold">
                         {w.n}
                       </span>
-                      <h3 className="mt-4 text-lg sm:text-xl font-extrabold text-gray-900">{w.title}</h3>
+                      <h3 className="mt-4 text-lg sm:text-xl font-extrabold text-gray-900">
+                        <Link to={w.link} className="hover:text-[#3BBA93] transition-colors">
+                          {w.title}
+                        </Link>
+                      </h3>
                       <p className="mt-2 text-xs sm:text-sm leading-relaxed text-gray-600 font-normal">
                         {w.body}
                       </p>
                     </div>
-                    <Link to={w.link} className="mt-5 inline-flex items-center text-xs font-bold text-[#3BBA93] hover:underline">
-                      <span>Learn more</span>
+                    <Link
+                      to={w.link}
+                      className="mt-5 inline-flex items-center text-xs font-bold text-[#3BBA93] hover:underline"
+                      aria-label={`Explore ${w.title}`}
+                    >
+                      <span>Explore {w.title}</span>
                       <ArrowRight className="w-3.5 h-3.5 ml-1" />
                     </Link>
                   </article>

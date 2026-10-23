@@ -37,6 +37,7 @@ export const LegalPolicyPage: React.FC<LegalPolicyPageProps> = ({ slug, fallback
         description={policy?.summary || `${fallbackTitle} for Avadapay financial infrastructure, payments, POS, and SMS services.`}
         canonical={`/${slug}`}
         keywords={`Avadapay ${fallbackTitle}, legal compliance, terms of service, privacy policy`}
+        noindex={true}
       />
       {/* Top Brand Banner */}
       <section className="bg-[#2A292D] text-white pt-24 sm:pt-32 pb-16 px-4">
