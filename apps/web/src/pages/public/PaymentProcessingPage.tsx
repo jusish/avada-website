@@ -45,7 +45,7 @@ const METHODS = [
   },
   {
     title: 'Multi-currency settlement',
-    body: 'Receive in local currency or settle to crypto where regulation allows.',
+    body: 'Receive in local currency or settle internationally across supported major currencies.',
     img: '/media/pp_multicurrency.jpg',
   },
   {
@@ -97,7 +97,7 @@ const WHY = [
   {
     Icon: CodeXml,
     title: 'Developer friendly',
-    body: 'Clean documentation, sandbox access, predictable webhooks, and SDKs to match.',
+    body: 'Developer sandbox access, predictable webhooks, and direct engineering integration support.',
   },
 ];
 
@@ -260,7 +260,7 @@ const PaymentProcessingHeroVisual: React.FC = () => (
       </div>
       <span className="inline-flex items-center gap-1.5 text-[11px] font-semibold text-[#3BBA93] bg-[#3BBA93]/15 px-2.5 py-0.5 rounded-full">
         <span className="w-1.5 h-1.5 rounded-full bg-[#3BBA93] animate-pulse" />
-        PCI-DSS · 99.99% SLA
+        Enterprise Grade · 99.9% Uptime
       </span>
     </div>
 
@@ -398,7 +398,10 @@ export const PaymentProcessingPage: React.FC = () => (
         </>
       }
       description="Mobile money, cards, payment links, and bank rails, across 17+ African markets, with one API, one dashboard, and one settlement flow."
-      actions={[{ label: 'Contact Us', to: '/contact?inquiry=payments', variant: 'outline' }]}
+      actions={[
+        { label: 'Talk to Sales', to: '/contact?inquiry=payments', variant: 'solid' },
+        { label: 'Explore API Docs', to: '/docs', variant: 'outline' },
+      ]}
       media={<PaymentProcessingHeroVisual />}
     />
 
@@ -495,7 +498,7 @@ export const PaymentProcessingPage: React.FC = () => (
       <div className="mt-10 border-y border-[#3BBA93]/15">
         <div className="py-6">
           <Marquee animation="animate-marquee-slow">
-            {[...ROW_ONE, ...ROW_ONE].map((logo, i) => (
+            {ROW_ONE.map((logo, i) => (
               <div key={i} className="px-[4.2rem] h-14 flex items-center">
                 {logo}
               </div>
@@ -504,7 +507,7 @@ export const PaymentProcessingPage: React.FC = () => (
         </div>
         <div className="py-6 border-t border-[#3BBA93]/15">
           <Marquee animation="animate-marquee-reverse">
-            {[...ROW_TWO, ...ROW_TWO].map((logo, i) => (
+            {ROW_TWO.map((logo, i) => (
               <div key={i} className="px-[4.2rem] h-14 flex items-center">
                 {logo}
               </div>

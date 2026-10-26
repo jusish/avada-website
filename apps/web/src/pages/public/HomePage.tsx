@@ -7,8 +7,7 @@ import { ROW_ONE, ROW_TWO } from '@/components/home/PartnerLogos';
 import { Marquee } from '@/components/Marquee';
 import { FadeIn, StaggerContainer, StaggerItem, HoverScale, easeOutQuint } from '@/components/motion/Motion';
 import { SEO } from '@/components/seo/SEO';
-import heroBgWebp from '@/assets/hero-bg.webp';
-import heroBgJpg from '@/assets/hero-bg.jpg';
+import { Button } from '@/components/ui/button';
 
 const GREEN = '#3BBA93';
 
@@ -93,10 +92,10 @@ const WAYS = [
 ];
 
 const WHY = [
-  { title: ['One API,', '17+ markets'], to: '/payment-processing' },
-  { title: ['99.9% uptime'], to: '/payment-processing' },
-  { title: ['Mobile-', 'money-first'], to: '/payment-processing' },
-  { title: ['Payouts you', 'can rely on'], to: '/payment-processing' },
+  { title: ['One API,', '17+ markets'], to: '/payment-processing', action: 'See coverage & rails' },
+  { title: ['99.9% uptime', 'reliability'], to: '/payment-processing', action: 'See reliability & SLA' },
+  { title: ['Mobile money', 'first design'], to: '/payment-processing', action: 'See mobile money rails' },
+  { title: ['Payouts you', 'can rely on'], to: '/payment-processing', action: 'See payout options' },
 ];
 
 const INDUSTRIES = [
@@ -157,9 +156,9 @@ export const HomePage: React.FC = () => {
         {/* Softly blurred background image with balanced ambient dark overlay */}
         <div className="absolute inset-0 z-0 overflow-hidden bg-[#0B132B]">
           <picture>
-            <source srcSet={heroBgWebp} type="image/webp" />
+            <source srcSet="/hero-bg.webp" type="image/webp" />
             <img
-              src={heroBgJpg}
+              src="/hero-bg.jpg"
               alt="AvadaPay Hero Background"
               loading="eager"
               decoding="async"
@@ -185,7 +184,7 @@ export const HomePage: React.FC = () => {
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.65, delay: 0.2, ease: easeOutQuint }}
-            className="mt-8 sm:mt-12 flex flex-wrap items-center justify-center gap-6 sm:gap-12 text-sm sm:text-base font-semibold text-white/95"
+            className="mt-8 sm:mt-10 flex flex-wrap items-center justify-center gap-6 sm:gap-12 text-sm sm:text-base font-semibold text-white/95"
           >
             <div className="flex items-center space-x-2">
               <span className="w-2 h-2 rounded-full bg-[#3BBA93]" />
@@ -199,6 +198,32 @@ export const HomePage: React.FC = () => {
               <span className="w-2 h-2 rounded-full bg-[#3BBA93]" />
               <span>Mobile money + card + POS</span>
             </div>
+          </motion.div>
+
+          {/* Hero CTAs */}
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.65, delay: 0.3, ease: easeOutQuint }}
+            className="mt-8 sm:mt-10 flex flex-wrap items-center justify-center gap-4"
+          >
+            <Button
+              asChild
+              className="h-12 px-7 rounded-xl bg-[#3BBA93] hover:bg-[#32a481] text-white font-extrabold text-sm sm:text-base shadow-lg shadow-[#3BBA93]/30"
+            >
+              <Link to="/contact">
+                Talk to Sales
+              </Link>
+            </Button>
+            <Button
+              asChild
+              variant="outline"
+              className="h-12 px-7 rounded-xl border border-white/30 bg-white/10 hover:bg-white/20 text-white font-bold text-sm sm:text-base backdrop-blur-sm"
+            >
+              <Link to="/docs">
+                Explore API Docs
+              </Link>
+            </Button>
           </motion.div>
         </div>
 
@@ -324,7 +349,7 @@ export const HomePage: React.FC = () => {
                       ))}
                     </h3>
                     <div className="mt-6 flex items-center justify-between">
-                      <span className="text-xs font-bold text-[#3BBA93] group-hover:underline">Explore solution</span>
+                      <span className="text-xs font-bold text-[#3BBA93] group-hover:underline">{w.action}</span>
                       <span className="w-10 h-10 rounded-full bg-[#3BBA93] text-white flex items-center justify-center transition-transform duration-200 group-hover:translate-x-1 shadow-sm">
                         <ArrowRight className="w-5 h-5" strokeWidth={2.5} />
                       </span>
@@ -474,14 +499,14 @@ export const HomePage: React.FC = () => {
         </FadeIn>
         <div className="mt-8 space-y-4">
           <Marquee animation="animate-marquee-slow">
-            {[...ROW_ONE, ...ROW_ONE].map((logo, i) => (
+            {ROW_ONE.map((logo, i) => (
               <div key={i} className="px-8 sm:px-12 h-12 flex items-center">
                 {logo}
               </div>
             ))}
           </Marquee>
           <Marquee animation="animate-marquee-reverse">
-            {[...ROW_TWO, ...ROW_TWO].map((logo, i) => (
+            {ROW_TWO.map((logo, i) => (
               <div key={i} className="px-8 sm:px-12 h-12 flex items-center">
                 {logo}
               </div>

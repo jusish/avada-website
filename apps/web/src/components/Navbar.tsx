@@ -111,6 +111,9 @@ export const Navbar: React.FC = () => {
           <div className="relative" ref={dropdownRef}>
             <button
               type="button"
+              aria-haspopup="true"
+              aria-expanded={countryDropdownOpen}
+              aria-label="Select Country Market"
               onClick={() => setCountryDropdownOpen(!countryDropdownOpen)}
               className={`flex items-center space-x-2 text-[13px] font-bold transition-colors px-2.5 py-1.5 rounded-lg ${
                 onLight
@@ -191,14 +194,15 @@ export const Navbar: React.FC = () => {
 
         {/* Right: Primary "Contact Us" Button */}
         <div className="hidden lg:flex items-center">
-          <Link to="/contact">
-            <Button
-              size="sm"
-              className="bg-[#3BBA93] hover:bg-[#32a481] text-white font-bold rounded-md px-7 h-11 text-base transition-transform active:scale-95"
-            >
+          <Button
+            asChild
+            size="sm"
+            className="bg-[#3BBA93] hover:bg-[#32a481] text-white font-bold rounded-md px-7 h-11 text-base transition-transform active:scale-95"
+          >
+            <Link to="/contact">
               Contact Us
-            </Button>
-          </Link>
+            </Link>
+          </Button>
         </div>
 
         {/* Mobile menu button */}
@@ -207,8 +211,9 @@ export const Navbar: React.FC = () => {
             variant="ghost"
             size="icon"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className={onLight ? 'text-[#2A292D] hover:bg-black/5' : 'text-white hover:bg-white/10'}
+            className={`min-w-[44px] min-h-[44px] ${onLight ? 'text-[#2A292D] hover:bg-black/5' : 'text-white hover:bg-white/10'}`}
             aria-label="Toggle Menu"
+            aria-expanded={mobileMenuOpen}
           >
             {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
           </Button>
@@ -290,11 +295,11 @@ export const Navbar: React.FC = () => {
           </div>
 
           <div className="pt-4 border-t border-white/10">
-            <Link to="/contact" onClick={() => setMobileMenuOpen(false)}>
-              <Button className="w-full bg-[#3BBA93] hover:bg-[#32a481] text-white font-semibold h-10 text-sm">
+            <Button asChild className="w-full bg-[#3BBA93] hover:bg-[#32a481] text-white font-semibold h-11 text-sm">
+              <Link to="/contact" onClick={() => setMobileMenuOpen(false)}>
                 Contact Us
-              </Button>
-            </Link>
+              </Link>
+            </Button>
           </div>
         </div>
       )}

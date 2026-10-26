@@ -220,10 +220,23 @@ On every Pull Request and direct push to `main`, the workflow executes:
 - **Type Check:** `pnpm type-check`
 - **Build Check:** `pnpm build`
 
-### 2. GHCR Container Build (Pushes to `main` Only)
-Strictly upon direct push to `main` after checks pass, Docker Buildx builds and tags the multi-stage images and publishes them to **GitHub Container Registry (GHCR)**:
-- `ghcr.io/jusish/avada-website/api:latest` and `:sha`
-- `ghcr.io/jusish/avada-website/web:latest` and `:sha`
+### 2. GHCR Container Build & Multi-Environment Deployments
+The repository manages two isolated environments hosted on the same infrastructure:
+
+| Environment | Branch | Target Domain | Compose Config | VPS Directory | Image Tag |
+|---|---|---|---|---|---|
+| **Production** | `main` | `avadapay.com`, `www.avadapay.com` | `docker-compose.yml` | `~/avada-website` | `latest` / `sha` |
+| **UAT (Staging)** | `uat` | `uat.avadapay.rw` | `docker-compose.uat.yml` | `~/avada-website-uat` | `uat` / `sha` |
+
+- **UAT Workflow (`.github/workflows/uat.yml`)**: Triggered on push to `uat`. Builds images tagged with `:uat`, deploys to `~/avada-website-uat` with isolated database `avada_uat_db` and volume `avada_uat_pgdata`, and configures Let's Encrypt for `uat.avadapay.rw`.
+- **Production Workflow (`.github/workflows/ci.yml`)**: Triggered on push to `main`. Deploys the official production environment to `avadapay.com`.
+
+#### Promotion Workflow
+1. Develop features and audit resolutions on `uat` branch.
+2. Push to `uat` to trigger automated build and deployment to `https://uat.avadapay.rw`.
+3. Team reviews and signs off on the live UAT release.
+4. Open a Pull Request from `uat` into `main`.
+5. Merging into `main` automatically deploys to `https://avadapay.com`.
 
 ---
 

@@ -234,16 +234,16 @@ export const TanzaniaPage: React.FC = () => {
                 : 'Connect to every major Tanzanian mobile money network through one integration. Collect payments faster, send payouts, and keep customers updated without managing four different providers.'}
             </p>
             <div className="mt-8 flex flex-wrap gap-4">
-              <Link to="/contact?country=Tanzania">
-                <Button className="h-[3.1rem] px-7 rounded-md bg-[#3BBA93] hover:bg-[#32a481] text-white text-base font-bold shadow-none">
+              <Button asChild className="h-[3.1rem] px-7 rounded-md bg-[#3BBA93] hover:bg-[#32a481] text-white text-base font-bold shadow-none">
+                <Link to="/contact?country=Tanzania">
                   {language === 'sw' ? 'Wasiliana Nasi' : 'Contact Us'}
-                </Button>
-              </Link>
-              <Link to="/contact?country=Tanzania&inquiry=pricing">
-                <Button className="h-[3.1rem] px-7 rounded-md bg-transparent border border-[#3BBA93] text-[#3BBA93] hover:bg-[#3BBA93]/10 text-base font-bold shadow-none">
-                  {language === 'sw' ? 'Bei za Tanzania' : 'View Tanzania Pricing'}
-                </Button>
-              </Link>
+                </Link>
+              </Button>
+              <Button asChild className="h-[3.1rem] px-7 rounded-md bg-transparent border border-[#3BBA93] text-[#3BBA93] hover:bg-[#3BBA93]/10 text-base font-bold shadow-none">
+                <Link to="/contact?country=Tanzania&inquiry=pricing">
+                  {language === 'sw' ? 'Bei za Tanzania' : 'Get Tanzania Pricing'}
+                </Link>
+              </Button>
             </div>
           </div>
 
@@ -541,12 +541,12 @@ export const TanzaniaPage: React.FC = () => {
               Dar es Salaam, Tanzania, full address to confirm.
             </p>
             <div className="mt-4">
-              <Link to="/contact?country=Tanzania&inquiry=meeting">
-                <Button className="h-11 px-6 bg-[#3BBA93] hover:bg-[#32a481] text-white font-bold rounded-lg flex items-center space-x-2">
+              <Button asChild className="h-11 px-6 bg-[#3BBA93] hover:bg-[#32a481] text-white font-bold rounded-lg flex items-center space-x-2">
+                <Link to="/contact?country=Tanzania&inquiry=meeting">
                   <span>{language === 'sw' ? 'Panga mkutano' : 'Book a meeting'}</span>
-                  <ArrowRight className="w-4 h-4" />
-                </Button>
-              </Link>
+                  <ArrowRight className="w-4 h-4 ml-1" />
+                </Link>
+              </Button>
             </div>
           </div>
         </div>

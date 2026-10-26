@@ -96,6 +96,16 @@ const PUBLIC_ROUTES = [
       'Join Avadapay. Discover open career opportunities in fintech, payments, engineering, sales, and executive leadership across Rwanda, Kenya, Tanzania, DRC, and Dubai.',
   },
   {
+    path: 'docs',
+    canonical: 'https://avadapay.com/docs',
+    title: 'API Documentation & Developer Sandbox | AvadaPay',
+    description:
+      'Explore AvadaPay developer APIs for collections, mobile money STK push, payouts, and transactional SMS across 17+ African markets.',
+    ogTitle: 'API Documentation & Developer Sandbox | AvadaPay',
+    ogDescription:
+      'Explore AvadaPay developer APIs for collections, mobile money STK push, payouts, and transactional SMS across 17+ African markets.',
+  },
+  {
     path: 'terms',
     canonical: 'https://avadapay.com/terms',
     title: 'Terms of Service | Avadapay',

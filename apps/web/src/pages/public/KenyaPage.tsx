@@ -124,7 +124,7 @@ const KenyaHeroVisual: React.FC = () => (
 
     <div className="pt-3 border-t border-white/10 flex items-center justify-between text-[11px] text-gray-400">
       <span>Nairobi Switch Status</span>
-      <span className="text-[#3BBA93] font-mono font-bold">99.99% Uptime</span>
+      <span className="text-[#3BBA93] font-mono font-bold">99.9% Uptime</span>
     </div>
   </div>
 );
@@ -229,16 +229,16 @@ export const KenyaPage: React.FC = () => {
               Reach your customers by SMS. All from one platform, with a local office in Nairobi.
             </p>
             <div className="mt-8 flex flex-wrap gap-4">
-              <Link to="/contact?country=Kenya">
-                <Button className="h-[3.1rem] px-7 rounded-md bg-[#3BBA93] hover:bg-[#32a481] text-white text-base font-bold shadow-none">
+              <Button asChild className="h-[3.1rem] px-7 rounded-md bg-[#3BBA93] hover:bg-[#32a481] text-white text-base font-bold shadow-none">
+                <Link to="/contact?country=Kenya">
                   Contact Us
-                </Button>
-              </Link>
-              <Link to="/contact?country=Kenya&inquiry=pricing">
-                <Button className="h-[3.1rem] px-7 rounded-md bg-transparent border border-[#3BBA93] text-[#3BBA93] hover:bg-[#3BBA93]/10 text-base font-bold shadow-none">
-                  View Kenya Pricing
-                </Button>
-              </Link>
+                </Link>
+              </Button>
+              <Button asChild className="h-[3.1rem] px-7 rounded-md bg-transparent border border-[#3BBA93] text-[#3BBA93] hover:bg-[#3BBA93]/10 text-base font-bold shadow-none">
+                <Link to="/contact?country=Kenya&inquiry=pricing">
+                  Get Kenya Pricing
+                </Link>
+              </Button>
             </div>
           </div>
 
@@ -496,12 +496,12 @@ export const KenyaPage: React.FC = () => {
               8th Floor, Westpark Towers, Westlands, Nairobi.
             </p>
             <div className="mt-4">
-              <Link to="/contact?country=Kenya&inquiry=meeting">
-                <Button className="h-11 px-6 bg-[#3BBA93] hover:bg-[#32a481] text-white font-bold rounded-lg flex items-center space-x-2">
+              <Button asChild className="h-11 px-6 bg-[#3BBA93] hover:bg-[#32a481] text-white font-bold rounded-lg flex items-center space-x-2">
+                <Link to="/contact?country=Kenya&inquiry=meeting">
                   <span>Book a meeting</span>
-                  <ArrowRight className="w-4 h-4" />
-                </Button>
-              </Link>
+                  <ArrowRight className="w-4 h-4 ml-1" />
+                </Link>
+              </Button>
             </div>
           </div>
         </div>
