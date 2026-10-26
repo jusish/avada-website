@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [1.16.0] - 2026-10-26
 
+### Added
+- **Google Analytics 4 Integration (gtag.js)**: Integrated official Google tag (`G-4LG1537EN5`) into `<head>` across all pages while preserving full internal Google Search Console site ownership verification (`<meta name="google-site-verification">`). Verified route shell propagation so live analytics tracking runs seamlessly across all public marketing and solution pages.
+
 ### Fixed
 - **Pre-Rendered Route Shells & Canonical Collision Resolution**: Resolved the Google Search Console indexing exclusion ("Alternate page with proper canonical tag") where 8 primary solution, market, and compliance pages (`/payment-processing`, `/pos`, `/bulk-sms`, `/rwanda`, `/kenya`, `/tanzania`, `/contact`, `/terms`, `/privacy`, `/cookies`) were mistakenly excluded because SPA Nginx fallback served a root `index.html` hardcoded with `<link rel="canonical" href="https://avadapay.com/" />`. Created `apps/web/scripts/generate-route-shells.mjs` to automatically pre-render individual static HTML route shells (`<route>.html` and `<route>/index.html`) with accurate per-page canonical tags, titles, descriptions, and Open Graph metadata directly in the raw HTML response.
 - **Nginx Static Route Prioritization**: Updated `docker/nginx.conf` `try_files` directive to `try_files $uri $uri.html $uri/index.html $uri/ /index.html;`, ensuring crawlers and visitors receive exact route-specific static HTML with HTTP 200 without triggering unwanted trailing-slash 301 redirects ("Page with redirect").
