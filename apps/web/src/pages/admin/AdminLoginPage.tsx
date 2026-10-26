@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/components/ui/card';
-import { Sparkles, Shield, Lock, Mail, AlertCircle, Loader2, Clock } from 'lucide-react';
+import { Sparkles, Shield, Lock, Mail, AlertCircle, Loader2, Clock, Eye, EyeOff } from 'lucide-react';
 
 export const AdminLoginPage: React.FC = () => {
   useAdminTitle('Administrator Sign In');
@@ -20,6 +20,7 @@ export const AdminLoginPage: React.FC = () => {
   const isDev = import.meta.env.DEV;
   const [email, setEmail] = useState(isDev ? 'admin@avada.com' : '');
   const [password, setPassword] = useState(isDev ? 'admin123' : '');
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [sessionNotice, setSessionNotice] = useState<string | null>(() => {
     const state = location.state as { message?: string } | null;
@@ -145,13 +146,21 @@ export const AdminLoginPage: React.FC = () => {
                   <Lock className="w-4 h-4 text-white/40 absolute left-3 top-2.5" />
                   <Input
                     id="admin-password"
-                    type="password"
+                    type={showPassword ? 'text' : 'password'}
                     placeholder="••••••••"
-                    className="pl-9 text-sm bg-white/5 border-white/10 text-white placeholder:text-white/30 focus-visible:ring-[#3BBA93] focus-visible:border-[#3BBA93]"
+                    className="pl-9 pr-10 text-sm bg-white/5 border-white/10 text-white placeholder:text-white/30 focus-visible:ring-[#3BBA93] focus-visible:border-[#3BBA93]"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     required
                   />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-2.5 text-white/40 hover:text-white transition-colors"
+                    aria-label={showPassword ? 'Hide password' : 'Show password'}
+                  >
+                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </button>
                 </div>
               </div>
 
