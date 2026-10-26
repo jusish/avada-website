@@ -14,6 +14,7 @@ const ALL_MODULES = [
   'roles',
   'users',
   'audit_logs',
+  'integrations',
 ] as const;
 
 async function main() {
@@ -467,44 +468,38 @@ You can modify your browser settings to decline non-essential cookies. Disabling
   }
   console.log('✅ Seeded Showcase Content Articles');
 
-  // 8. Seed Sample Inquiries for CRM Demo
-  const sampleInquiries = [
-    {
-      fullName: 'Jean-Paul Habimana',
-      email: 'jp.habimana@kigaliretail.rw',
-      phone: '+250 788 334 112',
-      orgName: 'Kigali Supermarkets Ltd',
-      roleTitle: 'Operations Director',
-      country: 'Rwanda',
-      inquiryType: 'pos',
-      message: 'We are expanding to 12 new retail branches in Kigali and Rubavu. We need smart Android POS terminals with MTN and Airtel MoMo support and automated daily settlement.',
-      status: 'UNREAD' as const,
+  // 8. Seed Core Integrations (PeopleForce Careers API)
+  await prisma.integration.upsert({
+    where: { key: 'peopleforce' },
+    update: {
+      name: 'PeopleForce Careers',
+      category: 'HR & Recruitment',
+      description: 'Synchronizes open vacancies and candidate job applications directly with PeopleForce ATS.',
+      enabled: true,
+      config: {
+        apiKey: 'fwCdMmY5gC1yz7xpkVGuDZQWQPJPjYtdS5iDkjHy7dz8TysrSx9w',
+        baseUrl: 'https://app.peopleforce.io/api/careers/v1',
+        autoSync: true,
+        syncIntervalMinutes: 60,
+      },
+      status: 'HEALTHY',
     },
-    {
-      fullName: 'Faith Mwangi',
-      email: 'fmwangi@nairobiexpress.co.ke',
-      phone: '+254 712 554 990',
-      orgName: 'Nairobi Express Logistics',
-      roleTitle: 'Chief Technology Officer',
-      country: 'Kenya',
-      inquiryType: 'sms',
-      message: 'Looking for high-volume transactional Bulk SMS rates for dispatching delivery alerts. Expected volume is 250,000 SMS per month with custom Sender ID.',
-      status: 'CONTACTED' as const,
-      handledById: adminUser.id,
-      handledAt: new Date(),
-      adminNotes: 'Spoke with Faith. Sent proposal for tiered SMS pricing at KES 0.32/SMS. Follow up on Monday.',
+    create: {
+      key: 'peopleforce',
+      name: 'PeopleForce Careers',
+      category: 'HR & Recruitment',
+      description: 'Synchronizes open vacancies and candidate job applications directly with PeopleForce ATS.',
+      enabled: true,
+      config: {
+        apiKey: 'fwCdMmY5gC1yz7xpkVGuDZQWQPJPjYtdS5iDkjHy7dz8TysrSx9w',
+        baseUrl: 'https://app.peopleforce.io/api/careers/v1',
+        autoSync: true,
+        syncIntervalMinutes: 60,
+      },
+      status: 'HEALTHY',
     },
-  ];
-
-  for (const inq of sampleInquiries) {
-    const existing = await prisma.contactInquiry.findFirst({
-      where: { email: inq.email },
-    });
-    if (!existing) {
-      await prisma.contactInquiry.create({ data: inq });
-    }
-  }
-  console.log('✅ Seeded Sample Inquiries');
+  });
+  console.log('✅ Seeded PeopleForce Careers API Integration');
 
   console.log('🎉 Enterprise CMS Database Seeding Completed Successfully!');
 }

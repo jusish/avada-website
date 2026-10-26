@@ -34,6 +34,7 @@ This document is the **single source of truth** for every feature implemented in
 26. [FEAT-026: Google Search Favicon Normalization & POS Service Schema Compliance](#feat-026-google-search-favicon-normalization--pos-service-schema-compliance)
 27. [FEAT-027: Sitelinks Hierarchy Optimization, Semantic Heading Anchoring & Legal Exclusion](#feat-027-sitelinks-hierarchy-optimization-semantic-heading-anchoring--legal-exclusion)
 28. [FEAT-028: Pre-Rendered Route Shell Pipeline & Canonical Collision Resolution](#feat-028-pre-rendered-route-shell-pipeline--canonical-collision-resolution)
+29. [FEAT-029: Extensible Integration Engine, PeopleForce Careers ATS Integration & Integration Telemetry Logging](#feat-029-extensible-integration-engine-peopleforce-careers-ats-integration--integration-telemetry-logging)
 
 ---
 
@@ -692,6 +693,143 @@ This document is the **single source of truth** for every feature implemented in
   - **Route Shell Generator (`generate-route-shells.mjs`)**: Post-build script that parses compiled `dist/index.html` and creates both `<route>.html` and `<route>/index.html` with route-specific `<link rel="canonical">`, `<title>`, `<meta name="description">`, Open Graph, and Twitter metadata, plus `noindex` directives for legal utility routes.
   - **Nginx Try-Files Priority**: Adjusted Nginx fallback to `try_files $uri $uri.html $uri/index.html $uri/ /index.html;`, serving route shells directly with HTTP 200 without triggering trailing-slash redirects.
   - **Build Command Binding**: Bound `node scripts/generate-route-shells.mjs` directly into `apps/web/package.json` `build` script.
+
+---
+
+## FEAT-029: Extensible Integration Engine, PeopleForce Careers ATS Integration & Integration Telemetry Logging
+- **ID**: `FEAT-029`
+- **Status**: Completed
+- **Created**: 2026-10-26
+- **Description**: Implemented an enterprise-grade Extensible Integrations Framework in the CMS Admin Portal, integrated the PeopleForce Careers API (`v1`) with full request/response telemetry logging (`IntegrationLog`), database persistence, live connection health testing, automatic and manual vacancy synchronization, and built a dedicated public Careers portal (`/careers`) with rich multi-facet search, country flags, and direct ATS application flow.
+- **Files Involved**:
+  - [`apps/api/prisma/schema.prisma`](../../apps/api/prisma/schema.prisma)
+  - [`apps/api/prisma/seed.ts`](../../apps/api/prisma/seed.ts)
+  - [`packages/shared/src/index.ts`](../../packages/shared/src/index.ts)
+  - [`apps/api/src/services/integration-logger.ts`](../../apps/api/src/services/integration-logger.ts)
+  - [`apps/api/src/services/peopleforce.service.ts`](../../apps/api/src/services/peopleforce.service.ts)
+  - [`apps/api/src/routes/integrations.routes.ts`](../../apps/api/src/routes/integrations.routes.ts)
+  - [`apps/api/src/routes/careers.routes.ts`](../../apps/api/src/routes/careers.routes.ts)
+  - [`apps/api/src/middleware/auth.ts`](../../apps/api/src/middleware/auth.ts)
+  - [`apps/api/src/server.ts`](../../apps/api/src/server.ts)
+  - [`apps/web/src/pages/admin/AdminIntegrationsPage.tsx`](../../apps/web/src/pages/admin/AdminIntegrationsPage.tsx)
+  - [`apps/web/src/components/admin/IntegrationLogModal.tsx`](../../apps/web/src/components/admin/IntegrationLogModal.tsx)
+  - [`apps/web/src/components/AdminSidebar.tsx`](../../apps/web/src/components/AdminSidebar.tsx)
+  - [`apps/web/src/pages/admin/AdminRolesPage.tsx`](../../apps/web/src/pages/admin/AdminRolesPage.tsx)
+  - [`apps/web/src/pages/admin/AdminSettingsPage.tsx`](../../apps/web/src/pages/admin/AdminSettingsPage.tsx)
+  - [`apps/web/src/pages/public/CareersPage.tsx`](../../apps/web/src/pages/public/CareersPage.tsx)
+  - [`apps/web/src/components/Footer.tsx`](../../apps/web/src/components/Footer.tsx)
+  - [`apps/web/src/App.tsx`](../../apps/web/src/App.tsx)
+  - [`apps/web/scripts/generate-route-shells.mjs`](../../apps/web/scripts/generate-route-shells.mjs)
+  - [`apps/web/public/sitemap.xml`](../../apps/web/public/sitemap.xml)
+- **Rationale**:
+  - AvadaPay operates across multiple African jurisdictions and needed a mechanism to attract top talent by displaying live open vacancies from PeopleForce ATS.
+  - Hardcoding PeopleForce directly into a static page would not allow administrators to monitor health, rotate API keys, or inspect logs.
+  - To support future third-party integrations (e.g. Mailgun transactional email, Slack alerts, HubSpot CRM), a generalized Integrations Architecture was established.
+- **Implementation Details**:
+  - **Database Models (`schema.prisma`)**:
+    - `Integration`: Tracks integration key, credentials (API key, base URL), status (`HEALTHY`, `DEGRADED`, `DISCONNECTED`, `ERROR`), roundtrip latency in ms, and sync timestamps.
+    - `IntegrationLog`: Immutable log of every outgoing HTTP request across integrations, storing method, URL, sanitized headers (masking sensitive tokens), request payload, response status code, response body, latency duration in ms, and error details.
+    - `JobVacancy`: Local cache of synchronized vacancies from PeopleForce (`title`, `description`, `department`, `location`, `countryCode`, `employmentType`, `applyUrl`, `active`, `featured`).
+  - **CMS Integrations Hub (`/admin/integrations`)**:
+    - Multi-card overview showing active integrations (PeopleForce) and modular future slots.
+    - PeopleForce Management Studio with 3 dedicated tabs: Health & Sync (with live "Test Connection" and "Sync Vacancies Now" triggers), Configuration (API key with show/hide toggle and database persistence), and Integration Logs.
+    - Integration Log Modal: Full inspector displaying sanitized request headers, request parameters, response status, and formatted JSON response with copy action.
+  - **Public Careers Page (`/careers`)**:
+    - High-contrast fintech aesthetic matching `#3BBA93` and `#2A292D`.
+    - Real-time search keyword bar, country filter with vector country flags (Rwanda, Kenya, Tanzania, DRC, UAE, Remote), department filter, and employment type filter.
+    - Vacancy cards with role badges and location flags.
+    - Comprehensive vacancy detail modal with job overview, responsibilities, requirements, benefits, link sharing, and direct "Apply on PeopleForce" button.
+    - "Why Build at AvadaPay" value props and culture section.
+  - **SEO & Navigation**:
+    - Added "Careers" with "Hiring" badge to the global Footer under Useful Links.
+    - Pre-rendered route shells generated for `/careers` and added to `sitemap.xml`.
+
+---
+
+## FEAT-030: CMS Session Expiration, Proactive Token Validation & Auto-Logout Interceptor
+- **ID**: `FEAT-030`
+- **Status**: Completed
+- **Created**: 2026-10-26
+- **Description**: Resolved a critical UX issue where administrators opening the CMS with an expired or invalidated token remained in a "zombie" logged-in state on the frontend while all backend API calls failed with silent 401 Unauthorized errors. Implemented client-side proactive JWT expiration parsing, global 401 HTTP fetch interception, server profile verification (`GET /api/auth/me`), automatic storage purging, friendly session expiration alert banners, and seamless return redirection on `AdminLoginPage`.
+- **Files Involved**:
+  - [`apps/web/src/lib/jwt.ts`](../../apps/web/src/lib/jwt.ts)
+  - [`apps/web/src/lib/auth-interceptor.ts`](../../apps/web/src/lib/auth-interceptor.ts)
+  - [`apps/web/src/context/AuthContext.tsx`](../../apps/web/src/context/AuthContext.tsx)
+  - [`apps/web/src/pages/admin/AdminLoginPage.tsx`](../../apps/web/src/pages/admin/AdminLoginPage.tsx)
+  - [`apps/web/src/components/AdminSidebar.tsx`](../../apps/web/src/components/AdminSidebar.tsx)
+  - [`docs/changelog/CHANGELOG.md`](../../docs/changelog/CHANGELOG.md)
+  - [`docs/changelog/features-storage.md`](../../docs/changelog/features-storage.md)
+- **Rationale**:
+  - Previously, `AuthContext` restored `avada_auth_token` and `avada_auth_user` directly from `localStorage` without inspecting the token's expiration timestamp or verifying it against the server.
+  - When the token expired, `AdminProtectedLayout` evaluated `if (!token)` which was falsely true, allowing the user to access protected routes (`/admin/dashboard`, `/admin/integrations`, etc.).
+  - Concurrent API calls immediately received HTTP 401 (`Invalid or expired token`), resulting in empty tables, zeroed metrics, and non-functional action buttons without informing the user why.
+- **Implementation Details**:
+  - **Proactive JWT Expiration Utility (`jwt.ts`)**: Built a zero-dependency JWT decoder handling URL-safe base64 decoding with padding and Unicode support. Calculates remaining lifetime and flags expired tokens with a safety buffer.
+  - **Global Fetch 401 Interceptor (`auth-interceptor.ts`)**: Patched `window.fetch` to catch 401 responses on all authenticated `/api/*` requests (excluding `/api/auth/login` to preserve wrong-password validation errors). Emits a decoupled custom event `avada:auth:expired` and stores flash notice state in `sessionStorage`.
+  - **Auth Context Lifecycle (`AuthContext.tsx`)**:
+    - Purges expired tokens synchronously on initial boot before child layout renders.
+    - Asynchronously verifies unexpired credentials against `GET /api/auth/me` on startup.
+    - Synchronizes updated user permissions and roles.
+    - Listens to `avada:auth:expired` to instantly nullify auth state and purge local storage.
+    - Runs a periodic 30-second interval monitor to detect expiration during long idle sessions.
+  - **Admin Login Notice & Return Route (`AdminLoginPage.tsx`)**:
+    - Displays an amber session-expired alert banner (`Clock` icon) explaining why the user was logged out.
+    - Restores the administrator directly to their intended destination (`state.from.pathname`) upon successful re-authentication.
+  - **Sidebar Clean Sign Out (`AdminSidebar.tsx`)**:
+    - Replaced raw `localStorage` calls with reactive `token` from `useAuth()`.
+    - Updated "Sign Out" button to provide explicit sign-out flash notices.
+
+---
+
+## FEAT-031: Careers Position Deep-Linking & Production Inquiry Seed Sanitization
+- **ID**: `FEAT-031`
+- **Status**: Completed
+- **Created**: 2026-10-26
+- **Description**: Enabled rich deep-linking for job vacancies across hash (`#<id>`), query string (`?job=<id>`), and direct route paths (`/careers/:jobId`) so shared position URLs open the detail modal directly. Connected via SSH to production VPS (`167.86.93.195`), deleted mock sample inquiries from PostgreSQL, and stripped dummy inquiry generation from `apps/api/prisma/seed.ts`.
+- **Files Involved**:
+  - [`apps/api/prisma/seed.ts`](../../apps/api/prisma/seed.ts)
+  - [`apps/web/src/App.tsx`](../../apps/web/src/App.tsx)
+  - [`apps/web/src/pages/public/CareersPage.tsx`](../../apps/web/src/pages/public/CareersPage.tsx)
+  - [`docs/changelog/CHANGELOG.md`](../../docs/changelog/CHANGELOG.md)
+  - [`docs/changelog/features-storage.md`](../../docs/changelog/features-storage.md)
+- **Rationale**:
+  - Sharing career links (e.g. `http://localhost:5173/careers#97294`) previously only landed the user on the general listing without mounting the specific position, requiring visitors to manually find the role.
+  - The seed script previously populated fake mock inquiries for Rwanda ("Jean-Paul Habimana") and Kenya ("Faith Mwangi") in `contact_inquiries`. On production, these showed up in the CMS Inbox as real customer leads, creating confusion with regional management.
+- **Implementation Details**:
+  - **Direct Production DB Cleanup**: Executed SQL commands over SSH inside Docker container `avada-postgres` on `167.86.93.195`, permanently deleting the 2 mock inquiries while preserving all 6 real prospective merchant leads.
+  - **Seed File Sanitization (`seed.ts`)**: Removed the `sampleInquiries` generation loop completely. Seeding now strictly initializes necessary baseline metadata (roles, system admin user, countries, inquiry categories, site settings, legal compliance documents, PeopleForce integration config).
+  - **Multi-Format Career Deep-Linking (`CareersPage.tsx`)**:
+    - Supports URL hashes (`#<id>`), query parameters (`?job=<id>`), and route parameters (`/careers/:jobId`).
+    - Synchronizes `window.history.pushState` on modal open and `replaceState` on modal close so browser address bar reflects the current role.
+    - Connects `popstate` and `hashchange` browser events so native Back/Forward buttons close or re-open modals smoothly.
+    - Fallback single-vacancy API query (`/api/public/careers/vacancies/:id`) automatically loads the vacancy if not present in the pre-filtered array.
+
+---
+
+## FEAT-032: Legal Compliance Suite Modernization & Markdown Parser Overhaul
+- **ID**: `FEAT-032`
+- **Status**: Completed
+- **Created**: 2026-10-26
+- **Description**: Redesigned the Legal Compliance pages (`/terms`, `/privacy`, `/cookies`) in `LegalPolicyPage.tsx`. Built an AST line-by-line block and inline markdown parser that eliminates all unparsed raw asterisks (`*`, `**`), bolds only key terms with unbolded body copy, brings the hero section close to the top of the viewport, expands the layout to a balanced 2-column structure with sticky compliance navigation, in-page numbered clause table of contents, and replaces bubbly `rounded-3xl` containers with crisp `rounded-xl` document paper styling.
+- **Files Involved**:
+  - [`apps/web/src/pages/public/LegalPolicyPage.tsx`](../../apps/web/src/pages/public/LegalPolicyPage.tsx)
+  - [`docs/changelog/CHANGELOG.md`](../../docs/changelog/CHANGELOG.md)
+  - [`docs/changelog/features-storage.md`](../../docs/changelog/features-storage.md)
+- **Rationale**:
+  - Previously, `LegalPolicyPage.tsx` naively split text on `\n\n`, causing list items that immediately followed intro sentences to collapse into single run-on paragraphs filled with literal `* **` asterisks.
+  - Body text was styled with heavy `font-medium text-[#2A292D]/85` across the entire document, resulting in an aggressive, over-bolded look.
+  - The hero section pushed the document far down the viewport with excessive top padding (`pt-32 pb-16`), while `max-w-5xl -mt-6 rounded-3xl` produced a floating bubble card centered in a large void on desktop screens.
+- **Implementation Details**:
+  - **Block Markdown Parser**: Parses raw document strings into structured blocks (`h1`, `h3` with generated anchor IDs, bullet `list`, `divider`, `callout`, and `paragraph`).
+  - **Inline Formatter (`renderFormattedInline`)**: Resolves `**bold**` into `<strong className="font-semibold text-gray-900">`, resolves `*italic*`, converts email addresses into clickable `mailto:` links, and strips outer syntax asterisks.
+  - **Elevated Top Section**: Compact, refined dark header (`pt-8 pb-10`) right below the navigation bar, featuring breadcrumbs, document title (`text-2xl sm:text-4xl font-extrabold`), versioning, and effective date badge strip.
+  - **Balanced 2-Column Grid (`max-w-7xl`)**:
+    - Sticky left sidebar (280px): Compliance suite navigation pills, dynamic in-page Table of Contents with smooth section jumping, and contact desk card.
+    - Right document canvas (`rounded-xl border border-gray-200/80 shadow-2xs`): Crisp document toolbar with "Share Link" and "Print / Save PDF" buttons, comfortable body typography (`text-xs sm:text-[13px] text-gray-600 font-normal leading-relaxed`), and subtle emerald dot bullet indicators.
+
+
+
+
 
 
 

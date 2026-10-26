@@ -26,6 +26,13 @@ enum UserStatus {
   SUSPENDED
 }
 
+enum IntegrationStatus {
+  HEALTHY
+  DEGRADED
+  DISCONNECTED
+  ERROR
+}
+
 model Role {
   id          String   @id @default(uuid())
   name        String   @unique // e.g. "Super Admin", "Content Editor", "Customer Support"
@@ -185,4 +192,64 @@ model ContentItem {
   updatedAt DateTime      @updatedAt
 
   @@map("content_items")
+}
+
+model Integration {
+  id              String            @id @default(uuid())
+  key             String            @unique // e.g. "peopleforce"
+  name            String            // e.g. "PeopleForce Careers"
+  category        String            // e.g. "HR & Recruitment"
+  description     String?
+  enabled         Boolean           @default(true)
+  config          Json              // { apiKey, baseUrl, autoSync, syncIntervalMinutes }
+  status          IntegrationStatus @default(DISCONNECTED)
+  lastHealthCheck DateTime?
+  lastSyncAt      DateTime?
+  healthMessage   String?
+  latencyMs       Int?
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+  logs            IntegrationLog[]
+
+  @@map("integrations")
+}
+
+model IntegrationLog {
+  id              String       @id @default(uuid())
+  integrationKey  String       // e.g. "peopleforce"
+  integrationId   String?
+  integration     Integration? @relation(fields: [integrationId], references: [id], onDelete: Cascade)
+  method          String       // "GET", "POST", etc.
+  endpoint        String       // "/vacancies"
+  url             String       // Full URL
+  requestHeaders  Json?        // Masked headers
+  requestPayload  Json?        // Request body or query parameters
+  responseStatus  Int          // HTTP code (200, 401, 500, etc.)
+  responsePayload Json?        // Response data
+  durationMs      Int          // Response time in ms
+  status          String       // "SUCCESS" | "ERROR"
+  errorMessage    String?
+  createdAt       DateTime     @default(now())
+
+  @@index([integrationKey, createdAt])
+  @@map("integration_logs")
+}
+
+model JobVacancy {
+  id             String   @id // PeopleForce vacancy ID e.g. "245790"
+  title          String
+  description    String   @db.Text
+  department     String?
+  location       String?
+  countryCode    String?  // e.g. "ae", "rw", "cd", "ke", "tz", "remote"
+  employmentType String?
+  applyUrl       String
+  active         Boolean  @default(true)
+  featured       Boolean  @default(false)
+  rawPayload     Json?
+  syncedAt       DateTime @default(now())
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@map("job_vacancies")
 }

@@ -48,4 +48,10 @@
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
+  <url>
+    <loc>https://avadapay.com/careers</loc>
+    <lastmod>2026-10-26</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.85</priority>
+  </url>
 </urlset>

@@ -16,6 +16,8 @@ import rolesRoutes from './routes/roles.routes';
 import usersRoutes from './routes/users.routes';
 import analyticsRoutes from './routes/analytics.routes';
 import auditLogsRoutes from './routes/audit-logs.routes';
+import integrationsRoutes from './routes/integrations.routes';
+import careersRoutes from './routes/careers.routes';
 
 dotenv.config();
 
@@ -47,6 +49,8 @@ app.get('/api/health', (_req: Request, res: Response) => {
 
 // Public Website Endpoints
 app.use('/api/public', publicRoutes);
+app.use('/api/public/careers', careersRoutes);
+app.use('/api/careers', careersRoutes); // Convenience alias
 app.use('/api/contact', publicRoutes); // Alias for legacy/convenience
 app.use('/api/auth', authRoutes);
 
@@ -58,6 +62,7 @@ app.use('/api/admin/countries', countriesRoutes);
 app.use('/api/admin/inquiry-types', inquiryTypesRoutes);
 app.use('/api/admin/inquiries', inquiriesRoutes);
 app.use('/api/admin/settings', settingsRoutes);
+app.use('/api/admin/integrations', integrationsRoutes);
 app.use('/api/admin/policies', policiesRoutes);
 app.use('/api/admin/roles', rolesRoutes);
 app.use('/api/admin/users', usersRoutes);

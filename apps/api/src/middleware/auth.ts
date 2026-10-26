@@ -66,7 +66,14 @@ export const requireAuth = async (
       roles: { view: true, edit: true },
       users: { view: true, edit: true },
       audit_logs: { view: true, edit: true },
+      integrations: { view: true, edit: true },
     };
+
+    const rolePerms = (user.role?.permissions as unknown as Record<string, { view: boolean; edit: boolean }>) || {};
+    // If user's role hasn't defined 'integrations' yet, inherit from 'settings'
+    if (!rolePerms.integrations && rolePerms.settings) {
+      rolePerms.integrations = { ...rolePerms.settings };
+    }
 
     req.user = {
       id: user.id,
@@ -74,7 +81,7 @@ export const requireAuth = async (
       name: user.name,
       roleId: user.roleId || undefined,
       roleName: user.role?.name || 'Administrator',
-      permissions: (user.role?.permissions as unknown as PermissionMatrix) || defaultPermissions,
+      permissions: (rolePerms as unknown as PermissionMatrix) || defaultPermissions,
     };
 
     next();

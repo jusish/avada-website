@@ -86,6 +86,16 @@ const PUBLIC_ROUTES = [
       "Speak with Avadapay's financial infrastructure experts. Inquire about payment processing, POS terminals, bulk SMS rates, or custom API integrations.",
   },
   {
+    path: 'careers',
+    canonical: 'https://avadapay.com/careers',
+    title: 'Careers & Job Openings across Africa & Middle East | Avadapay',
+    description:
+      'Join Avadapay. Discover open career opportunities in fintech, payments, engineering, sales, and executive leadership across Rwanda, Kenya, Tanzania, DRC, and Dubai.',
+    ogTitle: 'Careers & Job Openings across Africa & Middle East | Avadapay',
+    ogDescription:
+      'Join Avadapay. Discover open career opportunities in fintech, payments, engineering, sales, and executive leadership across Rwanda, Kenya, Tanzania, DRC, and Dubai.',
+  },
+  {
     path: 'terms',
     canonical: 'https://avadapay.com/terms',
     title: 'Terms of Service | Avadapay',

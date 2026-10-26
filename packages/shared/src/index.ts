@@ -12,7 +12,8 @@ export type CmsModule =
   | 'settings'
   | 'roles'
   | 'users'
-  | 'audit_logs';
+  | 'audit_logs'
+  | 'integrations';
 
 export interface ModulePermission {
   view: boolean;
@@ -325,4 +326,83 @@ export interface ApiResponse<T = unknown> {
   message?: string;
   error?: string;
   details?: unknown;
+}
+
+// ==========================================
+// Integrations & PeopleForce Careers Engine
+// ==========================================
+
+export type IntegrationStatus = 'HEALTHY' | 'DEGRADED' | 'DISCONNECTED' | 'ERROR';
+
+export interface IntegrationConfig {
+  apiKey?: string;
+  baseUrl?: string;
+  autoSync?: boolean;
+  syncIntervalMinutes?: number;
+  [key: string]: unknown;
+}
+
+export interface Integration {
+  id: string;
+  key: string;
+  name: string;
+  category: string;
+  description?: string | null;
+  enabled: boolean;
+  config: IntegrationConfig;
+  status: IntegrationStatus;
+  lastHealthCheck?: string | null;
+  lastSyncAt?: string | null;
+  healthMessage?: string | null;
+  latencyMs?: number | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface IntegrationLog {
+  id: string;
+  integrationKey: string;
+  integrationId?: string | null;
+  method: string;
+  endpoint: string;
+  url: string;
+  requestHeaders?: Record<string, unknown> | null;
+  requestPayload?: unknown;
+  responseStatus: number;
+  responsePayload?: unknown;
+  durationMs: number;
+  status: 'SUCCESS' | 'ERROR';
+  errorMessage?: string | null;
+  createdAt: string;
+}
+
+export interface JobVacancy {
+  id: string;
+  title: string;
+  description: string;
+  department?: string | null;
+  location?: string | null;
+  countryCode?: string | null;
+  employmentType?: string | null;
+  applyUrl: string;
+  active: boolean;
+  featured: boolean;
+  syncedAt: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface VacancyFilters {
+  search?: string;
+  country?: string;
+  department?: string;
+  employmentType?: string;
+}
+
+export interface VacancyMetadata {
+  totalCount: number;
+  departments: string[];
+  locations: { name: string; countryCode?: string }[];
+  employmentTypes: string[];
+  lastSyncedAt?: string | null;
 }

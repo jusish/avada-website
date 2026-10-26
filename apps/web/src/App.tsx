@@ -16,6 +16,7 @@ import { BulkSmsPage } from '@/pages/public/BulkSmsPage';
 import { CountryPage } from '@/pages/public/CountryPage';
 import { ContactPage } from '@/pages/public/ContactPage';
 import { LegalPolicyPage } from '@/pages/public/LegalPolicyPage';
+import { CareersPage } from '@/pages/public/CareersPage';
 
 // Admin CMS & Operations Pages
 import { AdminLoginPage } from '@/pages/admin/AdminLoginPage';
@@ -31,6 +32,7 @@ import { AdminSettingsPage } from '@/pages/admin/AdminSettingsPage';
 import { AdminRolesPage } from '@/pages/admin/AdminRolesPage';
 import { AdminUsersPage } from '@/pages/admin/AdminUsersPage';
 import { AdminAuditLogsPage } from '@/pages/admin/AdminAuditLogsPage';
+import { AdminIntegrationsPage } from '@/pages/admin/AdminIntegrationsPage';
 
 // Public Layout
 const PublicLayout: React.FC = () => {
@@ -91,6 +93,8 @@ export const App: React.FC = () => {
             <Route path="/pos" element={<PosPage />} />
             <Route path="/bulk-sms" element={<BulkSmsPage />} />
             <Route path="/contact" element={<ContactPage />} />
+            <Route path="/careers" element={<CareersPage />} />
+            <Route path="/careers/:jobId" element={<CareersPage />} />
 
             {/* Official Legal & Compliance Pages */}
             <Route
@@ -197,6 +201,18 @@ export const App: React.FC = () => {
                 </AdminPermissionGuard>
               }
             />
+
+            {/* Integrations & External APIs */}
+            <Route
+              path="integrations"
+              element={
+                <AdminPermissionGuard module="integrations">
+                  <AdminIntegrationsPage />
+                </AdminPermissionGuard>
+              }
+            />
+            <Route path="integrations/logs" element={<Navigate to="/admin/integrations" replace />} />
+            <Route path="settings/integrations" element={<Navigate to="/admin/integrations" replace />} />
 
             {/* Backward compatibility aliases */}
             <Route path="content" element={<Navigate to="/admin/content/articles" replace />} />

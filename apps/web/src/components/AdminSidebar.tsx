@@ -12,6 +12,7 @@ import {
   FileText,
   Scale,
   Settings,
+  Cpu,
   ShieldAlert,
   Users,
   ScrollText,
@@ -35,16 +36,16 @@ interface NavGroup {
 }
 
 export const AdminSidebar: React.FC = () => {
-  const { user, logout, canView } = useAuth();
+  const { user, token, logout, canView } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
   const [unreadCount, setUnreadCount] = useState<number>(0);
 
   useEffect(() => {
+    if (!token) return;
+
     // Fetch unread inquiries count for badge
     const fetchUnread = () => {
-      const token = localStorage.getItem('avada_auth_token');
-      if (!token) return;
       fetch('/api/admin/inquiries/stats', {
         headers: { Authorization: `Bearer ${token}` },
       })
@@ -60,11 +61,11 @@ export const AdminSidebar: React.FC = () => {
     fetchUnread();
     const interval = setInterval(fetchUnread, 30000);
     return () => clearInterval(interval);
-  }, []);
+  }, [token]);
 
   const handleLogout = () => {
-    logout();
-    navigate('/admin/login');
+    logout('You have signed out of your CMS session.');
+    navigate('/admin/login', { replace: true });
   };
 
   const navGroups: NavGroup[] = [
@@ -140,6 +141,17 @@ export const AdminSidebar: React.FC = () => {
           path: '/admin/content/settings',
           icon: Settings,
           module: 'settings',
+        },
+      ],
+    },
+    {
+      group: 'Integrations & External APIs',
+      items: [
+        {
+          name: 'Connected Integrations',
+          path: '/admin/integrations',
+          icon: Cpu,
+          module: 'integrations',
         },
       ],
     },

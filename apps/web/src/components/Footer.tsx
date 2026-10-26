@@ -227,6 +227,7 @@ export const Footer: React.FC = () => {
             <li><Link to="/payment-processing" className="hover:text-[#3BBA93] transition-colors">Payment Processing</Link></li>
             <li><Link to="/pos" className="hover:text-[#3BBA93] transition-colors">POS</Link></li>
             <li><Link to="/bulk-sms" className="hover:text-[#3BBA93] transition-colors">Bulk SMS</Link></li>
+            <li><Link to="/careers" className="hover:text-[#3BBA93] transition-colors flex items-center gap-1.5"><span>Careers</span><span className="text-[10px] px-1.5 py-0.5 rounded-full bg-[#3BBA93]/20 text-[#3BBA93] font-bold">Hiring</span></Link></li>
           </ul>
         </div>
 

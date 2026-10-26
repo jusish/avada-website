@@ -1,15 +1,17 @@
 import React, { useState } from 'react';
-import { useNavigate, Link, Navigate } from 'react-router-dom';
+import { useNavigate, useLocation, Link, Navigate } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
+import { getAndClearSessionNotice } from '@/lib/auth-interceptor';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/components/ui/card';
-import { Sparkles, Shield, Lock, Mail, AlertCircle, Loader2 } from 'lucide-react';
+import { Sparkles, Shield, Lock, Mail, AlertCircle, Loader2, Clock } from 'lucide-react';
 
 export const AdminLoginPage: React.FC = () => {
   const { token, login, isLoading } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
 
   // In development, provide prefilled demo credentials for convenience.
   // In production, strictly leave blank and hide any helper credentials box.
@@ -17,6 +19,11 @@ export const AdminLoginPage: React.FC = () => {
   const [email, setEmail] = useState(isDev ? 'admin@avada.com' : '');
   const [password, setPassword] = useState(isDev ? 'admin123' : '');
   const [error, setError] = useState<string | null>(null);
+  const [sessionNotice, setSessionNotice] = useState<string | null>(() => {
+    const state = location.state as { message?: string } | null;
+    if (state?.message) return state.message;
+    return getAndClearSessionNotice();
+  });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // If already authenticated, redirect straight to dashboard
@@ -35,6 +42,7 @@ export const AdminLoginPage: React.FC = () => {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
+    setSessionNotice(null);
     setIsSubmitting(true);
 
     try {
@@ -51,7 +59,13 @@ export const AdminLoginPage: React.FC = () => {
       }
 
       login(data.data.token, data.data.user);
-      navigate('/admin/dashboard', { replace: true });
+
+      // Restore user to intended page or dashboard
+      const state = location.state as { from?: { pathname?: string; search?: string } } | null;
+      const redirectPath = state?.from
+        ? `${state.from.pathname || '/admin/dashboard'}${state.from.search || ''}`
+        : '/admin/dashboard';
+      navigate(redirectPath, { replace: true });
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An unexpected error occurred.');
     } finally {
@@ -89,6 +103,17 @@ export const AdminLoginPage: React.FC = () => {
 
           <form onSubmit={handleLogin}>
             <CardContent className="space-y-4 pt-5">
+              {/* Session Expiry or Logged Out Banner */}
+              {sessionNotice && (
+                <div className="p-3.5 rounded-xl bg-amber-500/15 border border-amber-500/30 text-amber-200 text-xs flex items-start space-x-2.5 shadow-sm">
+                  <Clock className="w-4 h-4 text-amber-400 flex-shrink-0 mt-0.5" />
+                  <div className="space-y-0.5">
+                    <p className="font-bold text-amber-300">Session Notice</p>
+                    <p className="text-amber-200/90 leading-relaxed">{sessionNotice}</p>
+                  </div>
+                </div>
+              )}
+
               {error && (
                 <div className="p-3 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 text-xs flex items-center space-x-2">
                   <AlertCircle className="w-4 h-4 flex-shrink-0" />

@@ -44,6 +44,21 @@ This document outlines backend standards for the Avada API service (`apps/api`).
 
 ---
 
+## 🔌 Integrations & Outgoing API Logging
+
+1. **Database-Backed Integration Config**:
+   - Never hardcode third-party API keys in frontend code or static JSON.
+   - All external integrations (e.g., PeopleForce, Mailgun, Slack) must be recorded in the `integrations` table in PostgreSQL.
+   - Credentials must be masked in API responses (`apiKeyMasked`) and in administrative views.
+
+2. **Mandatory Integration Telemetry Logging (`IntegrationLog`)**:
+   - Every outgoing API call to an external service must be logged through `IntegrationLogger.logCall()`.
+   - Record: `method`, `endpoint`, `url`, `durationMs`, `responseStatus`, `status` (`SUCCESS` / `ERROR`).
+   - All outgoing headers must pass through `sanitizeHeaders()` to ensure sensitive tokens (e.g. `X-API-KEY`, `Authorization`) are masked as `xxxx...xxxx`.
+   - Large request/response bodies must be guarded against database bloat via `safePayload()`.
+
+---
+
 ## 📡 API Response Formatting
 
 Standardized JSON envelopes:

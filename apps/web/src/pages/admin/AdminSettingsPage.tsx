@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
 import { GeneralContacts, SocialLink, FooterConfig } from '@avada/shared';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
@@ -23,6 +24,8 @@ import {
   Globe,
   ToggleLeft,
   ToggleRight,
+  Cpu,
+  ArrowRight,
 } from 'lucide-react';
 
 export const AdminSettingsPage: React.FC = () => {
@@ -482,6 +485,38 @@ export const AdminSettingsPage: React.FC = () => {
             )}
           </div>
         </CardContent>
+      </Card>
+
+      {/* Card 4: Third-Party Integrations Banner */}
+      <Card className="bg-gradient-to-r from-gray-900 to-[#2A292D] text-white border-none shadow-sm rounded-xl overflow-hidden p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="flex items-center space-x-4">
+          <div className="w-12 h-12 rounded-xl bg-[#3BBA93]/20 text-[#3BBA93] border border-[#3BBA93]/30 flex items-center justify-center flex-shrink-0">
+            <Cpu className="w-6 h-6" />
+          </div>
+          <div>
+            <h3 className="font-bold text-sm text-white flex items-center gap-2">
+              <span>Third-Party Integrations Engine</span>
+              <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#3BBA93]/20 text-[#3BBA93] border border-[#3BBA93]/30 font-semibold">
+                PeopleForce Active
+              </span>
+            </h3>
+            <p className="text-xs text-gray-300 mt-1">
+              Manage external API connections, run connection health tests, sync live vacancies, and inspect raw request/response logs.
+            </p>
+          </div>
+        </div>
+
+        <Link to="/admin/integrations">
+          <Button
+            type="button"
+            variant="gradient"
+            size="sm"
+            className="rounded-xl text-xs font-bold space-x-1.5 whitespace-nowrap"
+          >
+            <span>Open Integrations Hub</span>
+            <ArrowRight className="w-3.5 h-3.5" />
+          </Button>
+        </Link>
       </Card>
     </div>
   );
