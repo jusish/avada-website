@@ -9,10 +9,17 @@ const router = Router();
 router.use(requireAuth);
 
 const countrySchema = z.object({
-  code: z.string().min(2).max(4).toLowerCase(),
+  code: z
+    .string()
+    .min(2)
+    .max(4)
+    .transform((v) => v.trim().toUpperCase()),
   slug: z.string().min(2).toLowerCase(),
   name: z.string().min(2),
-  currencyCode: z.string().default('USD'),
+  currencyCode: z
+    .string()
+    .default('USD')
+    .transform((v) => v.trim().toUpperCase()),
   headline: z.string().min(3),
   tagline: z.string().default(''),
   description: z.string().min(5),
@@ -38,6 +45,8 @@ router.get('/', requirePermission('countries', 'view'), async (_req: Authenticat
       success: true,
       data: countries.map((c) => ({
         ...c,
+        code: c.code.toUpperCase(),
+        currencyCode: c.currencyCode.toUpperCase(),
         telcoPartners: (c.telcoPartners as string[]) || [],
         paymentRails: (c.paymentRails as string[]) || [],
         createdAt: c.createdAt.toISOString(),
@@ -63,7 +72,13 @@ router.post('/', requirePermission('countries', 'edit'), async (req: Authenticat
 
     // Check duplicate code or slug
     const existing = await prisma.country.findFirst({
-      where: { OR: [{ code: data.code }, { slug: data.slug }] },
+      where: {
+        OR: [
+          { code: data.code },
+          { code: data.code.toLowerCase() },
+          { slug: data.slug },
+        ],
+      },
     });
 
     if (existing) {
@@ -112,6 +127,22 @@ router.put('/:id', requirePermission('countries', 'edit'), async (req: Authentic
     if (!existing) {
       res.status(404).json({ success: false, error: 'Country not found' });
       return;
+    }
+
+    if (parse.data.code || parse.data.slug) {
+      const conflict = await prisma.country.findFirst({
+        where: {
+          id: { not: id },
+          OR: [
+            ...(parse.data.code ? [{ code: parse.data.code }, { code: parse.data.code.toLowerCase() }] : []),
+            ...(parse.data.slug ? [{ slug: parse.data.slug }] : []),
+          ],
+        },
+      });
+      if (conflict) {
+        res.status(400).json({ success: false, error: 'A country with this code or slug already exists.' });
+        return;
+      }
     }
 
     const updated = await prisma.country.update({

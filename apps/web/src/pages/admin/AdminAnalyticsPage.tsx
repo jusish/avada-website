@@ -174,25 +174,58 @@ export const AdminAnalyticsPage: React.FC = () => {
         </div>
 
         {/* Timeline Bar Chart */}
-        <div className="h-48 flex items-end justify-between gap-2 pt-6 pb-2 border-b border-gray-100">
+        <div className="h-52 flex items-end justify-between gap-1.5 pt-6 pb-2 border-b border-gray-100">
           {data?.timeline && data.timeline.length > 0 ? (
             data.timeline.map((point, idx) => {
+              const total = data.timeline.length;
               const heightPct = Math.max(12, Math.round((point.visits / maxVisits) * 100));
+
+              // Clean milestone interval distribution so X-axis labels never collide or truncate
+              const showLabel =
+                total <= 7
+                  ? true
+                  : total <= 14
+                  ? idx % 2 === 0 || idx === total - 1
+                  : total <= 24
+                  ? idx % 4 === 0 || idx === total - 1
+                  : idx % Math.max(1, Math.floor((total - 1) / 5)) === 0 || idx === total - 1;
+
               return (
-                <div key={idx} className="flex-1 flex flex-col items-center gap-2 group relative">
+                <div key={idx} className="flex-1 min-w-0 flex flex-col items-center gap-2 group relative">
                   {/* Tooltip */}
-                  <div className="absolute -top-10 opacity-0 group-hover:opacity-100 transition-opacity bg-[#2A292D] text-white text-[10px] font-bold py-1 px-2 rounded-lg pointer-events-none whitespace-nowrap z-10 shadow-lg">
-                    {point.visits} visits ({point.unique} unique)
+                  <div className="absolute -top-12 opacity-0 group-hover:opacity-100 transition-all duration-150 bg-[#2A292D] text-white text-[10px] py-1.5 px-2.5 rounded-lg pointer-events-none whitespace-nowrap z-20 shadow-xl border border-white/10 flex flex-col items-center">
+                    <span className="text-[10px] text-gray-300 font-normal">{point.date}</span>
+                    <span className="font-bold text-[#3BBA93]">
+                      {point.visits.toLocaleString()} <span className="text-white/70 font-normal">visits</span> · {point.unique.toLocaleString()} <span className="text-white/70 font-normal">unique</span>
+                    </span>
                   </div>
-                  <div className="w-full bg-gray-100 rounded-t-xl overflow-hidden h-40 flex items-end">
+
+                  {/* Bar */}
+                  <div className="w-full bg-gray-100 rounded-t-xl overflow-hidden h-36 flex items-end">
                     <div
                       className="w-full bg-gradient-to-t from-[#3BBA93] to-emerald-400 group-hover:from-emerald-500 group-hover:to-teal-300 rounded-t-xl transition-all duration-300"
                       style={{ height: `${heightPct}%` }}
                     />
                   </div>
-                  <span className="text-[10px] text-gray-400 font-semibold truncate w-full text-center">
-                    {point.date.slice(5)}
-                  </span>
+
+                  {/* X-Axis Milestone Label or Subtle Tick */}
+                  <div className="w-full h-5 relative flex items-center justify-center">
+                    {showLabel ? (
+                      <span
+                        className={`absolute text-[10px] font-semibold text-gray-500 whitespace-nowrap pointer-events-none ${
+                          idx === 0
+                            ? 'left-0 text-left'
+                            : idx === total - 1
+                            ? 'right-0 text-right'
+                            : 'left-1/2 -translate-x-1/2 text-center'
+                        }`}
+                      >
+                        {point.date}
+                      </span>
+                    ) : (
+                      <span className="w-1 h-1 rounded-full bg-gray-200 group-hover:bg-[#3BBA93] transition-colors" />
+                    )}
+                  </div>
                 </div>
               );
             })

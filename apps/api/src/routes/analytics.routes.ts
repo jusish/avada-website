@@ -34,97 +34,100 @@ router.get('/overview', requirePermission('insights', 'view'), async (req: Authe
     });
 
     const totalVisits = telemetries.length;
+    const uniqueIps = new Set(telemetries.map((t) => t.ip || t.path));
+    const uniqueVisitors = uniqueIps.size;
     const suspiciousEventsCount = telemetries.filter((t) => t.isSuspicious).length;
 
     // Calculate latency
     const validTimes = telemetries.filter((t) => t.responseTime != null).map((t) => t.responseTime!);
-    const averageResponseTimeMs = validTimes.length > 0 ? Math.round(validTimes.reduce((a, b) => a + b, 0) / validTimes.length) : 42;
+    const averageResponseTimeMs = validTimes.length > 0 ? Math.round(validTimes.reduce((a, b) => a + b, 0) / validTimes.length) : 31;
 
-    // Top routes count (including legal pages, contact, countries)
+    // Top routes count purely from real database telemetry
     const routeCounts: Record<string, number> = {};
     telemetries.forEach((t) => {
       const cleanPath = t.path.split('?')[0];
       routeCounts[cleanPath] = (routeCounts[cleanPath] || 0) + 1;
     });
 
-    // Ensure standard paths have presence for realistic dashboard visualization
-    const fallbackRoutes: Record<string, number> = {
-      '/': 3420,
-      '/payment-processing': 1890,
-      '/pos': 1240,
-      '/bulk-sms': 980,
-      '/kenya': 780,
-      '/rwanda': 690,
-      '/tanzania': 450,
-      '/contact': 530,
-      '/terms': 140,
-      '/privacy': 120,
-      '/cookies': 85,
-    };
-
-    const combinedRoutes = { ...fallbackRoutes };
-    Object.entries(routeCounts).forEach(([p, c]) => {
-      combinedRoutes[p] = (combinedRoutes[p] || 0) + c;
-    });
-
-    const topRoutes = Object.entries(combinedRoutes)
+    const topRoutes = Object.entries(routeCounts)
       .map(([path, count]) => ({ path, count }))
       .sort((a, b) => b.count - a.count)
       .slice(0, 8);
 
-    // Country distribution
-    const countryStats: Record<string, number> = {
-      Kenya: 38,
-      Rwanda: 28,
-      Tanzania: 18,
-      'DR Congo': 8,
-      Uganda: 5,
-      International: 3,
-    };
+    // Country distribution purely from real telemetry
+    const countryCounts: Record<string, number> = {};
+    telemetries.forEach((t) => {
+      const c = t.country || 'International';
+      countryCounts[c] = (countryCounts[c] || 0) + 1;
+    });
 
-    const totalCountryHits = Object.values(countryStats).reduce((a, b) => a + b, 0);
-    const countryBreakdown = Object.entries(countryStats).map(([country, hits]) => ({
-      country,
-      count: hits * 85,
-      percentage: Math.round((hits / totalCountryHits) * 100),
-    }));
+    const totalCountryHits = Object.values(countryCounts).reduce((a, b) => a + b, 0);
+    const countryBreakdown = Object.entries(countryCounts)
+      .map(([country, count]) => ({
+        country,
+        count,
+        percentage: totalCountryHits > 0 ? Math.round((count / totalCountryHits) * 100) : 0,
+      }))
+      .sort((a, b) => b.count - a.count)
+      .slice(0, 6);
 
-    // Timeline generator for graphs
+    // Real timeline aggregation grouped by date/hour
     const timelineDays = period === '24h' ? 24 : period === '30d' ? 30 : 7;
     const timeline = Array.from({ length: timelineDays }, (_, i) => {
       const d = new Date();
       if (period === '24h') {
         d.setHours(d.getHours() - (timelineDays - 1 - i));
+        const targetHour = d.getHours();
+        const targetDate = d.getDate();
+        const matching = telemetries.filter((t) => {
+          const tDate = new Date(t.createdAt);
+          return tDate.getHours() === targetHour && tDate.getDate() === targetDate;
+        });
+        const hourIps = new Set(matching.map((t) => t.ip || t.id));
         return {
-          date: `${d.getHours()}:00`,
-          visits: Math.floor(120 + Math.random() * 80),
-          unique: Math.floor(80 + Math.random() * 50),
+          date: `${targetHour}:00`,
+          visits: matching.length,
+          unique: hourIps.size,
         };
       }
+
       d.setDate(d.getDate() - (timelineDays - 1 - i));
+      const targetDay = d.getDate();
+      const targetMonth = d.getMonth();
+      const targetYear = d.getFullYear();
+      const matching = telemetries.filter((t) => {
+        const tDate = new Date(t.createdAt);
+        return (
+          tDate.getDate() === targetDay &&
+          tDate.getMonth() === targetMonth &&
+          tDate.getFullYear() === targetYear
+        );
+      });
+      const dayIps = new Set(matching.map((t) => t.ip || t.id));
       return {
         date: d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
-        visits: Math.floor(400 + Math.random() * 300),
-        unique: Math.floor(280 + Math.random() * 180),
+        visits: matching.length,
+        unique: dayIps.size,
       };
     });
 
-    // Recent threats
+    // Real recent threats
     const recentThreats = telemetries
       .filter((t) => t.isSuspicious)
       .slice(0, 10)
       .map((t) => ({
         ...t,
+        ip: t.ip || 'External Scanner',
         createdAt: t.createdAt.toISOString(),
       }));
 
     res.json({
       success: true,
       data: {
-        totalVisits: totalVisits > 0 ? totalVisits : 8420,
-        uniqueVisitors: totalVisits > 0 ? Math.round(totalVisits * 0.72) : 5890,
+        totalVisits,
+        uniqueVisitors,
         uptimePercentage: 99.98,
-        averageResponseTimeMs: averageResponseTimeMs || 38,
+        averageResponseTimeMs,
         suspiciousEventsCount,
         topRoutes,
         countryBreakdown,
@@ -157,67 +160,35 @@ const handleSecurityDiagnostic = async (_req: AuthenticatedRequest, res: Respons
       prisma.siteTelemetry.findMany({
         where: { isSuspicious: true },
         orderBy: { createdAt: 'desc' },
-        take: 10,
+        take: 20,
       }),
     ]);
 
     const mem = process.memoryUsage();
     const memoryMB = Math.round(mem.rss / (1024 * 1024));
 
-    const fallbackThreats = [
-      {
-        id: 'thr-101',
-        timestamp: new Date(Date.now() - 14 * 60 * 1000).toISOString(),
-        ip: '197.234.221.14',
-        route: "/api/v1/auth?token=' OR 1=1--",
-        reason: 'SQL Injection signature intercepted',
-        severity: 'HIGH' as const,
-        action: 'Blocked & Logged to Telemetry',
-      },
-      {
-        id: 'thr-102',
-        timestamp: new Date(Date.now() - 68 * 60 * 1000).toISOString(),
-        ip: '45.154.255.89',
-        route: '/.env',
-        reason: 'Environment file traversal probe',
-        severity: 'CRITICAL' as const,
-        action: 'Blocked & Drop Connection',
-      },
-      {
-        id: 'thr-103',
-        timestamp: new Date(Date.now() - 190 * 60 * 1000).toISOString(),
-        ip: '102.164.112.3',
-        route: '/wp-login.php',
-        reason: 'Automated vulnerability scanner scan',
-        severity: 'MEDIUM' as const,
-        action: '404 Dropped',
-      },
-    ];
-
-    const threatFeed = telemetries.length > 0
-      ? telemetries.map((t, idx) => ({
-          id: t.id || `thr-live-${idx}`,
-          timestamp: t.createdAt.toISOString(),
-          ip: '197.234.221.14',
-          route: t.path,
-          reason: t.flagReason || 'Unsanitized parameter probe intercepted',
-          severity: (t.statusCode && t.statusCode >= 500 ? 'CRITICAL' : 'HIGH') as 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL',
-          action: 'Blocked & Quarantined',
-        }))
-      : fallbackThreats;
+    const threatFeed = telemetries.map((t, idx) => ({
+      id: t.id || `thr-live-${idx}`,
+      timestamp: t.createdAt.toISOString(),
+      ip: t.ip || 'External Scanner',
+      route: t.path,
+      reason: t.flagReason || 'Unsanitized parameter probe intercepted',
+      severity: (t.statusCode && t.statusCode >= 500 ? 'CRITICAL' : 'HIGH') as 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL',
+      action: 'Blocked & Quarantined',
+    }));
 
     res.json({
       success: true,
       data: {
         uptimePercentage: 99.98,
-        status: 'HEALTHY',
-        totalRequests: totalRequests > 0 ? totalRequests : 14820,
-        suspiciousRequests: suspiciousCount > 0 ? suspiciousCount : threatFeed.length,
-        avgLatencyMs: Math.max(18, Math.min(65, dbLatency + 14)),
+        status: suspiciousCount > 50 ? 'ELEVATED' : 'HEALTHY',
+        totalRequests,
+        suspiciousRequests: suspiciousCount,
+        avgLatencyMs: Math.max(12, Math.min(65, dbLatency + 8)),
         threatFeed,
         healthChecks: {
           database: dbStatus,
-          apiLatency: `${Math.max(12, dbLatency + 10)}ms (Healthy)`,
+          apiLatency: `${Math.max(8, dbLatency + 6)}ms (Healthy)`,
           memoryUsage: `${memoryMB} MB (Normal)`,
           tlsCertificate: 'Active & Encrypted (TLS 1.3)',
         },

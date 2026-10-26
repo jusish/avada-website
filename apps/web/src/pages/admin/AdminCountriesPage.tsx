@@ -99,8 +99,8 @@ export const AdminCountriesPage: React.FC = () => {
     setForm({
       name: c.name,
       slug: c.slug,
-      code: c.code,
-      currencyCode: c.currencyCode,
+      code: c.code.toUpperCase(),
+      currencyCode: c.currencyCode.toUpperCase(),
       headline: c.headline || 'Payment Infrastructure',
       description: c.description || '',
       active: c.active,
@@ -312,15 +312,15 @@ export const AdminCountriesPage: React.FC = () => {
                 {/* Card Top */}
                 <div className="p-5 pb-3 border-b border-gray-100 flex items-start justify-between">
                   <div className="flex items-center gap-3">
-                    <div className="w-11 h-11 rounded-xl bg-[#2A292D] text-white flex items-center justify-center font-black text-sm tracking-wider shadow-sm">
-                      {country.code}
+                    <div className="w-11 h-11 rounded-xl bg-emerald-50 border border-emerald-200/80 text-emerald-800 flex items-center justify-center font-black text-sm tracking-wider font-mono shadow-xs">
+                      {country.code.toUpperCase()}
                     </div>
                     <div>
                       <h3 className="font-bold text-base text-[#2A292D] flex items-center gap-1.5">
                         <span>{country.name}</span>
                       </h3>
                       <div className="text-[11px] text-gray-400 font-mono mt-0.5">
-                        /{country.slug} • {country.currencyCode} • {country.officePhone || ''}
+                        /{country.slug} • {country.currencyCode.toUpperCase()} • {country.officePhone || ''}
                       </div>
                     </div>
                   </div>

@@ -95,7 +95,7 @@ async function main() {
   // 3. Seed Default African Countries & Market Hubs
   const defaultCountries = [
     {
-      code: 'rw',
+      code: 'RW',
       slug: 'rwanda',
       name: 'Rwanda',
       currencyCode: 'RWF',
@@ -114,7 +114,7 @@ async function main() {
       displayOrder: 1,
     },
     {
-      code: 'ke',
+      code: 'KE',
       slug: 'kenya',
       name: 'Kenya',
       currencyCode: 'KES',
@@ -133,7 +133,7 @@ async function main() {
       displayOrder: 2,
     },
     {
-      code: 'tz',
+      code: 'TZ',
       slug: 'tanzania',
       name: 'Tanzania',
       currencyCode: 'TZS',
@@ -152,7 +152,7 @@ async function main() {
       displayOrder: 3,
     },
     {
-      code: 'cd',
+      code: 'CD',
       slug: 'drc',
       name: 'DRC (Democratic Republic of Congo)',
       currencyCode: 'USD',
@@ -171,7 +171,7 @@ async function main() {
       displayOrder: 4,
     },
     {
-      code: 'bj',
+      code: 'BJ',
       slug: 'benin',
       name: 'Benin',
       currencyCode: 'XOF',
@@ -190,7 +190,7 @@ async function main() {
       displayOrder: 5,
     },
     {
-      code: 'tg',
+      code: 'TG',
       slug: 'togo',
       name: 'Togo',
       currencyCode: 'XOF',
@@ -209,7 +209,7 @@ async function main() {
       displayOrder: 6,
     },
     {
-      code: 'ae',
+      code: 'AE',
       slug: 'uae',
       name: 'UAE (Headquarters)',
       currencyCode: 'AED',
@@ -231,7 +231,7 @@ async function main() {
 
   for (const country of defaultCountries) {
     await prisma.country.upsert({
-      where: { code: country.code },
+      where: { slug: country.slug },
       update: country,
       create: country,
     });

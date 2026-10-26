@@ -46,6 +46,8 @@ router.get('/site-config', async (_req: Request, res: Response): Promise<void> =
     const config: PublicSiteConfig = {
       countries: countries.map((c) => ({
         ...c,
+        code: c.code.toUpperCase(),
+        currencyCode: c.currencyCode.toUpperCase(),
         telcoPartners: (c.telcoPartners as string[]) || [],
         paymentRails: (c.paymentRails as string[]) || [],
         createdAt: c.createdAt.toISOString(),
@@ -91,6 +93,8 @@ router.get('/countries/:slug', async (req: Request, res: Response): Promise<void
       success: true,
       data: {
         ...country,
+        code: country.code.toUpperCase(),
+        currencyCode: country.currencyCode.toUpperCase(),
         telcoPartners: (country.telcoPartners as string[]) || [],
         paymentRails: (country.paymentRails as string[]) || [],
         createdAt: country.createdAt.toISOString(),

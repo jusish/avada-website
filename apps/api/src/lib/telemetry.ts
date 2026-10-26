@@ -5,8 +5,12 @@ export const telemetryMiddleware = (req: Request, res: Response, next: NextFunct
   const start = Date.now();
 
   res.on('finish', async () => {
-    // Only track public API calls and page accesses, skip asset requests
-    if (req.path.startsWith('/api/health') || req.path.startsWith('/api/admin/analytics')) {
+    // Only track public API calls and external traffic; skip internal health and admin management routes
+    if (
+      req.path.startsWith('/api/health') ||
+      req.path.startsWith('/api/admin') ||
+      req.path.startsWith('/api/auth')
+    ) {
       return;
     }
 
@@ -50,12 +54,23 @@ export const telemetryMiddleware = (req: Request, res: Response, next: NextFunct
       (req.headers['x-country-code'] as string) ||
       (req.path.includes('rwanda') ? 'Rwanda' : req.path.includes('kenya') ? 'Kenya' : req.path.includes('tanzania') ? 'Tanzania' : 'East Africa');
 
+    // Capture real client IP from reverse proxy headers
+    const rawIp =
+      (req.headers['cf-connecting-ip'] as string) ||
+      (req.headers['x-forwarded-for'] as string)?.split(',')[0]?.trim() ||
+      (req.headers['x-real-ip'] as string) ||
+      req.ip ||
+      req.socket?.remoteAddress ||
+      'Direct';
+    const cleanIp = rawIp.replace(/^::ffff:/, '');
+
     try {
       await prisma.siteTelemetry.create({
         data: {
           path: req.originalUrl || req.path,
           country,
           referrer: (req.headers['referer'] as string) || null,
+          ip: cleanIp,
           isSuspicious,
           flagReason,
           responseTime,

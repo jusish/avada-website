@@ -169,6 +169,7 @@ model SiteTelemetry {
   path         String
   country      String?
   referrer     String?
+  ip           String?
   isSuspicious Boolean  @default(false)
   flagReason   String?
   responseTime Int?     // in ms
