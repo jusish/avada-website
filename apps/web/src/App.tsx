@@ -17,6 +17,8 @@ import { CountryPage } from '@/pages/public/CountryPage';
 import { ContactPage } from '@/pages/public/ContactPage';
 import { LegalPolicyPage } from '@/pages/public/LegalPolicyPage';
 import { CareersPage } from '@/pages/public/CareersPage';
+import { DocsPage } from '@/pages/public/DocsPage';
+import { NotFoundPage } from '@/pages/public/NotFoundPage';
 
 // Admin CMS & Operations Pages
 import { AdminLoginPage } from '@/pages/admin/AdminLoginPage';
@@ -134,6 +136,7 @@ export const App: React.FC = () => {
             <Route path="/contact" element={<ContactPage />} />
             <Route path="/careers" element={<CareersPage />} />
             <Route path="/careers/:jobId" element={<CareersPage />} />
+            <Route path="/docs" element={<DocsPage />} />
 
             {/* Official Legal & Compliance Pages */}
             <Route
@@ -288,8 +291,10 @@ export const App: React.FC = () => {
             <Route path="audit-logs" element={<Navigate to="/admin/governance/audit-logs" replace />} />
           </Route>
 
-          {/* 404 Catch-all */}
-          <Route path="*" element={<Navigate to="/" replace />} />
+          {/* 404 Catch-all with Public Layout */}
+          <Route element={<PublicLayout />}>
+            <Route path="*" element={<NotFoundPage />} />
+          </Route>
         </Routes>
       </SiteConfigProvider>
     </AuthProvider>

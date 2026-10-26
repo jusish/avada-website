@@ -1,0 +1,180 @@
+name: UAT CI/CD & Deployment (uat.avadapay.rw)
+
+on:
+  push:
+    branches: [ uat ]
+  pull_request:
+    branches: [ uat ]
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # -------------------------------------------------------------
+  # Job 1: Quality Checks (Runs on every PR and Push to uat)
+  # -------------------------------------------------------------
+  checks:
+    name: Lint, Type Check & Build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.30.3
+          run_install: false
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build Shared Package
+        run: pnpm --filter @avada/shared build
+
+      - name: Generate Prisma Client
+        run: pnpm --filter @avada/api prisma:generate
+
+      - name: Lint Check
+        run: pnpm lint
+
+      - name: TypeScript Type Check
+        run: pnpm type-check
+
+      - name: Production Build
+        run: pnpm build
+
+  # -------------------------------------------------------------
+  # Job 2: Build & Push UAT Docker Images to GHCR
+  # (Strictly runs ONLY on direct push to uat or manual dispatch)
+  # -------------------------------------------------------------
+  docker-build-push:
+    name: Build & Push UAT to GHCR (${{ matrix.name }})
+    needs: [checks]
+    if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/uat'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: api
+            dockerfile: docker/Dockerfile.api
+            image: ghcr.io/${{ github.repository }}/api
+          - name: web
+            dockerfile: docker/Dockerfile.web
+            image: ghcr.io/${{ github.repository }}/web
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract metadata (tags, labels)
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ matrix.image }}
+          tags: |
+            type=raw,value=uat
+            type=sha,format=short
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ${{ matrix.dockerfile }}
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  # -------------------------------------------------------------
+  # Job 3: Automated SSH Deployment to VPS (Isolated UAT Environment)
+  # -------------------------------------------------------------
+  deploy:
+    name: Deploy UAT to VPS
+    needs: [docker-build-push]
+    if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/uat'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: read
+
+    steps:
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.VPS_IP }}
+          username: ${{ secrets.VPS_USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          password: ${{ secrets.VPS_PASSWORD }}
+          timeout: 1200s
+          command_timeout: 20m
+          script: |
+            set -e
+
+            echo "--- Navigating to UAT Deployment Directory ---"
+            mkdir -p ~/avada-website-uat
+            cd ~/avada-website-uat
+
+            # Authenticate Git with temporary GitHub Action token to pull latest compose
+            if [ ! -d ".git" ]; then
+              git init
+              git remote add origin https://${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
+            else
+              git remote set-url origin https://${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
+            fi
+            git fetch origin uat
+            git reset --hard origin/uat
+
+            # Export tags for the UAT compose file
+            export API_TAG=uat
+            export WEB_TAG=uat
+            export GITHUB_REPOSITORY_OWNER=$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')
+
+            echo "--- Authenticating with GHCR ---"
+            echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+
+            echo "--- Pulling New UAT Images ---"
+            docker compose -f docker-compose.uat.yml pull api web
+
+            echo "--- Ensuring UAT Database & Environment ---"
+            if [ ! -f ".env.uat" ]; then
+              cp .env.uat.example .env.uat 2>/dev/null || true
+            fi
+            docker compose -f docker-compose.uat.yml up -d postgres
+
+            echo "--- Running UAT Database Schema Push & Seed ---"
+            docker compose -f docker-compose.uat.yml run --rm --entrypoint "npx prisma db push --accept-data-loss" api
+            docker compose -f docker-compose.uat.yml run --rm --entrypoint "npx tsx prisma/seed.ts" api
+
+            echo "--- Starting UAT Application ---"
+            docker compose -f docker-compose.uat.yml up -d --remove-orphans
+
+            echo "✅ UAT Deployment Successful! uat.avadapay.rw is active."
+
+            echo "--- Cleaning Up Old Docker Images ---"
+            docker image prune -a --force --filter "until=24h"

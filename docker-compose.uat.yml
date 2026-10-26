@@ -1,0 +1,64 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: avada-uat-postgres
+    restart: always
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      POSTGRES_DB: ${POSTGRES_DB:-avada_uat_db}
+    volumes:
+      - avada_uat_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-avada_uat_db}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - default
+
+  api:
+    image: ghcr.io/${GITHUB_REPOSITORY_OWNER:-jusish}/avada-website/api:${API_TAG:-uat}
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.api
+    container_name: avada-uat-api
+    restart: always
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      PORT: 5005
+      NODE_ENV: production
+      DATABASE_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@postgres:5432/${POSTGRES_DB:-avada_uat_db}?schema=public
+      JWT_SECRET: ${JWT_SECRET:-avada_uat_super_secure_jwt_secret_key_2026_isolated}
+    networks:
+      - default
+
+  web:
+    image: ghcr.io/${GITHUB_REPOSITORY_OWNER:-jusish}/avada-website/web:${WEB_TAG:-uat}
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.web
+    container_name: avada-uat-web
+    restart: always
+    depends_on:
+      - api
+    environment:
+      - VIRTUAL_HOST=uat.avadapay.rw
+      - LETSENCRYPT_HOST=uat.avadapay.rw
+      - LETSENCRYPT_EMAIL=${LETSENCRYPT_EMAIL:-admin@avadapay.rw}
+    networks:
+      - default
+      - proxy
+
+volumes:
+  avada_uat_pgdata:
+
+networks:
+  default:
+  proxy:
+    name: avadaops_default
+    external: true

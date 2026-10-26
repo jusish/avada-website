@@ -2,6 +2,7 @@ import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { useSiteConfig } from '@/context/SiteConfigContext';
+import { Lock } from 'lucide-react';
 
 const Facebook = () => (
   <svg viewBox="0 0 24 24" className="w-4 h-4" fill="currentColor" aria-hidden="true">
@@ -59,7 +60,7 @@ const DEFAULT_CTA: FooterCta = {
   title: ['Ready to simplify payments', 'and SMS across Africa?'],
   body: 'Tell us where your business operates and what you need to collect, send or automate. Our team will help you identify the right AvadaPay setup.',
   primary: { label: 'Talk to Sales', to: '/contact' },
-  secondary: { label: 'Read the API docs', to: '/contact?inquiry=api' },
+  secondary: { label: 'Explore API Docs', to: '/docs' },
 };
 
 const FOOTER_CTAS: Record<string, FooterCta | null> = {
@@ -68,24 +69,25 @@ const FOOTER_CTAS: Record<string, FooterCta | null> = {
     title: ['Tell us where you want to', 'accept payments'],
     body: 'Share your target markets, expected volumes, and the methods your customers use. We’ll come back with pricing and a setup plan.',
     primary: { label: 'Talk to Sales', to: '/contact?inquiry=payments' },
-    secondary: { label: 'Read the API docs', to: '/contact?inquiry=api' },
+    secondary: { label: 'Explore API Docs', to: '/docs' },
   },
   '/pos': {
     title: ['Get Started with AvadaPay POS'],
     body: 'Tell us about your business, the markets you operate in, and your payment volumes. We’ll recommend the right POS solution.',
     primary: { label: 'Contact Us', to: '/contact?inquiry=pos' },
-    secondary: { label: 'Request a POS demo', to: '/contact?inquiry=pos_demo' },
+    secondary: { label: 'Request a POS Demo', to: '/contact?inquiry=pos_demo' },
   },
   '/bulk-sms': {
     title: ['Get Started with', 'AvadaPay Bulk SMS'],
     body: 'Share your country, expected monthly volume, and primary use case. We’ll come back with routing, rates, and a setup plan.',
     primary: { label: 'Contact Us', to: '/contact?inquiry=sms' },
-    secondary: { label: 'Read the SMS API docs', to: '/contact?inquiry=api' },
+    secondary: { label: 'Request SMS API Access', to: '/contact?inquiry=api' },
   },
   '/contact': null,
   '/terms': null,
   '/privacy': null,
   '/cookies': null,
+  '/docs': null,
 };
 
 interface CountryContact {
@@ -194,20 +196,21 @@ export const Footer: React.FC = () => {
             {cta.body}
           </p>
           <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
-            <Link to={cta.primary.to}>
-              <Button className="h-11 px-6 rounded-md bg-[#3BBA93] hover:bg-[#32a481] text-white font-bold text-[15px]">
+            <Button asChild className="h-11 px-6 rounded-md bg-[#3BBA93] hover:bg-[#32a481] text-white font-bold text-[15px]">
+              <Link to={cta.primary.to}>
                 {cta.primary.label}
-              </Button>
-            </Link>
-            {cta.secondary && (
-              <Link to={cta.secondary.to}>
-                <Button
-                  variant="outline"
-                  className="h-11 px-6 rounded-md bg-transparent border-[#3BBA93]/70 text-[#3BBA93] hover:bg-[#3BBA93]/10 hover:text-[#3BBA93] font-bold text-[15px]"
-                >
-                  {cta.secondary.label}
-                </Button>
               </Link>
+            </Button>
+            {cta.secondary && (
+              <Button
+                asChild
+                variant="outline"
+                className="h-11 px-6 rounded-md bg-transparent border-[#3BBA93]/70 text-[#3BBA93] hover:bg-[#3BBA93]/10 hover:text-[#3BBA93] font-bold text-[15px]"
+              >
+                <Link to={cta.secondary.to}>
+                  {cta.secondary.label}
+                </Link>
+              </Button>
             )}
           </div>
         </div>
@@ -296,9 +299,11 @@ export const Footer: React.FC = () => {
           <div className="flex items-center gap-4">
             <Link
               to="/admin/login"
-              className="text-[11px] font-semibold text-white/40 hover:text-[#3BBA93] transition-colors mr-2"
+              title="CMS Staff Login"
+              className="inline-flex items-center gap-1.5 text-[11px] font-semibold text-white/50 hover:text-[#3BBA93] transition-colors px-2 py-1 rounded hover:bg-white/5 mr-1"
             >
-              CMS Portal
+              <Lock className="w-3 h-3 text-[#3BBA93]/70" />
+              <span>CMS Portal</span>
             </Link>
 
             {/* Configurable Social Icons */}
@@ -315,7 +320,7 @@ export const Footer: React.FC = () => {
                   rel={rel}
                   aria-label={social.name}
                   title={`${social.name} (Opens in ${target === '_blank' ? 'new tab' : 'current window'})`}
-                  className="inline-flex items-center justify-center w-7 h-7 rounded-[5px] bg-[#3BBA93] text-[#2A292D] transition-transform hover:scale-110 shadow-sm"
+                  className="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-[#3BBA93] text-[#2A292D] transition-transform hover:scale-110 shadow-sm"
                 >
                   <Icon />
                 </a>

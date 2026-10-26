@@ -9,6 +9,7 @@ import { MapPin, Phone, Mail, CheckCircle2, Building, CreditCard, Radio } from '
 import { CountryFlag } from '@/components/CountryFlag';
 import { Country } from '@avada/shared';
 import { SEO } from '@/components/seo/SEO';
+import { NotFoundPage } from '@/pages/public/NotFoundPage';
 
 const makeFallback = (c: Omit<Country, 'displayOrder' | 'createdAt' | 'updatedAt'>): Country => ({
   ...c,
@@ -124,11 +125,11 @@ export const CountryPage: React.FC = () => {
             AvadaPay is currently establishing direct telco connectivity and mobile money rails across Benin. Stay tuned or contact our team for early access.
           </p>
           <div className="pt-2">
-            <Link to="/contact?country=Benin">
-              <Button className="bg-[#3BBA93] hover:bg-[#32a481] text-white font-bold rounded-xl text-sm">
+            <Button asChild className="bg-[#3BBA93] hover:bg-[#32a481] text-white font-bold rounded-xl text-sm">
+              <Link to="/contact?country=Benin">
                 Inquire About Benin Launch
-              </Button>
-            </Link>
+              </Link>
+            </Button>
           </div>
         </div>
       </div>
@@ -146,26 +147,7 @@ export const CountryPage: React.FC = () => {
     FALLBACK_COUNTRIES[slug];
 
   if (!country && !loading) {
-    return (
-      <div className="min-h-screen bg-[#F8FAFC] flex items-center justify-center p-6 text-center">
-        <div className="max-w-md bg-white rounded-3xl p-8 border border-gray-100 shadow-xl space-y-4">
-          <div className="w-16 h-16 rounded-full bg-[#3BBA93]/15 text-[#3BBA93] flex items-center justify-center mx-auto">
-            <Building className="w-8 h-8" />
-          </div>
-          <h2 className="text-2xl font-black text-[#2A292D]">Market Expanding Soon</h2>
-          <p className="text-sm text-gray-600">
-            AvadaPay is currently obtaining regulatory licensing and telco connectivity in this region.
-          </p>
-          <div className="pt-2">
-            <Link to="/contact">
-              <Button className="bg-[#3BBA93] hover:bg-[#32a481] text-white font-bold rounded-xl text-sm">
-                Inquire About Regional Launch
-              </Button>
-            </Link>
-          </div>
-        </div>
-      </div>
-    );
+    return <NotFoundPage />;
   }
 
   if (!country) {
@@ -209,16 +191,16 @@ export const CountryPage: React.FC = () => {
           </p>
 
           <div className="pt-4 flex flex-wrap gap-4">
-            <Link to={`/contact?country=${encodeURIComponent(country.name)}`}>
-              <Button className="h-12 px-8 rounded-xl bg-[#3BBA93] hover:bg-[#32a481] text-white font-black text-sm shadow-lg shadow-[#3BBA93]/20">
+            <Button asChild className="h-12 px-8 rounded-xl bg-[#3BBA93] hover:bg-[#32a481] text-white font-black text-sm shadow-lg shadow-[#3BBA93]/20">
+              <Link to={`/contact?country=${encodeURIComponent(country.name)}`}>
                 Connect in {country.name}
-              </Button>
-            </Link>
-            <Link to="/contact?inquiry=api">
-              <Button variant="outline" className="h-12 px-6 rounded-xl border-white/20 text-white hover:bg-white/10 bg-transparent font-bold text-sm">
+              </Link>
+            </Button>
+            <Button asChild variant="outline" className="h-12 px-6 rounded-xl border-white/20 text-white hover:bg-white/10 bg-transparent font-bold text-sm">
+              <Link to="/docs">
                 View API Specs
-              </Button>
-            </Link>
+              </Link>
+            </Button>
           </div>
         </div>
       </section>
@@ -274,11 +256,11 @@ export const CountryPage: React.FC = () => {
               <p className="text-xs font-extrabold uppercase tracking-wider text-[#248767]">Transparent Pricing</p>
               <h4 className="text-xl font-black text-[#2A292D] mt-1">{country.pricingSummary}</h4>
             </div>
-            <Link to={`/contact?country=${encodeURIComponent(country.name)}&inquiry=payments`}>
-              <Button className="bg-[#3BBA93] hover:bg-[#32a481] text-white font-extrabold rounded-xl px-6 h-11 text-xs">
+            <Button asChild className="bg-[#3BBA93] hover:bg-[#32a481] text-white font-extrabold rounded-xl px-6 h-11 text-xs">
+              <Link to={`/contact?country=${encodeURIComponent(country.name)}&inquiry=payments`}>
                 Request Rate Sheet
-              </Button>
-            </Link>
+              </Link>
+            </Button>
           </div>
         </section>
       )}
@@ -294,11 +276,11 @@ export const CountryPage: React.FC = () => {
               </div>
               <h3 className="text-2xl font-black text-[#2A292D] mt-1">AvadaPay {country.name} Office</h3>
             </div>
-            <Link to={`/contact?country=${encodeURIComponent(country.name)}`}>
-              <Button variant="outline" className="border-[#3BBA93] text-[#3BBA93] hover:bg-[#3BBA93] hover:text-white font-bold rounded-xl text-xs">
+            <Button asChild variant="outline" className="border-[#3BBA93] text-[#3BBA93] hover:bg-[#3BBA93] hover:text-white font-bold rounded-xl text-xs">
+              <Link to={`/contact?country=${encodeURIComponent(country.name)}`}>
                 Schedule a Visit
-              </Button>
-            </Link>
+              </Link>
+            </Button>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-[1fr_1.5fr] gap-8 items-start">

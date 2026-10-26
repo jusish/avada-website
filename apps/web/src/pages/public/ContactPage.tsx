@@ -31,8 +31,14 @@ const FALLBACK_COUNTRIES = [
   { value: 'DRC', label: 'Democratic Republic of Congo (DRC)' },
   { value: 'Uganda', label: 'Uganda' },
   { value: 'Nigeria', label: 'Nigeria' },
+  { value: 'Ghana', label: 'Ghana' },
+  { value: 'Benin', label: 'Benin' },
+  { value: 'Togo', label: 'Togo' },
+  { value: 'Cote dIvoire', label: "Côte d'Ivoire" },
+  { value: 'Zambia', label: 'Zambia' },
   { value: 'South Africa', label: 'South Africa' },
-  { value: 'Other', label: 'Other' },
+  { value: 'UAE', label: 'United Arab Emirates (UAE)' },
+  { value: 'Other', label: 'Other African / Global Market' },
 ];
 
 export const ContactPage: React.FC = () => {
@@ -200,6 +206,8 @@ export const ContactPage: React.FC = () => {
                 </Label>
                 <Input
                   id="fullName"
+                  name="fullName"
+                  autoComplete="name"
                   type="text"
                   required
                   value={fullName}
@@ -217,6 +225,8 @@ export const ContactPage: React.FC = () => {
                   </Label>
                   <Input
                     id="email"
+                    name="email"
+                    autoComplete="email"
                     type="email"
                     required
                     value={email}
@@ -232,6 +242,8 @@ export const ContactPage: React.FC = () => {
                   </Label>
                   <Input
                     id="phone"
+                    name="phone"
+                    autoComplete="tel"
                     type="tel"
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
@@ -249,6 +261,8 @@ export const ContactPage: React.FC = () => {
                   </Label>
                   <Input
                     id="orgName"
+                    name="orgName"
+                    autoComplete="organization"
                     type="text"
                     value={orgName}
                     onChange={(e) => setOrgName(e.target.value)}
@@ -263,6 +277,8 @@ export const ContactPage: React.FC = () => {
                   </Label>
                   <Input
                     id="roleTitle"
+                    name="roleTitle"
+                    autoComplete="organization-title"
                     type="text"
                     value={roleTitle}
                     onChange={(e) => setRoleTitle(e.target.value)}
@@ -280,6 +296,7 @@ export const ContactPage: React.FC = () => {
                 <Select value={country} onValueChange={setCountry}>
                   <SelectTrigger
                     id="country"
+                    aria-label="Operational Country"
                     className="h-12 rounded-xl border-2 border-[#3BBA93] bg-white text-base px-4 focus:ring-1 focus:ring-[#3BBA93]"
                   >
                     <SelectValue placeholder="Select Country" />
@@ -302,6 +319,7 @@ export const ContactPage: React.FC = () => {
                 <Select value={inquiryType} onValueChange={setInquiryType}>
                   <SelectTrigger
                     id="inquiryType"
+                    aria-label="Type of Inquiry"
                     className="h-12 rounded-xl border-2 border-[#3BBA93] bg-white text-base px-4 focus:ring-1 focus:ring-[#3BBA93]"
                   >
                     <SelectValue placeholder="Select Inquiry Type" />
@@ -323,6 +341,7 @@ export const ContactPage: React.FC = () => {
                 </Label>
                 <textarea
                   id="message"
+                  name="message"
                   required
                   rows={5}
                   value={message}
@@ -345,7 +364,7 @@ export const ContactPage: React.FC = () => {
                       <span>Sending inquiry...</span>
                     </>
                   ) : (
-                    <span>Submit Inquiry</span>
+                    <span>Send Inquiry to Sales Team</span>
                   )}
                 </Button>
               </div>

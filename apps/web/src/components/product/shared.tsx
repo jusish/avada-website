@@ -66,17 +66,19 @@ export const ProductHero: React.FC<ProductHeroProps> = ({
         </p>
         <div className="mt-8 flex flex-wrap gap-4">
           {actions.map((a) => (
-            <Link key={a.label} to={a.to}>
-              <Button
-                className={
-                  a.variant === 'solid'
-                    ? 'h-[3.1rem] px-6 rounded-md bg-[#3BBA93] hover:bg-[#32a481] text-white text-base font-bold shadow-none transition-transform hover:-translate-y-0.5'
-                    : 'h-[3.1rem] px-6 rounded-md bg-transparent border border-[#3BBA93] text-[#3BBA93] hover:bg-[#3BBA93]/10 text-base font-bold shadow-none transition-transform hover:-translate-y-0.5'
-                }
-              >
+            <Button
+              key={a.label}
+              asChild
+              className={
+                a.variant === 'solid'
+                  ? 'h-[3.1rem] px-6 rounded-md bg-[#3BBA93] hover:bg-[#32a481] text-white text-base font-bold shadow-none transition-transform hover:-translate-y-0.5'
+                  : 'h-[3.1rem] px-6 rounded-md bg-transparent border border-[#3BBA93] text-[#3BBA93] hover:bg-[#3BBA93]/10 text-base font-bold shadow-none transition-transform hover:-translate-y-0.5'
+              }
+            >
+              <Link to={a.to}>
                 {a.label}
-              </Button>
-            </Link>
+              </Link>
+            </Button>
           ))}
         </div>
       </motion.div>

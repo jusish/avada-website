@@ -388,11 +388,11 @@ export const BulkSmsPage: React.FC = () => {
               Pick your country, enter your monthly volume, and see your blended per-SMS rate.
             </p>
             <div className="pt-2">
-              <Link to="/contact?inquiry=sms">
-                <Button className="bg-[#3BBA93] hover:bg-[#32a481] text-white font-bold px-8 h-12 rounded-lg text-base shadow-sm">
+              <Button asChild className="bg-[#3BBA93] hover:bg-[#32a481] text-white font-bold px-8 h-12 rounded-lg text-base shadow-sm">
+                <Link to="/contact?inquiry=sms">
                   Contact Us
-                </Button>
-              </Link>
+                </Link>
+              </Button>
             </div>
           </div>
 
@@ -517,11 +517,11 @@ export const BulkSmsPage: React.FC = () => {
                 </div>
 
                 {/* Buy SMS Button */}
-                <Link to={`/contact?inquiry=sms&country=${selectedCountry.name}&volume=${volume}`}>
-                  <Button className="w-full bg-[#3BBA93] hover:bg-[#32a481] text-white font-bold h-12 rounded-xl text-base shadow-md">
-                    Buy SMS
-                  </Button>
-                </Link>
+                <Button asChild className="w-full bg-[#3BBA93] hover:bg-[#32a481] text-white font-bold h-12 rounded-xl text-base shadow-md">
+                  <Link to={`/contact?inquiry=sms&country=${selectedCountry.name}&volume=${volume}`}>
+                    Get Bulk SMS Rates
+                  </Link>
+                </Button>
               </div>
             </div>
           </div>

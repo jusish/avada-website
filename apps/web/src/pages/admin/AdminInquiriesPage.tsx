@@ -30,6 +30,8 @@ import {
   Trash2,
   Save,
   RotateCw,
+  Copy,
+  Check,
 } from 'lucide-react';
 
 export const AdminInquiriesPage: React.FC = () => {
@@ -52,6 +54,16 @@ export const AdminInquiriesPage: React.FC = () => {
   const [adminNotes, setAdminNotes] = useState('');
   const [updatingStatus, setUpdatingStatus] = useState(false);
   const [savingNotes, setSavingNotes] = useState(false);
+  const [copiedField, setCopiedField] = useState<string | null>(null);
+
+  const handleCopy = (text: string, fieldId: string, e?: React.MouseEvent) => {
+    if (e) e.stopPropagation();
+    navigator.clipboard.writeText(text);
+    setCopiedField(fieldId);
+    setTimeout(() => {
+      setCopiedField((curr) => (curr === fieldId ? null : curr));
+    }, 2000);
+  };
 
   // Fetch data
   const fetchData = async () => {
@@ -412,9 +424,38 @@ export const AdminInquiriesPage: React.FC = () => {
                       <div className="font-bold text-[#2A292D] group-hover:text-[#3BBA93] transition-colors">
                         {inq.fullName}
                       </div>
-                      <div className="text-[11px] text-gray-500 flex items-center gap-2 mt-0.5">
-                        <span>{inq.email}</span>
-                        {inq.phone && <span>• {inq.phone}</span>}
+                      <div className="text-[11px] text-gray-500 flex items-center gap-1.5 mt-0.5">
+                        <button
+                          type="button"
+                          onClick={(e) => handleCopy(inq.email, `table-email-${inq.id}`, e)}
+                          title="Click to copy email address"
+                          className="hover:text-[#3BBA93] inline-flex items-center gap-1 transition-colors px-1 py-0.5 rounded hover:bg-gray-100"
+                        >
+                          <span>{inq.email}</span>
+                          {copiedField === `table-email-${inq.id}` ? (
+                            <span className="text-[#3BBA93] inline-flex items-center text-[10px] font-bold"><Check className="w-3 h-3 mr-0.5" /> Copied</span>
+                          ) : (
+                            <Copy className="w-2.5 h-2.5 opacity-40 hover:opacity-100" />
+                          )}
+                        </button>
+                        {inq.phone && (
+                          <>
+                            <span>•</span>
+                            <button
+                              type="button"
+                              onClick={(e) => handleCopy(inq.phone!, `table-phone-${inq.id}`, e)}
+                              title="Click to copy phone number"
+                              className="hover:text-[#3BBA93] inline-flex items-center gap-1 transition-colors px-1 py-0.5 rounded hover:bg-gray-100"
+                            >
+                              <span>{inq.phone}</span>
+                              {copiedField === `table-phone-${inq.id}` ? (
+                                <span className="text-[#3BBA93] inline-flex items-center text-[10px] font-bold"><Check className="w-3 h-3 mr-0.5" /> Copied</span>
+                              ) : (
+                                <Copy className="w-2.5 h-2.5 opacity-40 hover:opacity-100" />
+                              )}
+                            </button>
+                          </>
+                        )}
                       </div>
                       {inq.orgName && (
                         <div className="text-[10px] text-gray-400 flex items-center gap-1 mt-0.5">
@@ -494,21 +535,47 @@ export const AdminInquiriesPage: React.FC = () => {
                   <span className="text-xs text-white/70 font-mono">ID: {activeInquiry.id.slice(0, 8)}</span>
                 </div>
                 <DialogTitle className="text-xl font-bold text-white">{activeInquiry.fullName}</DialogTitle>
-                <div className="text-xs text-white/70 mt-1 flex flex-wrap items-center gap-3">
-                  <span className="flex items-center gap-1">
+                <div className="text-xs text-white/90 mt-2.5 flex flex-wrap items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={(e) => handleCopy(activeInquiry.email, 'modal-email', e)}
+                    className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-white/10 hover:bg-white/20 transition-all text-white border border-white/15 cursor-pointer group active:scale-95"
+                    title="Click to copy email address"
+                  >
                     <Mail className="w-3.5 h-3.5 text-[#3BBA93]" />
-                    {activeInquiry.email}
-                  </span>
+                    <span className="font-mono text-xs">{activeInquiry.email}</span>
+                    {copiedField === 'modal-email' ? (
+                      <span className="inline-flex items-center gap-1 text-[#3BBA93] text-[11px] font-bold bg-[#3BBA93]/20 px-1.5 py-0.5 rounded">
+                        <Check className="w-3 h-3" /> Copied!
+                      </span>
+                    ) : (
+                      <Copy className="w-3 h-3 text-white/50 group-hover:text-white transition-colors" />
+                    )}
+                  </button>
+
                   {activeInquiry.phone && (
-                    <span className="flex items-center gap-1">
+                    <button
+                      type="button"
+                      onClick={(e) => handleCopy(activeInquiry.phone!, 'modal-phone', e)}
+                      className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-white/10 hover:bg-white/20 transition-all text-white border border-white/15 cursor-pointer group active:scale-95"
+                      title="Click to copy phone number"
+                    >
                       <Phone className="w-3.5 h-3.5 text-[#3BBA93]" />
-                      {activeInquiry.phone}
-                    </span>
+                      <span className="font-mono text-xs">{activeInquiry.phone}</span>
+                      {copiedField === 'modal-phone' ? (
+                        <span className="inline-flex items-center gap-1 text-[#3BBA93] text-[11px] font-bold bg-[#3BBA93]/20 px-1.5 py-0.5 rounded">
+                          <Check className="w-3 h-3" /> Copied!
+                        </span>
+                      ) : (
+                        <Copy className="w-3 h-3 text-white/50 group-hover:text-white transition-colors" />
+                      )}
+                    </button>
                   )}
+
                   {activeInquiry.orgName && (
-                    <span className="flex items-center gap-1">
+                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-white/5 text-white/70 border border-white/10">
                       <Building className="w-3.5 h-3.5 text-[#3BBA93]" />
-                      {activeInquiry.orgName}
+                      <span>{activeInquiry.orgName}</span>
                     </span>
                   )}
                 </div>

@@ -84,7 +84,7 @@ const RwandaHeroVisual: React.FC = () => (
 
     <div className="pt-3 border-t border-white/10 flex items-center justify-between text-[11px] text-gray-400">
       <span>Kigali Central Node</span>
-      <span className="text-[#3BBA93] font-mono font-bold">99.98% SLA</span>
+      <span className="text-[#3BBA93] font-mono font-bold">99.9% SLA</span>
     </div>
   </div>
 );
@@ -214,16 +214,16 @@ export const RwandaPage: React.FC = () => {
               transaction by SMS. Keep finance teams aligned, all from one dashboard with AvadaPay.
             </p>
             <div className="mt-8 flex flex-wrap gap-4">
-              <Link to="/contact?country=Rwanda">
-                <Button className="h-[3.1rem] px-7 rounded-md bg-[#3BBA93] hover:bg-[#32a481] text-white text-base font-bold shadow-none">
+              <Button asChild className="h-[3.1rem] px-7 rounded-md bg-[#3BBA93] hover:bg-[#32a481] text-white text-base font-bold shadow-none">
+                <Link to="/contact?country=Rwanda">
                   Contact Us
-                </Button>
-              </Link>
-              <Link to="/contact?country=Rwanda&inquiry=pricing">
-                <Button className="h-[3.1rem] px-7 rounded-md bg-transparent border border-[#3BBA93] text-[#3BBA93] hover:bg-[#3BBA93]/10 text-base font-bold shadow-none">
-                  View Rwanda Pricing
-                </Button>
-              </Link>
+                </Link>
+              </Button>
+              <Button asChild className="h-[3.1rem] px-7 rounded-md bg-transparent border border-[#3BBA93] text-[#3BBA93] hover:bg-[#3BBA93]/10 text-base font-bold shadow-none">
+                <Link to="/contact?country=Rwanda&inquiry=pricing">
+                  Get Rwanda Pricing
+                </Link>
+              </Button>
             </div>
           </div>
 
@@ -403,12 +403,12 @@ export const RwandaPage: React.FC = () => {
               BHC Building, KG 7 Ave Kacyiru, Gasabo, Kigali, Rwanda
             </p>
             <div className="mt-4">
-              <Link to="/contact?country=Rwanda&inquiry=meeting">
-                <Button className="h-11 px-6 bg-[#3BBA93] hover:bg-[#32a481] text-white font-bold rounded-lg flex items-center space-x-2">
+              <Button asChild className="h-11 px-6 bg-[#3BBA93] hover:bg-[#32a481] text-white font-bold rounded-lg flex items-center space-x-2">
+                <Link to="/contact?country=Rwanda&inquiry=meeting">
                   <span>Book a meeting</span>
-                  <ArrowRight className="w-4 h-4" />
-                </Button>
-              </Link>
+                  <ArrowRight className="w-4 h-4 ml-1" />
+                </Link>
+              </Button>
             </div>
           </div>
         </div>

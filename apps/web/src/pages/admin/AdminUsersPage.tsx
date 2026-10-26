@@ -25,6 +25,8 @@ import {
   Save,
   ToggleLeft,
   ToggleRight,
+  Eye,
+  EyeOff,
 } from 'lucide-react';
 
 export const AdminUsersPage: React.FC = () => {
@@ -40,6 +42,7 @@ export const AdminUsersPage: React.FC = () => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [roleId, setRoleId] = useState('');
   const [status, setStatus] = useState<'ACTIVE' | 'INVITED' | 'SUSPENDED'>('ACTIVE');
   const [saving, setSaving] = useState(false);
@@ -78,6 +81,7 @@ export const AdminUsersPage: React.FC = () => {
     setName('');
     setEmail('');
     setPassword('');
+    setShowPassword(false);
     setRoleId(roles[0]?.id || '');
     setStatus('ACTIVE');
     setIsModalOpen(true);
@@ -89,6 +93,7 @@ export const AdminUsersPage: React.FC = () => {
     setName(u.name);
     setEmail(u.email);
     setPassword(''); // leave blank if not changing
+    setShowPassword(false);
     setRoleId(u.roleId);
     setStatus(u.status || 'ACTIVE');
     setIsModalOpen(true);
@@ -399,14 +404,24 @@ export const AdminUsersPage: React.FC = () => {
               <label className="block text-xs font-semibold text-gray-700 mb-1">
                 {editingUser ? 'Update Password (leave blank to keep current)' : 'Account Password *'}
               </label>
-              <input
-                type="password"
-                required={!editingUser}
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder={editingUser ? '••••••••' : 'Minimum 8 characters'}
-                className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#3BBA93] focus:bg-white text-[#2A292D]"
-              />
+              <div className="relative">
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  required={!editingUser}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder={editingUser ? '••••••••' : 'Minimum 8 characters'}
+                  className="w-full p-2.5 pr-10 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#3BBA93] focus:bg-white text-[#2A292D]"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-2.5 text-gray-400 hover:text-gray-600 transition-colors"
+                  aria-label={showPassword ? 'Hide password' : 'Show password'}
+                >
+                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
+              </div>
             </div>
 
             <div>
