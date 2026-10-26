@@ -165,18 +165,19 @@ export const Footer: React.FC = () => {
       phone: contacts.supportPhone,
       address: contacts.officeAddress,
     };
-  } else if (cleanPath in BUILTIN_COUNTRY_CONTACTS) {
-    contactColumn = BUILTIN_COUNTRY_CONTACTS[cleanPath];
   } else if (
     matchedCountry &&
     (matchedCountry.officeAddress || matchedCountry.officeEmail || matchedCountry.officePhone)
   ) {
+    const builtin = BUILTIN_COUNTRY_CONTACTS[cleanPath];
     contactColumn = {
       title: 'Contact Us',
-      email: matchedCountry.officeEmail || undefined,
-      phone: matchedCountry.officePhone || undefined,
-      address: matchedCountry.officeAddress || undefined,
+      email: matchedCountry.officeEmail || builtin?.email || undefined,
+      phone: matchedCountry.officePhone || builtin?.phone || undefined,
+      address: matchedCountry.officeAddress || builtin?.address || undefined,
     };
+  } else if (cleanPath in BUILTIN_COUNTRY_CONTACTS) {
+    contactColumn = BUILTIN_COUNTRY_CONTACTS[cleanPath];
   }
 
   return (
@@ -204,8 +205,7 @@ export const Footer: React.FC = () => {
             {cta.secondary && (
               <Button
                 asChild
-                variant="outline"
-                className="h-11 px-6 rounded-md bg-transparent border-[#3BBA93]/70 text-[#3BBA93] hover:bg-[#3BBA93]/10 hover:text-[#3BBA93] font-bold text-[15px]"
+                className="h-11 px-6 rounded-md bg-transparent border border-[#3BBA93]/70 text-[#3BBA93] hover:bg-[#3BBA93] hover:text-white font-bold text-[15px] transition-colors"
               >
                 <Link to={cta.secondary.to}>
                   {cta.secondary.label}

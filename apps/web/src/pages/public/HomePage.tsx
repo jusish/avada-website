@@ -1,6 +1,14 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowRight, ChevronUp, ExternalLink } from 'lucide-react';
+import {
+  ArrowRight,
+  ChevronUp,
+  ExternalLink,
+  CheckCircle2,
+  Zap,
+  Smartphone,
+  ShieldCheck,
+} from 'lucide-react';
 import { motion } from 'framer-motion';
 import { CIRCLE_FLAGS } from '@/components/home/CircleFlags';
 import { ROW_ONE, ROW_TWO } from '@/components/home/PartnerLogos';
@@ -46,6 +54,57 @@ const UNDER_HERO_ITEMS = [
   { Icon: CloudPlatformIcon, text: 'One platform.' },
   { Icon: PaperPlane, text: 'Payments and' },
   { Icon: ChatBubbleIcon, text: 'SMS across Africa.' },
+];
+
+const INTRO_CAPABILITIES = [
+  {
+    id: 'zero-stitching',
+    icon: Zap,
+    title: 'Zero Stitching',
+    subtitle: 'One contract & API instead of 5+ per country',
+    tag: 'Single API Gateway',
+    description:
+      'Eliminate the complexity of negotiating separate telco agreements, maintaining fragmented SDKs, and managing disjointed escrow balances across multiple countries.',
+    badge: '1 Contract • 17+ Hubs',
+    points: [
+      'Single commercial agreement covers all operating African corridors',
+      'One unified REST API & signed webhook standard for every payment method',
+      'Unified treasury and automated reconciliation against your internal order IDs',
+    ],
+    metric: { value: '1 Unified API', label: 'Replaces 17+ fragmented gateways' },
+  },
+  {
+    id: 'omni-channel',
+    icon: Smartphone,
+    title: 'Omni-Channel Flow',
+    subtitle: 'Collections, payouts, POS, and SMS synchronized',
+    tag: 'Synchronized Ledger',
+    description:
+      'Accept customer mobile money and cards, disburse bulk payouts to agents, swipe Smart POS terminals in-store, and send transaction SMS through one central ledger.',
+    badge: 'Real-time Orchestration',
+    points: [
+      'Direct mobile money rails across all regional carriers + global card schemes',
+      'Instant automated bulk disbursements to mobile wallets and bank accounts',
+      'Android Smart POS terminals connected live to your merchant analytics',
+    ],
+    metric: { value: '4-in-1', label: 'Payments, Payouts, POS & SMS' },
+  },
+  {
+    id: 'local-settlement',
+    icon: ShieldCheck,
+    title: 'Local Settlement',
+    subtitle: 'Direct multi-currency payouts in local fiat currency',
+    tag: 'Local Clearing',
+    description:
+      'Settle locally in your preferred local fiat or international currencies next-day directly to your bank account with complete transparency and zero hidden cross-border FX markups.',
+    badge: '99.9% Uptime SLA',
+    points: [
+      'Next-day automated bank clearing directly into your registered commercial account',
+      'Real-time multi-currency exchange rates and transparent ledger balances',
+      'Enterprise-grade financial audit trails and automated exportable reports',
+    ],
+    metric: { value: '99.9% SLA', label: 'Settlement reliability guaranteed' },
+  },
 ];
 
 const TwoToneHeading: React.FC<{ green: string; dark: string; className?: string }> = ({
@@ -142,6 +201,7 @@ const OFFICES: OfficeItem[] = [
 
 export const HomePage: React.FC = () => {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
+  const [activeCapability, setActiveCapability] = useState(0);
 
   return (
     <div className="flex flex-col bg-white text-[#2A292D] font-sans overflow-x-hidden">
@@ -217,8 +277,7 @@ export const HomePage: React.FC = () => {
             </Button>
             <Button
               asChild
-              variant="outline"
-              className="h-12 px-7 rounded-xl border border-white/30 bg-white/10 hover:bg-white/20 text-white font-bold text-sm sm:text-base backdrop-blur-sm"
+              className="h-12 px-7 rounded-xl border border-white/30 bg-white/10 hover:bg-white/20 text-white hover:text-white hover:border-white/60 font-bold text-sm sm:text-base backdrop-blur-sm transition-all"
             >
               <Link to="/docs">
                 Explore API Docs
@@ -244,35 +303,153 @@ export const HomePage: React.FC = () => {
         </motion.div>
       </section>
 
-      {/* 2 — INTRO SECTION & 3-ITEM MARQUEE */}
-      <section className="bg-white pt-12 sm:pt-16 pb-14 sm:pb-20">
-        <FadeIn delay={0.05}>
+      {/* 2 — INTRO SECTION & LIVE MARQUEE TICKER */}
+      <section className="bg-white pt-10 sm:pt-14 pb-14 sm:pb-20 overflow-hidden">
+        {/* Ticker Strip in Refined Container */}
+        <div className="relative border-y border-gray-100 bg-[#FAFAFC] py-4 sm:py-5">
+          <div className="pointer-events-none absolute inset-y-0 left-0 w-16 sm:w-28 bg-gradient-to-r from-white to-transparent z-10" />
+          <div className="pointer-events-none absolute inset-y-0 right-0 w-16 sm:w-28 bg-gradient-to-l from-white to-transparent z-10" />
+
           <Marquee animation="animate-marquee-slow">
             <div className="flex items-center">
               {UNDER_HERO_ITEMS.map((item, idx) => (
-                <div key={idx} className="flex items-center gap-3.5 sm:gap-4.5 pr-12 sm:pr-20 shrink-0">
-                  <item.Icon className="w-8 sm:w-11 h-auto shrink-0" />
-                  <span className="whitespace-nowrap font-extrabold tracking-tight text-[#2A292D] text-2xl sm:text-4xl md:text-[42px] leading-none">
+                <div key={idx} className="flex items-center gap-3 sm:gap-4 pr-12 sm:pr-20 shrink-0">
+                  <div className="w-8 sm:w-9 h-8 sm:h-9 rounded-xl bg-[#3BBA93]/10 flex items-center justify-center shrink-0">
+                    <item.Icon className="w-5 sm:w-6 h-auto" />
+                  </div>
+                  <span className="whitespace-nowrap font-extrabold tracking-tight text-[#2A292D] text-lg sm:text-2xl md:text-[26px] leading-none">
                     {item.text}
                   </span>
+                  <span className="text-[#3BBA93] text-sm ml-4 sm:ml-8 opacity-40 font-bold">•</span>
                 </div>
               ))}
             </div>
           </Marquee>
-        </FadeIn>
+        </div>
 
-        <FadeIn delay={0.15} className="max-w-3xl mx-auto px-6 mt-10 sm:mt-14 text-center text-sm sm:text-base md:text-[17px] leading-relaxed text-gray-600 space-y-5">
-          <p>
-            African businesses don’t operate in a single payment world. Customers pay through
-            M-Pesa in Nairobi, Orange Money in Kinshasa, Tigo Pesa in Dar es Salaam, and cards
-            almost everywhere. AvadaPay connects you to all of it through one integration.
-          </p>
-          <p>
-            Collect payments, send payouts to agents and customers, accept in-person payments
-            through POS, and communicate every transaction through SMS, without stitching
-            together five different providers per country.
-          </p>
-        </FadeIn>
+        {/* 2-Column Feature Showcase: Narrative on Left, Interactive Capability Navigator on Right */}
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 mt-12 sm:mt-16">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-center">
+            {/* Left Column: Narrative and CTAs (6 cols) */}
+            <FadeIn delay={0.1} className="lg:col-span-6 space-y-6">
+              <h2 className="text-3xl sm:text-4xl lg:text-[42px] font-black tracking-tight text-[#2A292D] leading-[1.12]">
+                African commerce is fragmented.{' '}
+                <span className="text-[#3BBA93] block mt-1">We make it unified.</span>
+              </h2>
+
+              <p className="text-base sm:text-lg text-gray-700 leading-relaxed font-normal">
+                African businesses don&apos;t operate in a single payment world. Customers pay through
+                regional mobile money wallets, national bank rails, and international cards across diverse markets.
+                AvadaPay connects you to all of them through one seamless integration.
+              </p>
+
+              <p className="text-sm sm:text-base text-gray-600 leading-relaxed font-normal">
+                Collect payments, send payouts to agents and customers, accept in-person payments
+                through POS, and communicate every transaction through SMS, without stitching
+                together multiple disconnected providers per country.
+              </p>
+
+              <div className="pt-2 flex flex-wrap items-center gap-4">
+                <Button asChild className="h-11 px-6 rounded-xl bg-[#2A292D] hover:bg-black text-white font-bold text-sm shadow-md transition-all">
+                  <Link to="/contact">
+                    <span>Talk to Sales</span>
+                    <ArrowRight className="w-4 h-4 ml-2" />
+                  </Link>
+                </Button>
+                <Link
+                  to="/docs"
+                  className="inline-flex items-center gap-1.5 text-xs font-bold text-[#3BBA93] hover:text-[#2d9676] transition-colors"
+                >
+                  <span>Explore developer documentation</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </Link>
+              </div>
+            </FadeIn>
+
+            {/* Right Column: Interactive Capability Switcher (6 cols) */}
+            <FadeIn delay={0.2} className="lg:col-span-6">
+              <div className="space-y-4">
+                {/* 3-Tab Navigator Bar */}
+                <div className="flex p-1.5 bg-gray-100 rounded-2xl space-x-1 border border-gray-200/80">
+                  {INTRO_CAPABILITIES.map((cap, idx) => {
+                    const Icon = cap.icon;
+                    const isActive = activeCapability === idx;
+                    return (
+                      <button
+                        key={cap.id}
+                        type="button"
+                        onClick={() => setActiveCapability(idx)}
+                        className={`flex-1 py-2.5 px-3 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
+                          isActive
+                            ? 'bg-white text-[#2A292D] shadow-sm ring-1 ring-black/5'
+                            : 'text-gray-500 hover:text-gray-900'
+                        }`}
+                      >
+                        <Icon className={`w-3.5 h-3.5 ${isActive ? 'text-[#3BBA93]' : 'text-gray-400'}`} />
+                        <span className="hidden sm:inline">{cap.title}</span>
+                        <span className="sm:hidden">{cap.title.split(' ')[0]}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+
+                {/* Selected Capability Details Card */}
+                {(() => {
+                  const current = INTRO_CAPABILITIES[activeCapability] || INTRO_CAPABILITIES[0];
+                  const Icon = current.icon;
+                  return (
+                    <motion.div
+                      key={current.id}
+                      initial={{ opacity: 0, y: 8 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.25 }}
+                      className="rounded-3xl border border-gray-200/90 bg-gradient-to-b from-gray-50/70 via-white to-white p-6 sm:p-7 shadow-xs space-y-4"
+                    >
+                      <div className="flex items-center justify-between">
+                        <div className="w-10 h-10 rounded-xl bg-[#3BBA93]/15 text-[#3BBA93] flex items-center justify-center font-bold">
+                          <Icon className="w-5 h-5" />
+                        </div>
+                        <span className="text-[10px] font-bold text-[#3BBA93] bg-[#E3F5EE] px-2.5 py-0.5 rounded-full border border-[#3BBA93]/30">
+                          {current.tag}
+                        </span>
+                      </div>
+
+                      <div>
+                        <h3 className="text-lg sm:text-xl font-extrabold text-[#2A292D]">
+                          {current.title}
+                        </h3>
+                        <p className="text-xs sm:text-sm text-gray-500 font-semibold mt-0.5">
+                          {current.subtitle}
+                        </p>
+                      </div>
+
+                      <p className="text-xs sm:text-sm text-gray-600 leading-relaxed font-normal">
+                        {current.description}
+                      </p>
+
+                      <div className="pt-2 border-t border-gray-150 space-y-2">
+                        {current.points.map((p, i) => (
+                          <div key={i} className="flex items-start space-x-2.5 text-xs text-gray-700 font-medium">
+                            <CheckCircle2 className="w-3.5 h-3.5 text-[#3BBA93] shrink-0 mt-0.5" />
+                            <span>{p}</span>
+                          </div>
+                        ))}
+                      </div>
+
+                      <div className="pt-3 border-t border-gray-150 flex items-center justify-between text-xs">
+                        <span className="font-bold text-[#3BBA93] flex items-center gap-1">
+                          <span className="w-1.5 h-1.5 rounded-full bg-[#3BBA93] animate-pulse" />
+                          {current.badge}
+                        </span>
+                        <span className="text-gray-500 font-medium">{current.metric.label}</span>
+                      </div>
+                    </motion.div>
+                  );
+                })()}
+              </div>
+            </FadeIn>
+          </div>
+        </div>
       </section>
 
       {/* 3 — FOUR WAYS SECTION */}

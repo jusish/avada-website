@@ -17,6 +17,8 @@ import { CountryFlag } from '@/components/CountryFlag';
 import { FadeIn, StaggerContainer, StaggerItem, HoverScale } from '@/components/motion/Motion';
 import { OptimizedImage } from '@/components/ui/OptimizedImage';
 import { SEO } from '@/components/seo/SEO';
+import { useSiteConfig } from '@/context/SiteConfigContext';
+import { resolveMapEmbedUrl } from '@/lib/maps';
 
 /* ------------------------------------------------------------------ */
 /* Accordion component                                                 */
@@ -134,6 +136,11 @@ const KenyaHeroVisual: React.FC = () => (
 /* ------------------------------------------------------------------ */
 
 export const KenyaPage: React.FC = () => {
+  const { countries } = useSiteConfig();
+  const keData = countries.find((c) => c.slug === 'kenya' || c.code.toLowerCase() === 'ke');
+  const officeAddress = keData?.officeAddress || '8th Floor, Westpark Towers, Westlands, Nairobi, Kenya';
+  const mapEmbedUrl = resolveMapEmbedUrl(keData?.mapEmbedUrl, officeAddress);
+
   const [openSector, setOpenSector] = useState<number | null>(null);
 
   const paymentPills = [
@@ -483,7 +490,7 @@ export const KenyaPage: React.FC = () => {
           <div className="h-72 sm:h-96 w-full rounded-3xl overflow-hidden border border-gray-200 shadow-md bg-gray-100">
             <iframe
               title="AvadaPay Kenya Office — Westpark Towers, Nairobi"
-              src="https://www.google.com/maps?q=Westpark+Towers+Westlands+Nairobi+Kenya&output=embed"
+              src={mapEmbedUrl}
               className="w-full h-full border-0"
               loading="lazy"
               referrerPolicy="no-referrer-when-downgrade"
@@ -493,7 +500,7 @@ export const KenyaPage: React.FC = () => {
           <div className="mt-6">
             <h3 className="text-xl sm:text-2xl font-black text-[#2A292D]">Nairobi</h3>
             <p className="mt-1.5 text-base font-semibold text-gray-600">
-              8th Floor, Westpark Towers, Westlands, Nairobi.
+              {officeAddress}
             </p>
             <div className="mt-4">
               <Button asChild className="h-11 px-6 bg-[#3BBA93] hover:bg-[#32a481] text-white font-bold rounded-lg flex items-center space-x-2">

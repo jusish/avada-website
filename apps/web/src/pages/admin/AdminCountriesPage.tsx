@@ -23,7 +23,11 @@ import {
   CreditCard,
   Search,
   Save,
+  Phone,
+  Mail,
+  Sparkles,
 } from 'lucide-react';
+import { resolveMapEmbedUrl, getMapExternalLink } from '@/lib/maps';
 
 export const AdminCountriesPage: React.FC = () => {
   const { token, canEdit } = useAuth();
@@ -46,6 +50,7 @@ export const AdminCountriesPage: React.FC = () => {
     paymentRails: '',
     officeAddress: '',
     officePhone: '',
+    officeEmail: '',
     mapEmbedUrl: '',
   });
   const [saving, setSaving] = useState(false);
@@ -88,6 +93,7 @@ export const AdminCountriesPage: React.FC = () => {
       paymentRails: 'Mobile Money, Visa, Mastercard, Bank Payouts',
       officeAddress: '',
       officePhone: '+260 968 332 766',
+      officeEmail: '',
       mapEmbedUrl: '',
     });
     setIsModalOpen(true);
@@ -108,6 +114,7 @@ export const AdminCountriesPage: React.FC = () => {
       paymentRails: Array.isArray(c.paymentRails) ? c.paymentRails.join(', ') : '',
       officeAddress: c.officeAddress || '',
       officePhone: c.officePhone || '',
+      officeEmail: c.officeEmail || '',
       mapEmbedUrl: c.mapEmbedUrl || '',
     });
     setIsModalOpen(true);
@@ -140,6 +147,11 @@ export const AdminCountriesPage: React.FC = () => {
     if (!token || !canEdit('countries')) return;
     setSaving(true);
     try {
+      const resolvedMap = resolveMapEmbedUrl(
+        form.mapEmbedUrl,
+        form.officeAddress || (form.name ? `${form.name} Office` : '')
+      );
+
       const payload = {
         name: form.name,
         slug: form.slug,
@@ -148,9 +160,10 @@ export const AdminCountriesPage: React.FC = () => {
         headline: form.headline,
         description: form.description,
         active: form.active,
-        officeAddress: form.officeAddress,
-        officePhone: form.officePhone,
-        mapEmbedUrl: form.mapEmbedUrl,
+        officeAddress: form.officeAddress.trim() || null,
+        officePhone: form.officePhone.trim() || null,
+        officeEmail: form.officeEmail.trim() || null,
+        mapEmbedUrl: resolvedMap || null,
         telcoPartners: form.telcoPartners
           .split(',')
           .map((s) => s.trim())
@@ -232,7 +245,14 @@ export const AdminCountriesPage: React.FC = () => {
       c.name.toLowerCase().includes(search.toLowerCase()) ||
       c.code.toLowerCase().includes(search.toLowerCase()) ||
       c.slug.toLowerCase().includes(search.toLowerCase()) ||
-      (c.officeAddress && c.officeAddress.toLowerCase().includes(search.toLowerCase()))
+      (c.officeAddress && c.officeAddress.toLowerCase().includes(search.toLowerCase())) ||
+      (c.officeEmail && c.officeEmail.toLowerCase().includes(search.toLowerCase())) ||
+      (c.officePhone && c.officePhone.toLowerCase().includes(search.toLowerCase()))
+  );
+
+  const previewMapUrl = resolveMapEmbedUrl(
+    form.mapEmbedUrl,
+    form.officeAddress || (form.name ? `${form.name} Office` : '')
   );
 
   return (
@@ -348,6 +368,24 @@ export const AdminCountriesPage: React.FC = () => {
                       {country.officeAddress || 'No regional physical office configured'}
                     </p>
                   </div>
+
+                  {/* Office Contact Info (Phone & Email) */}
+                  {(country.officePhone || country.officeEmail) && (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-2 border-t border-gray-100">
+                      {country.officePhone && (
+                        <div className="flex items-center gap-1.5 text-gray-600">
+                          <Phone className="w-3 h-3 text-[#3BBA93] shrink-0" />
+                          <span className="truncate">{country.officePhone}</span>
+                        </div>
+                      )}
+                      {country.officeEmail && (
+                        <div className="flex items-center gap-1.5 text-gray-600">
+                          <Mail className="w-3 h-3 text-[#3BBA93] shrink-0" />
+                          <span className="truncate">{country.officeEmail}</span>
+                        </div>
+                      )}
+                    </div>
+                  )}
 
                   {/* Telecom & Carrier Partners */}
                   <div>
@@ -523,31 +561,103 @@ export const AdminCountriesPage: React.FC = () => {
               />
             </div>
 
-            <div>
-              <label className="block text-xs font-bold text-gray-700 mb-1">Office Contact Phone</label>
-              <input
-                type="text"
-                value={form.officePhone}
-                onChange={(e) => setForm({ ...form, officePhone: e.target.value })}
-                placeholder="+256 700 000 000"
-                className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#3BBA93] focus:bg-white text-[#2A292D]"
-              />
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label className="block text-xs font-bold text-gray-700 mb-1">Office Contact Phone</label>
+                <input
+                  type="text"
+                  value={form.officePhone}
+                  onChange={(e) => setForm({ ...form, officePhone: e.target.value })}
+                  placeholder="+256 700 000 000"
+                  className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#3BBA93] focus:bg-white text-[#2A292D]"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-gray-700 mb-1">Office Support Email</label>
+                <input
+                  type="email"
+                  value={form.officeEmail}
+                  onChange={(e) => setForm({ ...form, officeEmail: e.target.value })}
+                  placeholder="e.g. rwanda@avadapay.com"
+                  className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#3BBA93] focus:bg-white text-[#2A292D]"
+                />
+              </div>
             </div>
 
-            <div>
-              <label className="block text-xs font-bold text-gray-700 mb-1">
-                Google Maps Embed URL (Iframe src)
-              </label>
+            {/* Google Maps Location & Instant Live Preview */}
+            <div className="space-y-2 pt-1">
+              <div className="flex items-center justify-between">
+                <label className="block text-xs font-bold text-gray-700">
+                  Office Location Map
+                </label>
+                {form.officeAddress && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setForm((prev) => ({
+                        ...prev,
+                        mapEmbedUrl: prev.officeAddress,
+                      }));
+                    }}
+                    className="inline-flex items-center gap-1 text-[11px] font-bold text-[#3BBA93] hover:text-[#2d9676] transition-colors"
+                  >
+                    <Sparkles className="w-3 h-3" />
+                    <span>Auto-fill from Address</span>
+                  </button>
+                )}
+              </div>
               <input
                 type="text"
                 value={form.mapEmbedUrl}
-                onChange={(e) => setForm({ ...form, mapEmbedUrl: e.target.value })}
-                placeholder="https://www.google.com/maps/embed?pb=..."
+                onChange={(e) => {
+                  const val = e.target.value;
+                  // If user pasted an iframe snippet, automatically extract src
+                  if (val.includes('<iframe') && val.includes('src=')) {
+                    const match = val.match(/src=["']([^"']+)["']/i);
+                    setForm({ ...form, mapEmbedUrl: match ? match[1] : val });
+                  } else {
+                    setForm({ ...form, mapEmbedUrl: val });
+                  }
+                }}
+                placeholder="Enter building, street address, Google Maps link, or iframe..."
                 className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-xl font-mono text-[11px] focus:ring-2 focus:ring-[#3BBA93] focus:bg-white text-[#2A292D]"
               />
-              <span className="text-[10px] text-gray-400 mt-1 block">
-                Paste the full src link from Google Maps &gt; Share &gt; Embed a map.
+              <span className="text-[10px] text-gray-500 block leading-tight">
+                💡 <strong>Quick Location:</strong> You can type any building or street name (e.g. <em>&quot;Kigali Heights, Kigali&quot;</em>), paste a Google Maps link, or click <strong>Auto-fill from Address</strong>. No need to extract iframe code!
               </span>
+
+              {/* Real-time Interactive Map Preview */}
+              {previewMapUrl ? (
+                <div className="mt-2 space-y-1">
+                  <div className="w-full h-44 rounded-xl overflow-hidden border border-gray-200 bg-gray-100 shadow-inner">
+                    <iframe
+                      title="Office Map Live Preview"
+                      src={previewMapUrl}
+                      className="w-full h-full border-0"
+                      loading="lazy"
+                    />
+                  </div>
+                  <div className="flex justify-between items-center text-[10px] text-gray-500 px-1 pt-0.5">
+                    <span className="text-emerald-600 font-semibold flex items-center gap-1">
+                      ✓ Interactive Map Preview active
+                    </span>
+                    <a
+                      href={getMapExternalLink(previewMapUrl)}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="hover:underline text-[#3BBA93] font-semibold flex items-center gap-0.5"
+                    >
+                      <span>Open in Google Maps</span>
+                      <ExternalLink className="w-2.5 h-2.5" />
+                    </a>
+                  </div>
+                </div>
+              ) : (
+                <div className="w-full py-4 px-3 rounded-xl bg-gray-50 border border-dashed border-gray-200 text-center text-[11px] text-gray-400">
+                  Enter an address or location above to see a live map preview here.
+                </div>
+              )}
             </div>
 
             <div>
