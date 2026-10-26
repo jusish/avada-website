@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Routes, Route, Navigate, Outlet, useLocation, useParams } from 'react-router-dom';
 import { AuthProvider, useAuth } from '@/context/AuthContext';
 import { SiteConfigProvider } from '@/context/SiteConfigContext';
@@ -53,10 +53,49 @@ const CountryRedirect: React.FC = () => {
   return <Navigate to={`/${countrySlug || ''}`} replace />;
 };
 
+// Admin Route Title Mapping
+const ADMIN_ROUTE_TITLES: Record<string, string> = {
+  '/admin': 'Dashboard Overview | AvadaPay CMS',
+  '/admin/dashboard': 'Dashboard Overview | AvadaPay CMS',
+  '/admin/insights/analytics': 'Analytics & Telemetry | AvadaPay CMS',
+  '/admin/insights/security': 'Security Telemetry | AvadaPay CMS',
+  '/admin/inquiries': 'Inquiries CRM | AvadaPay CMS',
+  '/admin/inquiries/types': 'Inquiry Categories | AvadaPay CMS',
+  '/admin/content/countries': 'Regional Markets | AvadaPay CMS',
+  '/admin/content/articles': 'Articles & Announcements | AvadaPay CMS',
+  '/admin/content/policies': 'Legal Policies | AvadaPay CMS',
+  '/admin/content/settings': 'Global Site Settings | AvadaPay CMS',
+  '/admin/integrations': 'Connected Integrations | AvadaPay CMS',
+  '/admin/integrations/logs': 'Integration Telemetry Logs | AvadaPay CMS',
+  '/admin/settings/integrations': 'Connected Integrations | AvadaPay CMS',
+  '/admin/governance/roles': 'Role Permissions | AvadaPay CMS',
+  '/admin/governance/users': 'User Directory | AvadaPay CMS',
+  '/admin/governance/audit-logs': 'Audit Logs | AvadaPay CMS',
+  '/admin/roles': 'Role Permissions | AvadaPay CMS',
+  '/admin/users': 'User Directory | AvadaPay CMS',
+  '/admin/audit-logs': 'Audit Logs | AvadaPay CMS',
+};
+
 // Admin Protected Layout
 const AdminProtectedLayout: React.FC = () => {
   const { token, isLoading } = useAuth();
   const location = useLocation();
+
+  useEffect(() => {
+    const cleanPath = location.pathname.replace(/\/$/, '');
+    const title = ADMIN_ROUTE_TITLES[cleanPath] || 'Administration Portal | AvadaPay CMS';
+    document.title = title;
+
+    if (typeof document !== 'undefined') {
+      let metaRobots = document.querySelector('meta[name="robots"]') as HTMLMetaElement | null;
+      if (!metaRobots) {
+        metaRobots = document.createElement('meta');
+        metaRobots.name = 'robots';
+        document.head.appendChild(metaRobots);
+      }
+      metaRobots.content = 'noindex, nofollow';
+    }
+  }, [location.pathname]);
 
   if (isLoading) {
     return (

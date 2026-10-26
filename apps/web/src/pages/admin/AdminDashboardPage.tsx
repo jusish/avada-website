@@ -88,7 +88,7 @@ export const AdminDashboardPage: React.FC = () => {
             <Link to="/admin/content/countries">
               <Button size="sm" variant="ghost" className="rounded-lg text-xs font-semibold bg-black/40 hover:bg-black/60 text-white/90 border border-white/15 hover:border-[#3BBA93]/40 space-x-1.5 transition-colors">
                 <Globe2 className="w-3.5 h-3.5 text-[#3BBA93]" />
-                <span>African Markets</span>
+                <span>Regional Presence</span>
               </Button>
             </Link>
             <Link to="/admin/insights/analytics">

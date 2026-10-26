@@ -20,6 +20,7 @@ import {
   DialogDescription,
 } from '@/components/ui/dialog';
 import { CountryFlag } from '@/components/CountryFlag';
+import { SEO } from '@/components/seo/SEO';
 import {
   Briefcase,
   Search,
@@ -252,6 +253,12 @@ export const CareersPage: React.FC = () => {
 
   return (
     <div className="bg-[#F8FAFC] min-h-screen">
+      <SEO
+        title={activeVacancy ? `${activeVacancy.title} - Careers` : 'Careers & Open Positions'}
+        description="Explore open engineering, product, operations, and leadership roles at AvadaPay across Rwanda, Kenya, Tanzania, DRC, and Dubai HQ."
+        canonical="/careers"
+        keywords="AvadaPay careers, fintech jobs Africa, engineering jobs Nairobi, tech jobs Kigali"
+      />
       {/* 1. Hero Section */}
       <section className="relative bg-[#2A292D] text-white pt-24 pb-20 overflow-hidden">
         {/* Ambient background blur circles */}

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate, useLocation, Link, Navigate } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
 import { getAndClearSessionNotice } from '@/lib/auth-interceptor';
+import { useAdminTitle } from '@/lib/useAdminTitle';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -9,6 +10,7 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter }
 import { Sparkles, Shield, Lock, Mail, AlertCircle, Loader2, Clock } from 'lucide-react';
 
 export const AdminLoginPage: React.FC = () => {
+  useAdminTitle('Administrator Sign In');
   const { token, login, isLoading } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
