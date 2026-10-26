@@ -10,6 +10,7 @@ import { CountryFlag } from '@/components/CountryFlag';
 import { Country } from '@avada/shared';
 import { SEO } from '@/components/seo/SEO';
 import { NotFoundPage } from '@/pages/public/NotFoundPage';
+import { resolveMapEmbedUrl } from '@/lib/maps';
 
 const makeFallback = (c: Omit<Country, 'displayOrder' | 'createdAt' | 'updatedAt'>): Country => ({
   ...c,
@@ -158,6 +159,11 @@ export const CountryPage: React.FC = () => {
     );
   }
 
+  const mapUrl = resolveMapEmbedUrl(
+    country.mapEmbedUrl,
+    country.officeAddress || (country.name ? `${country.name} Office` : '')
+  );
+
   return (
     <div className="min-h-screen bg-[#F8FAFC] text-[#2A292D] font-sans pb-24">
       <SEO
@@ -196,7 +202,7 @@ export const CountryPage: React.FC = () => {
                 Connect in {country.name}
               </Link>
             </Button>
-            <Button asChild variant="outline" className="h-12 px-6 rounded-xl border-white/20 text-white hover:bg-white/10 bg-transparent font-bold text-sm">
+            <Button asChild className="h-12 px-6 rounded-xl border border-white/20 text-white hover:text-white hover:bg-white/10 hover:border-white/50 bg-transparent font-bold text-sm backdrop-blur-sm transition-all">
               <Link to="/docs">
                 View API Specs
               </Link>
@@ -323,11 +329,11 @@ export const CountryPage: React.FC = () => {
             </div>
 
             {/* Interactive Map Embed */}
-            {country.mapEmbedUrl ? (
+            {mapUrl ? (
               <div className="w-full h-64 sm:h-80 rounded-2xl overflow-hidden border border-gray-200 shadow-md">
                 <iframe
                   title={`${country.name} Office Map`}
-                  src={country.mapEmbedUrl}
+                  src={mapUrl}
                   width="100%"
                   height="100%"
                   style={{ border: 0 }}

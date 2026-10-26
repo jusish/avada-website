@@ -13,6 +13,8 @@ import { CountryFlag } from '@/components/CountryFlag';
 import { FadeIn, StaggerContainer, StaggerItem, HoverScale } from '@/components/motion/Motion';
 import { OptimizedImage } from '@/components/ui/OptimizedImage';
 import { SEO } from '@/components/seo/SEO';
+import { useSiteConfig } from '@/context/SiteConfigContext';
+import { resolveMapEmbedUrl } from '@/lib/maps';
 
 /* ------------------------------------------------------------------ */
 /* Hero Visual Component                                               */
@@ -94,6 +96,11 @@ const TanzaniaHeroVisual: React.FC = () => (
 /* ------------------------------------------------------------------ */
 
 export const TanzaniaPage: React.FC = () => {
+  const { countries } = useSiteConfig();
+  const tzData = countries.find((c) => c.slug === 'tanzania' || c.code.toLowerCase() === 'tz');
+  const officeAddress = tzData?.officeAddress || 'Victoria Commercial Center, New Bagamoyo Road, Dar es Salaam, Tanzania';
+  const mapEmbedUrl = resolveMapEmbedUrl(tzData?.mapEmbedUrl, officeAddress);
+
   const [language, setLanguage] = useState<'en' | 'sw'>(() => {
     return (localStorage.getItem('avada_tz_lang') as 'en' | 'sw') || 'en';
   });
@@ -527,7 +534,7 @@ export const TanzaniaPage: React.FC = () => {
           <div className="h-72 sm:h-96 w-full rounded-3xl overflow-hidden border border-gray-200 shadow-md bg-gray-100">
             <iframe
               title="AvadaPay Tanzania Office — Dar es Salaam"
-              src="https://www.google.com/maps?q=Dar+es+Salaam+Tanzania&output=embed"
+              src={mapEmbedUrl}
               className="w-full h-full border-0"
               loading="lazy"
               referrerPolicy="no-referrer-when-downgrade"
@@ -538,7 +545,7 @@ export const TanzaniaPage: React.FC = () => {
           <div className="mt-6">
             <h3 className="text-xl sm:text-2xl font-black text-[#2A292D]">Dar es Salaam</h3>
             <p className="mt-1.5 text-base font-semibold text-gray-600">
-              Dar es Salaam, Tanzania, full address to confirm.
+              {officeAddress}
             </p>
             <div className="mt-4">
               <Button asChild className="h-11 px-6 bg-[#3BBA93] hover:bg-[#32a481] text-white font-bold rounded-lg flex items-center space-x-2">

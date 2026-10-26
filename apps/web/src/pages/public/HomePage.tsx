@@ -1,6 +1,10 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowRight, ChevronUp, ExternalLink } from 'lucide-react';
+import {
+  ArrowRight,
+  ChevronUp,
+  ExternalLink,
+} from 'lucide-react';
 import { motion } from 'framer-motion';
 import { CIRCLE_FLAGS } from '@/components/home/CircleFlags';
 import { ROW_ONE, ROW_TWO } from '@/components/home/PartnerLogos';
@@ -217,8 +221,7 @@ export const HomePage: React.FC = () => {
             </Button>
             <Button
               asChild
-              variant="outline"
-              className="h-12 px-7 rounded-xl border border-white/30 bg-white/10 hover:bg-white/20 text-white font-bold text-sm sm:text-base backdrop-blur-sm"
+              className="h-12 px-7 rounded-xl border border-white/30 bg-white/10 hover:bg-white/20 text-white hover:text-white hover:border-white/60 font-bold text-sm sm:text-base backdrop-blur-sm transition-all"
             >
               <Link to="/docs">
                 Explore API Docs
@@ -245,34 +248,100 @@ export const HomePage: React.FC = () => {
       </section>
 
       {/* 2 — INTRO SECTION & 3-ITEM MARQUEE */}
-      <section className="bg-white pt-12 sm:pt-16 pb-14 sm:pb-20">
+      <section className="bg-white pt-12 sm:pt-16 pb-14 sm:pb-20 overflow-hidden">
         <FadeIn delay={0.05}>
-          <Marquee animation="animate-marquee-slow">
-            <div className="flex items-center">
-              {UNDER_HERO_ITEMS.map((item, idx) => (
-                <div key={idx} className="flex items-center gap-3.5 sm:gap-4.5 pr-12 sm:pr-20 shrink-0">
-                  <item.Icon className="w-8 sm:w-11 h-auto shrink-0" />
-                  <span className="whitespace-nowrap font-extrabold tracking-tight text-[#2A292D] text-2xl sm:text-4xl md:text-[42px] leading-none">
-                    {item.text}
-                  </span>
-                </div>
-              ))}
-            </div>
-          </Marquee>
+          <div className="relative">
+            <div className="pointer-events-none absolute inset-y-0 left-0 w-12 sm:w-24 bg-gradient-to-r from-white to-transparent z-10" />
+            <div className="pointer-events-none absolute inset-y-0 right-0 w-12 sm:w-24 bg-gradient-to-l from-white to-transparent z-10" />
+
+            <Marquee animation="animate-marquee-slow">
+              <div className="flex items-center">
+                {UNDER_HERO_ITEMS.map((item, idx) => (
+                  <div key={idx} className="flex items-center gap-3.5 sm:gap-4.5 pr-12 sm:pr-20 shrink-0">
+                    <item.Icon className="w-8 sm:w-11 h-auto shrink-0" />
+                    <span className="whitespace-nowrap font-extrabold tracking-tight text-[#2A292D] text-2xl sm:text-4xl md:text-[42px] leading-none">
+                      {item.text}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </Marquee>
+          </div>
         </FadeIn>
 
-        <FadeIn delay={0.15} className="max-w-3xl mx-auto px-6 mt-10 sm:mt-14 text-center text-sm sm:text-base md:text-[17px] leading-relaxed text-gray-600 space-y-5">
-          <p>
-            African businesses don’t operate in a single payment world. Customers pay through
-            M-Pesa in Nairobi, Orange Money in Kinshasa, Tigo Pesa in Dar es Salaam, and cards
-            almost everywhere. AvadaPay connects you to all of it through one integration.
-          </p>
-          <p>
-            Collect payments, send payouts to agents and customers, accept in-person payments
-            through POS, and communicate every transaction through SMS, without stitching
-            together five different providers per country.
-          </p>
-        </FadeIn>
+        {/* Narrative Presentation Card */}
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 mt-10 sm:mt-14">
+          <FadeIn delay={0.15}>
+            <div className="rounded-3xl border border-gray-200/80 bg-gradient-to-b from-gray-50/70 via-white to-white p-7 sm:p-10 shadow-xs text-center space-y-6">
+              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#E3F5EE] text-[#2d9676] text-xs font-bold border border-[#3BBA93]/30">
+                <span className="w-2 h-2 rounded-full bg-[#3BBA93]" />
+                <span>Pan-African Payment Infrastructure</span>
+              </div>
+
+              <div className="space-y-4 max-w-3xl mx-auto text-sm sm:text-base md:text-[17px] leading-relaxed text-gray-700">
+                <p>
+                  African businesses don&apos;t operate in a single payment world. Customers pay through{' '}
+                  <span className="inline-flex items-center px-2 py-0.5 rounded-md bg-white border border-gray-200 text-xs font-bold text-gray-800 shadow-2xs mx-0.5">
+                    M-Pesa in Nairobi
+                  </span>
+                  ,{' '}
+                  <span className="inline-flex items-center px-2 py-0.5 rounded-md bg-white border border-gray-200 text-xs font-bold text-gray-800 shadow-2xs mx-0.5">
+                    Orange Money in Kinshasa
+                  </span>
+                  ,{' '}
+                  <span className="inline-flex items-center px-2 py-0.5 rounded-md bg-white border border-gray-200 text-xs font-bold text-gray-800 shadow-2xs mx-0.5">
+                    Tigo Pesa in Dar es Salaam
+                  </span>
+                  , and{' '}
+                  <span className="inline-flex items-center px-2 py-0.5 rounded-md bg-white border border-gray-200 text-xs font-bold text-gray-800 shadow-2xs mx-0.5">
+                    cards almost everywhere
+                  </span>
+                  . AvadaPay connects you to all of it through one integration.
+                </p>
+                <p className="text-gray-600">
+                  Collect payments, send payouts to agents and customers, accept in-person payments
+                  through POS, and communicate every transaction through SMS, without stitching
+                  together five different providers per country.
+                </p>
+              </div>
+
+              {/* 4 Micro Capabilities Strip */}
+              <div className="pt-2 grid grid-cols-2 sm:grid-cols-4 gap-2.5 sm:gap-3 text-left">
+                <div className="p-3.5 rounded-2xl bg-white border border-gray-150 shadow-2xs">
+                  <div className="w-7 h-7 rounded-lg bg-[#3BBA93]/15 text-[#3BBA93] flex items-center justify-center text-xs font-extrabold mb-2">
+                    01
+                  </div>
+                  <h4 className="text-xs font-bold text-[#2A292D]">Collect Payments</h4>
+                  <p className="text-[11px] text-gray-500 mt-1 leading-snug">Mobile money &amp; cards</p>
+                </div>
+
+                <div className="p-3.5 rounded-2xl bg-white border border-gray-150 shadow-2xs">
+                  <div className="w-7 h-7 rounded-lg bg-[#3BBA93]/15 text-[#3BBA93] flex items-center justify-center text-xs font-extrabold mb-2">
+                    02
+                  </div>
+                  <h4 className="text-xs font-bold text-[#2A292D]">Send Payouts</h4>
+                  <p className="text-[11px] text-gray-500 mt-1 leading-snug">Instant agent &amp; customer disbursement</p>
+                </div>
+
+                <div className="p-3.5 rounded-2xl bg-white border border-gray-150 shadow-2xs">
+                  <div className="w-7 h-7 rounded-lg bg-[#3BBA93]/15 text-[#3BBA93] flex items-center justify-center text-xs font-extrabold mb-2">
+                    03
+                  </div>
+                  <h4 className="text-xs font-bold text-[#2A292D]">Smart POS</h4>
+                  <p className="text-[11px] text-gray-500 mt-1 leading-snug">Seamless in-person checkout</p>
+                </div>
+
+                <div className="p-3.5 rounded-2xl bg-white border border-gray-150 shadow-2xs">
+                  <div className="w-7 h-7 rounded-lg bg-[#3BBA93]/15 text-[#3BBA93] flex items-center justify-center text-xs font-extrabold mb-2">
+                    04
+                  </div>
+                  <h4 className="text-xs font-bold text-[#2A292D]">Transaction SMS</h4>
+                  <p className="text-[11px] text-gray-500 mt-1 leading-snug">Direct carrier notifications</p>
+                </div>
+              </div>
+            </div>
+          </FadeIn>
+        </div>
       </section>
 
       {/* 3 — FOUR WAYS SECTION */}

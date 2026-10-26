@@ -95,8 +95,7 @@ export const DocsPage: React.FC = () => {
 
             <Button
               asChild
-              variant="outline"
-              className="h-12 px-7 rounded-xl border-white/20 bg-white/10 hover:bg-white/20 text-white font-bold text-sm"
+              className="h-12 px-7 rounded-xl border border-white/20 bg-white/10 hover:bg-white/20 text-white hover:text-white hover:border-white/50 font-bold text-sm backdrop-blur-sm transition-all"
             >
               <Link to="/contact?inquiry=payments" className="inline-flex items-center gap-2">
                 <span>Talk to Solutions Engineer</span>
