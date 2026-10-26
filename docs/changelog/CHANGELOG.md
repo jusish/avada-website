@@ -5,6 +5,13 @@ All notable changes to the Avada Website and CMS project will be documented in t
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.16.0] - 2026-10-26
+
+### Fixed
+- **Pre-Rendered Route Shells & Canonical Collision Resolution**: Resolved the Google Search Console indexing exclusion ("Alternate page with proper canonical tag") where 8 primary solution, market, and compliance pages (`/payment-processing`, `/pos`, `/bulk-sms`, `/rwanda`, `/kenya`, `/tanzania`, `/contact`, `/terms`, `/privacy`, `/cookies`) were mistakenly excluded because SPA Nginx fallback served a root `index.html` hardcoded with `<link rel="canonical" href="https://avadapay.com/" />`. Created `apps/web/scripts/generate-route-shells.mjs` to automatically pre-render individual static HTML route shells (`<route>.html` and `<route>/index.html`) with accurate per-page canonical tags, titles, descriptions, and Open Graph metadata directly in the raw HTML response.
+- **Nginx Static Route Prioritization**: Updated `docker/nginx.conf` `try_files` directive to `try_files $uri $uri.html $uri/index.html $uri/ /index.html;`, ensuring crawlers and visitors receive exact route-specific static HTML with HTTP 200 without triggering unwanted trailing-slash 301 redirects ("Page with redirect").
+- **Automated Monorepo Build Pipeline**: Bound route shell pre-rendering directly to `pnpm build` in `apps/web/package.json`, ensuring continuous deployment builds always bundle fresh static route shells.
+
 ## [1.15.0] - 2026-10-23
 
 ### Changed

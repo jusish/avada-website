@@ -33,6 +33,7 @@ This document is the **single source of truth** for every feature implemented in
 25. [FEAT-025: Intermediate Proxy Robots.txt Resolution & Legacy Asset Synchronization](#feat-025-intermediate-proxy-robotstxt-resolution--legacy-asset-synchronization)
 26. [FEAT-026: Google Search Favicon Normalization & POS Service Schema Compliance](#feat-026-google-search-favicon-normalization--pos-service-schema-compliance)
 27. [FEAT-027: Sitelinks Hierarchy Optimization, Semantic Heading Anchoring & Legal Exclusion](#feat-027-sitelinks-hierarchy-optimization-semantic-heading-anchoring--legal-exclusion)
+28. [FEAT-028: Pre-Rendered Route Shell Pipeline & Canonical Collision Resolution](#feat-028-pre-rendered-route-shell-pipeline--canonical-collision-resolution)
 
 ---
 
@@ -669,6 +670,28 @@ This document is the **single source of truth** for every feature implemented in
   - **Legal Policy Noindex Flagging**: Injected `noindex={true}` into `LegalPolicyPage.tsx` (`<meta name="robots" content="noindex, follow">`), ensuring `/cookies`, `/privacy`, and `/terms` remain accessible to site visitors via footer navigation and retain link juice, but are explicitly removed from Google Search SERP snippets and sitelinks.
   - **Semantic Heading Anchor Linking**: Converted product card titles in `HomePage.tsx` (`<h3>`) into direct clickable `<Link>` elements and updated generic "Learn more" buttons to descriptive anchor text ("Explore Payment Processing", "Explore POS Solutions", "Explore Bulk SMS").
   - **Sitemap Priority Tuning**: Updated `sitemap.xml` with fresh `lastmod` timestamps, focusing exclusively on high-priority routes (`/`, `/payment-processing`, `/pos`, `/bulk-sms`, `/rwanda`, `/kenya`, `/tanzania`, and `/contact`).
+
+---
+
+## FEAT-028: Pre-Rendered Route Shell Pipeline & Canonical Collision Resolution
+- **ID**: `FEAT-028`
+- **Status**: Completed
+- **Created**: 2026-10-26
+- **Description**: Eliminated Google Search Console "Alternate page with proper canonical tag" indexing exclusions across 8 primary pages (`/payment-processing`, `/pos`, `/bulk-sms`, `/rwanda`, `/kenya`, `/tanzania`, `/contact`, `/terms`, `/privacy`, `/cookies`) by establishing an automated build-time static HTML route shell pre-rendering pipeline and updating Nginx routing priority.
+- **Files Involved**:
+  - [`apps/web/scripts/generate-route-shells.mjs`](../../apps/web/scripts/generate-route-shells.mjs)
+  - [`apps/web/package.json`](../../apps/web/package.json)
+  - [`docker/nginx.conf`](../../docker/nginx.conf)
+  - [`docs/changelog/CHANGELOG.md`](../../docs/changelog/CHANGELOG.md)
+  - [`docs/changelog/features-storage.md`](../../docs/changelog/features-storage.md)
+- **Rationale**:
+  - In a client-side Single Page Application (SPA), Nginx falls back to serving root `index.html` for every subpage request.
+  - Because `index.html` contained `<link rel="canonical" href="https://avadapay.com/" />`, Googlebot parsed this tag upon fetching raw HTML for `/bulk-sms`, `/payment-processing`, etc., and classified them as duplicate "Alternate pages" whose canonical destination was the homepage.
+  - Additionally, if Nginx routed requests to disk directories without proper try_files fallback, standard directory redirects could issue 301 Moved Permanently, causing "Page with redirect" warnings.
+- **Implementation Details**:
+  - **Route Shell Generator (`generate-route-shells.mjs`)**: Post-build script that parses compiled `dist/index.html` and creates both `<route>.html` and `<route>/index.html` with route-specific `<link rel="canonical">`, `<title>`, `<meta name="description">`, Open Graph, and Twitter metadata, plus `noindex` directives for legal utility routes.
+  - **Nginx Try-Files Priority**: Adjusted Nginx fallback to `try_files $uri $uri.html $uri/index.html $uri/ /index.html;`, serving route shells directly with HTTP 200 without triggering trailing-slash redirects.
+  - **Build Command Binding**: Bound `node scripts/generate-route-shells.mjs` directly into `apps/web/package.json` `build` script.
 
 
 
