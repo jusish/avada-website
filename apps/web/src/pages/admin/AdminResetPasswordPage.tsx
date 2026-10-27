@@ -15,7 +15,8 @@ export const AdminResetPasswordPage: React.FC = () => {
 
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -142,12 +143,12 @@ export const AdminResetPasswordPage: React.FC = () => {
                 )}
 
                 <div className="space-y-1.5">
-                  <Label htmlFor="new-password" className="text-xs text-white/80">New Password</Label>
+                  <Label htmlFor="new-password" className="text-xs text-white/80">New Password *</Label>
                   <div className="relative">
                     <Lock className="w-4 h-4 text-white/40 absolute left-3 top-2.5" />
                     <Input
                       id="new-password"
-                      type={showPassword ? 'text' : 'password'}
+                      type={showNewPassword ? 'text' : 'password'}
                       placeholder="At least 8 characters"
                       className="pl-9 pr-10 text-sm bg-white/5 border-white/10 text-white placeholder:text-white/30 focus-visible:ring-[#3BBA93] focus-visible:border-[#3BBA93]"
                       value={newPassword}
@@ -156,28 +157,36 @@ export const AdminResetPasswordPage: React.FC = () => {
                     />
                     <button
                       type="button"
-                      onClick={() => setShowPassword(!showPassword)}
+                      onClick={() => setShowNewPassword(!showNewPassword)}
                       className="absolute right-3 top-2.5 text-white/40 hover:text-white transition-colors"
-                      aria-label={showPassword ? 'Hide password' : 'Show password'}
+                      aria-label={showNewPassword ? 'Hide password' : 'Show password'}
                     >
-                      {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                      {showNewPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                     </button>
                   </div>
                 </div>
 
                 <div className="space-y-1.5">
-                  <Label htmlFor="confirm-password" className="text-xs text-white/80">Confirm New Password</Label>
+                  <Label htmlFor="confirm-password" className="text-xs text-white/80">Confirm New Password *</Label>
                   <div className="relative">
                     <Lock className="w-4 h-4 text-white/40 absolute left-3 top-2.5" />
                     <Input
                       id="confirm-password"
-                      type={showPassword ? 'text' : 'password'}
+                      type={showConfirmPassword ? 'text' : 'password'}
                       placeholder="Re-enter your new password"
                       className="pl-9 pr-10 text-sm bg-white/5 border-white/10 text-white placeholder:text-white/30 focus-visible:ring-[#3BBA93] focus-visible:border-[#3BBA93]"
                       value={confirmPassword}
                       onChange={(e) => setConfirmPassword(e.target.value)}
                       required
                     />
+                    <button
+                      type="button"
+                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                      className="absolute right-3 top-2.5 text-white/40 hover:text-white transition-colors"
+                      aria-label={showConfirmPassword ? 'Hide password' : 'Show password'}
+                    >
+                      {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    </button>
                   </div>
                 </div>
               </CardContent>

@@ -35,6 +35,7 @@ export const AdminProfilePage: React.FC = () => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showCurrentPass, setShowCurrentPass] = useState(false);
   const [showNewPass, setShowNewPass] = useState(false);
+  const [showConfirmPass, setShowConfirmPass] = useState(false);
   const [isChangingPass, setIsChangingPass] = useState(false);
   const [passSuccess, setPassSuccess] = useState<string | null>(null);
   const [passError, setPassError] = useState<string | null>(null);
@@ -393,13 +394,21 @@ export const AdminProfilePage: React.FC = () => {
                     <Lock className="w-4 h-4 text-gray-400 absolute left-3 top-2.5" />
                     <Input
                       id="profile-confirm-pass"
-                      type={showNewPass ? 'text' : 'password'}
+                      type={showConfirmPass ? 'text' : 'password'}
                       placeholder="Re-enter your new password"
                       className="pl-9 pr-10 text-xs bg-gray-50 border-gray-200"
                       value={confirmPassword}
                       onChange={(e) => setConfirmPassword(e.target.value)}
                       required
                     />
+                    <button
+                      type="button"
+                      onClick={() => setShowConfirmPass(!showConfirmPass)}
+                      className="absolute right-3 top-2.5 text-gray-400 hover:text-gray-600"
+                      aria-label={showConfirmPass ? 'Hide password' : 'Show password'}
+                    >
+                      {showConfirmPass ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    </button>
                   </div>
                 </div>
               </CardContent>
@@ -455,7 +464,7 @@ export const AdminProfilePage: React.FC = () => {
               )}
 
               <p className="text-xs text-gray-600 leading-relaxed">
-                By default, two-factor authentication is disabled for all users. Turning this on requires verification codes on sign-in, safeguarding sensitive regional financial settings and inquiries.
+                By default, two-factor authentication is disabled for all users. When enabled, every sign-in attempt will send a secure 6-digit one-time passcode (OTP) to your corporate email, ensuring only you can access your administrative session.
               </p>
 
               <div className="p-4 rounded-xl bg-gray-50 border border-gray-200 flex items-center justify-between">

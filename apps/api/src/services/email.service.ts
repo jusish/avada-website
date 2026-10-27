@@ -37,6 +37,13 @@ export interface PasswordResetData {
   expiresInMinutes?: number;
 }
 
+export interface TwoFactorOtpData {
+  email: string;
+  name: string;
+  otpCode: string;
+  expiresInMinutes?: number;
+}
+
 export class EmailService {
   private static transporter: Transporter | null = null;
 
@@ -70,7 +77,7 @@ export class EmailService {
 
   /**
    * Sends an inquiry notification to the country-specific office and manager emails.
-   * Returns the primary routed recipient email string or null.
+   * Fully branded in AvadaPay charcoal (#2A292D) and emerald (#3BBA93) with zero blue.
    */
   public static async sendInquiryNotification(
     inquiry: InquiryEmailData,
@@ -124,68 +131,75 @@ Manage this inquiry in AvadaPay Admin: https://avadapay.com/admin/inquiries
 <html>
 <head>
   <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
-    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #f4f6f9; margin: 0; padding: 24px; color: #1e293b; }
-    .card { max-width: 620px; margin: 0 auto; background: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 16px rgba(0,0,0,0.06); border: 1px solid #e2e8f0; }
-    .header { background: linear-gradient(135deg, #0052FF 0%, #0036b3 100%); padding: 28px 32px; color: #ffffff; }
-    .badge { display: inline-block; background: rgba(255,255,255,0.2); color: #ffffff; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; padding: 4px 10px; border-radius: 9999px; margin-bottom: 12px; }
-    .title { margin: 0; font-size: 22px; font-weight: 800; color: #ffffff; }
-    .body { padding: 32px; }
-    .meta-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px; padding-bottom: 24px; border-bottom: 1px solid #f1f5f9; }
-    .meta-item { font-size: 13px; }
-    .meta-label { color: #64748b; font-weight: 600; text-transform: uppercase; font-size: 11px; letter-spacing: 0.05em; margin-bottom: 4px; }
-    .meta-value { color: #0f172a; font-weight: 600; font-size: 14px; word-break: break-all; }
-    .message-box { background: #f8fafc; border-left: 4px solid #0052FF; border-radius: 6px; padding: 18px; margin-bottom: 28px; }
-    .message-text { margin: 0; font-size: 14px; line-height: 1.6; color: #334155; white-space: pre-wrap; }
-    .cta-btn { display: inline-block; background: #0052FF; color: #ffffff !important; text-decoration: none; padding: 12px 24px; border-radius: 8px; font-weight: 700; font-size: 14px; }
-    .footer { padding: 20px 32px; background: #f8fafc; font-size: 12px; color: #94a3b8; text-align: center; border-top: 1px solid #e2e8f0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #f3f4f6; margin: 0; padding: 20px; color: #1f2937; -webkit-font-smoothing: antialiased; }
+    .card { max-width: 480px; margin: 0 auto; background: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 16px rgba(0,0,0,0.06); border: 1px solid #e5e7eb; }
+    .header { background: #2A292D; padding: 20px 24px; text-align: left; }
+    .logo { font-size: 20px; font-weight: 800; letter-spacing: -0.5px; text-decoration: none; color: #ffffff; }
+    .logo-accent { color: #3BBA93; }
+    .badge { display: inline-block; background: rgba(59,186,147,0.15); border: 1px solid rgba(59,186,147,0.3); color: #3BBA93; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; padding: 3px 8px; border-radius: 9999px; margin-top: 10px; }
+    .title { margin: 6px 0 0 0; font-size: 18px; font-weight: 700; color: #ffffff; line-height: 1.3; }
+    .body { padding: 24px; }
+    .meta-grid { margin-bottom: 20px; }
+    .meta-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #f3f4f6; font-size: 13px; }
+    .meta-label { color: #6b7280; font-weight: 600; font-size: 12px; }
+    .meta-value { color: #111827; font-weight: 600; text-align: right; word-break: break-all; }
+    .message-box { background: #f9fafb; border-left: 3px solid #3BBA93; border-radius: 6px; padding: 14px; margin: 18px 0; }
+    .message-text { margin: 0; font-size: 13px; line-height: 1.6; color: #374151; white-space: pre-wrap; }
+    .btn-wrap { text-align: center; margin: 24px 0 10px 0; }
+    .cta-btn { display: inline-block; background: #3BBA93; color: #ffffff !important; text-decoration: none; padding: 11px 22px; border-radius: 8px; font-weight: 700; font-size: 13px; box-shadow: 0 2px 6px rgba(59,186,147,0.25); }
+    .footer { padding: 16px 24px; background: #f9fafb; font-size: 11px; color: #9ca3af; text-align: center; border-top: 1px solid #e5e7eb; }
   </style>
 </head>
 <body>
   <div class="card">
     <div class="header">
-      <div class="badge">${countryLabel} Market Hub</div>
+      <div class="logo">avada<span class="logo-accent">pay</span></div>
+      <div><span class="badge">${escapeHtml(countryLabel)} Hub</span></div>
       <h1 class="title">New Contact Inquiry</h1>
     </div>
     <div class="body">
       <div class="meta-grid">
-        <div class="meta-item">
-          <div class="meta-label">Full Name</div>
-          <div class="meta-value">${escapeHtml(inquiry.fullName)}</div>
+        <div class="meta-row">
+          <span class="meta-label">Full Name:</span>
+          <span class="meta-value">${escapeHtml(inquiry.fullName)}</span>
         </div>
-        <div class="meta-item">
-          <div class="meta-label">Email Address</div>
-          <div class="meta-value"><a href="mailto:${escapeHtml(inquiry.email)}" style="color: #0052FF;">${escapeHtml(inquiry.email)}</a></div>
+        <div class="meta-row">
+          <span class="meta-label">Email:</span>
+          <span class="meta-value"><a href="mailto:${escapeHtml(inquiry.email)}" style="color: #3BBA93; text-decoration: none;">${escapeHtml(inquiry.email)}</a></span>
         </div>
-        <div class="meta-item">
-          <div class="meta-label">Phone</div>
-          <div class="meta-value">${escapeHtml(inquiry.phone || 'N/A')}</div>
+        <div class="meta-row">
+          <span class="meta-label">Phone:</span>
+          <span class="meta-value">${escapeHtml(inquiry.phone || 'N/A')}</span>
         </div>
-        <div class="meta-item">
-          <div class="meta-label">Organization / Role</div>
-          <div class="meta-value">${escapeHtml(inquiry.orgName || 'N/A')}${inquiry.roleTitle ? ` (${escapeHtml(inquiry.roleTitle)})` : ''}</div>
+        <div class="meta-row">
+          <span class="meta-label">Organization:</span>
+          <span class="meta-value">${escapeHtml(inquiry.orgName || 'N/A')}${inquiry.roleTitle ? ` (${escapeHtml(inquiry.roleTitle)})` : ''}</span>
         </div>
-        <div class="meta-item">
-          <div class="meta-label">Inquiry Category</div>
-          <div class="meta-value" style="color: #0052FF; text-transform: uppercase;">${escapeHtml(inquiry.inquiryType)}</div>
+        <div class="meta-row">
+          <span class="meta-label">Inquiry Type:</span>
+          <span class="meta-value" style="color: #3BBA93; text-transform: uppercase;">${escapeHtml(inquiry.inquiryType)}</span>
         </div>
-        <div class="meta-item">
-          <div class="meta-label">Routed Recipient</div>
-          <div class="meta-value">${escapeHtml(recipients.join(', '))}</div>
+        <div class="meta-row" style="border-bottom: none;">
+          <span class="meta-label">Routed To:</span>
+          <span class="meta-value" style="font-size: 11px; color: #6b7280;">${escapeHtml(recipients.join(', '))}</span>
         </div>
       </div>
 
-      <div class="meta-label" style="margin-bottom: 8px;">Inquiry Message</div>
+      <div style="font-size: 11px; font-weight: 700; color: #6b7280; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px;">
+        Inquiry Message
+      </div>
       <div class="message-box">
         <p class="message-text">${escapeHtml(inquiry.message)}</p>
       </div>
 
-      <div style="text-align: center;">
-        <a href="https://avadapay.com/admin/inquiries" class="cta-btn">Open in AvadaPay Admin</a>
+      <div class="btn-wrap">
+        <a href="https://avadapay.com/admin/inquiries" class="cta-btn">View in AvadaPay Admin</a>
       </div>
     </div>
     <div class="footer">
-      This notification was automatically sent by AvadaPay Platform because you are registered as the contact for ${countryLabel}.
+      Automated routing for ${escapeHtml(countryLabel)} regional operations.
     </div>
   </div>
 </body>
@@ -196,7 +210,7 @@ Manage this inquiry in AvadaPay Admin: https://avadapay.com/admin/inquiries
     const transporter = this.getTransporter();
 
     if (!transporter) {
-      console.log(`[EmailService] (Local/Mock) SMTP not configured. Notification would be sent to [${recipients.join(', ')}] with subject: "${subject}"`);
+      console.log(`[EmailService] (Local/Mock) Notification would be sent to [${recipients.join(', ')}] with subject: "${subject}"`);
       return primaryRoutedEmail;
     }
 
@@ -218,7 +232,8 @@ Manage this inquiry in AvadaPay Admin: https://avadapay.com/admin/inquiries
   }
 
   /**
-   * Sends a branded team member invitation with temporary credentials and first-login instructions.
+   * Sends a compact branded team member invitation with temporary credentials.
+   * Strictly branded in AvadaPay dark charcoal (#2A292D) and emerald (#3BBA93) with zero blue.
    */
   public static async sendTeamInvitation(data: TeamInvitationData): Promise<boolean> {
     const defaultLoginUrl = `https://avadapay.com/admin/login?email=${encodeURIComponent(data.email)}`;
@@ -234,19 +249,20 @@ WELCOME TO AVADAPAY CMS
 ======================================================
 Hello ${data.name},
 
-You have been invited to join the AvadaPay Content Management & Regional Operations Platform.
+You have been invited to join the AvadaPay CMS & Regional Operations Platform.
 
-Your Account Details:
+Account Credentials:
 - Role: ${roleLabel}
 - Assigned Markets: ${hubsLabel}
 - Corporate Email: ${data.email}
 - Temporary Password: ${data.temporaryPassword}
 
-Please sign in using the link below. You will be prompted to set your personal permanent password immediately:
+Please sign in using your temporary password at:
 ${loginUrl}
 
 Security Notice:
-Do not share your temporary password with anyone. If you were not expecting this invitation, please contact your administrator.
+When you sign in with this temporary password, you will be prompted to set your secure permanent password immediately.
+Do not share your temporary password with anyone.
 `.trim();
 
     const htmlContent = `
@@ -254,74 +270,78 @@ Do not share your temporary password with anyone. If you were not expecting this
 <html>
 <head>
   <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
-    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #f4f6f9; margin: 0; padding: 24px; color: #1e293b; }
-    .card { max-width: 620px; margin: 0 auto; background: #ffffff; border-radius: 14px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.06); border: 1px solid #e2e8f0; }
-    .header { background: linear-gradient(135deg, #0052FF 0%, #0036b3 100%); padding: 32px; color: #ffffff; text-align: left; }
-    .badge { display: inline-block; background: rgba(255,255,255,0.22); color: #ffffff; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; padding: 5px 12px; border-radius: 9999px; margin-bottom: 14px; }
-    .title { margin: 0; font-size: 22px; font-weight: 800; color: #ffffff; line-height: 1.3; }
-    .body { padding: 32px; }
-    .greeting { font-size: 16px; font-weight: 600; color: #0f172a; margin-bottom: 12px; }
-    .lead { font-size: 14px; line-height: 1.6; color: #475569; margin-bottom: 24px; }
-    .creds-box { background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 10px; padding: 20px; margin-bottom: 24px; }
-    .creds-row { display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 13px; }
-    .creds-row:last-child { margin-bottom: 0; }
-    .creds-label { color: #64748b; font-weight: 600; text-transform: uppercase; font-size: 11px; letter-spacing: 0.05em; }
-    .creds-value { color: #0f172a; font-weight: 700; font-family: monospace; font-size: 14px; }
-    .temp-pass { background: #e0e7ff; color: #1e40af; padding: 3px 8px; border-radius: 6px; font-size: 15px; letter-spacing: 0.05em; }
-    .btn-wrap { text-align: center; margin: 30px 0; }
-    .cta-btn { display: inline-block; background: #0052FF; color: #ffffff !important; text-decoration: none; padding: 14px 28px; border-radius: 8px; font-weight: 700; font-size: 15px; box-shadow: 0 4px 12px rgba(0,82,255,0.25); }
-    .notice { background: #fffbeb; border-left: 4px solid #f59e0b; padding: 14px; border-radius: 6px; font-size: 12px; color: #92400e; line-height: 1.5; margin-bottom: 24px; }
-    .footer { padding: 20px 32px; background: #f8fafc; font-size: 12px; color: #94a3b8; text-align: center; border-top: 1px solid #e2e8f0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #f3f4f6; margin: 0; padding: 20px; color: #1f2937; -webkit-font-smoothing: antialiased; }
+    .card { max-width: 480px; margin: 0 auto; background: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 16px rgba(0,0,0,0.06); border: 1px solid #e5e7eb; }
+    .header { background: #2A292D; padding: 22px 24px; text-align: left; }
+    .logo { font-size: 20px; font-weight: 800; letter-spacing: -0.5px; text-decoration: none; color: #ffffff; }
+    .logo-accent { color: #3BBA93; }
+    .badge { display: inline-block; background: rgba(59,186,147,0.15); border: 1px solid rgba(59,186,147,0.3); color: #3BBA93; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; padding: 3px 8px; border-radius: 9999px; margin-top: 10px; }
+    .title { margin: 6px 0 0 0; font-size: 18px; font-weight: 700; color: #ffffff; line-height: 1.3; }
+    .body { padding: 24px; }
+    .greeting { font-size: 15px; font-weight: 700; color: #111827; margin-bottom: 8px; }
+    .lead { font-size: 13px; line-height: 1.5; color: #4b5563; margin-bottom: 18px; }
+    .creds-box { background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; padding: 14px 16px; margin-bottom: 18px; }
+    .creds-row { display: flex; justify-content: space-between; align-items: center; padding: 6px 0; border-bottom: 1px solid #f3f4f6; font-size: 12px; }
+    .creds-row:last-child { border-bottom: none; padding-bottom: 0; }
+    .creds-label { color: #6b7280; font-weight: 600; text-transform: uppercase; font-size: 11px; }
+    .creds-value { color: #111827; font-weight: 600; font-size: 12px; }
+    .temp-pass { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; background: #ecfdf5; border: 1px solid #a7f3d0; color: #065f46; padding: 3px 8px; border-radius: 6px; font-size: 13px; font-weight: 700; letter-spacing: 0.05em; }
+    .notice { background: #fdfdfd; border-left: 3px solid #3BBA93; padding: 10px 12px; border-radius: 4px; font-size: 11px; color: #4b5563; line-height: 1.4; margin-bottom: 20px; }
+    .btn-wrap { text-align: center; margin: 20px 0 10px 0; }
+    .cta-btn { display: inline-block; background: #3BBA93; color: #ffffff !important; text-decoration: none; padding: 12px 24px; border-radius: 8px; font-weight: 700; font-size: 13px; box-shadow: 0 2px 6px rgba(59,186,147,0.25); }
+    .url-hint { font-size: 11px; color: #9ca3af; text-align: center; margin-top: 14px; word-break: break-all; }
+    .footer { padding: 16px 24px; background: #f9fafb; font-size: 11px; color: #9ca3af; text-align: center; border-top: 1px solid #e5e7eb; }
   </style>
 </head>
 <body>
   <div class="card">
     <div class="header">
-      <div class="badge">Team Onboarding</div>
+      <div class="logo">avada<span class="logo-accent">pay</span></div>
+      <div><span class="badge">Team Onboarding</span></div>
       <h1 class="title">You're Invited to AvadaPay CMS</h1>
     </div>
     <div class="body">
       <div class="greeting">Hello ${escapeHtml(data.name)},</div>
       <p class="lead">
-        You have been granted administrative access to the AvadaPay CMS platform. Below are your account credentials and market assignments.
+        You have been granted administrative access to AvadaPay CMS. Here are your account credentials and market assignments:
       </p>
 
       <div class="creds-box">
-        <div class="creds-row" style="margin-bottom: 10px;">
-          <span class="creds-label">Assigned Role:</span>
-          <span class="creds-value" style="font-family: inherit; color: #0052FF;">${escapeHtml(roleLabel)}</span>
+        <div class="creds-row">
+          <span class="creds-label">Role</span>
+          <span class="creds-value" style="color: #3BBA93; font-weight: 700;">${escapeHtml(roleLabel)}</span>
         </div>
-        <div class="creds-row" style="margin-bottom: 10px;">
-          <span class="creds-label">Market Hubs:</span>
-          <span class="creds-value" style="font-family: inherit;">${escapeHtml(hubsLabel)}</span>
+        <div class="creds-row">
+          <span class="creds-label">Markets</span>
+          <span class="creds-value">${escapeHtml(hubsLabel)}</span>
         </div>
-        <div class="creds-row" style="margin-bottom: 10px;">
-          <span class="creds-label">Corporate Email:</span>
+        <div class="creds-row">
+          <span class="creds-label">Email</span>
           <span class="creds-value">${escapeHtml(data.email)}</span>
         </div>
         <div class="creds-row">
-          <span class="creds-label">Temporary Password:</span>
+          <span class="creds-label">Temp Password</span>
           <span class="creds-value temp-pass">${escapeHtml(data.temporaryPassword)}</span>
         </div>
       </div>
 
       <div class="notice">
-        <strong>Mandatory First-Time Password Setup:</strong><br>
-        When you sign in with this temporary password, the system will prompt you immediately to set a secure permanent password of your choice.
+        <strong>Mandatory First Login Setup:</strong><br>
+        Sign in using this temporary password. The system will prompt you immediately to set your personal permanent password.
       </div>
 
       <div class="btn-wrap">
-        <a href="${loginUrl}" class="cta-btn">Sign In & Set Up Your Password</a>
+        <a href="${loginUrl}" class="cta-btn">Sign In to AvadaPay CMS</a>
       </div>
 
-      <p style="font-size: 12px; color: #64748b; text-align: center; margin-top: 16px;">
-        Or copy and paste this link in your browser: <br>
-        <a href="${loginUrl}" style="color: #0052FF; word-break: break-all;">${loginUrl}</a>
+      <p class="url-hint">
+        Direct link: <a href="${loginUrl}" style="color: #3BBA93;">${loginUrl}</a>
       </p>
     </div>
     <div class="footer">
-      This is an automated administrative invitation from AvadaPay. If you were not expecting this message, please notify your team administrator.
+      Automated invitation sent by AvadaPay CMS Platform.
     </div>
   </div>
 </body>
@@ -353,7 +373,8 @@ Do not share your temporary password with anyone. If you were not expecting this
   }
 
   /**
-   * Sends a branded password reset email with a secure one-time link.
+   * Sends a compact branded password reset email with a secure one-time link.
+   * Strictly branded in AvadaPay dark charcoal (#2A292D) and emerald (#3BBA93) with zero blue.
    */
   public static async sendPasswordReset(data: PasswordResetData): Promise<boolean> {
     const subject = `Reset Your AvadaPay CMS Password`;
@@ -364,12 +385,12 @@ PASSWORD RESET REQUEST
 ======================================================
 Hello ${data.name},
 
-We received a request to reset your password for the AvadaPay CMS administration portal.
+We received a request to reset your password for AvadaPay CMS.
 
-Please click the link below to set a new password:
+Click the link below to set a new password:
 ${data.resetUrl}
 
-This link is valid for ${expireMinutes} minutes. If you did not request this password reset, please ignore this email; your account remains secure.
+This link is valid for ${expireMinutes} minutes. If you did not request this, you can safely ignore this email.
 `.trim();
 
     const htmlContent = `
@@ -377,31 +398,36 @@ This link is valid for ${expireMinutes} minutes. If you did not request this pas
 <html>
 <head>
   <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
-    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #f4f6f9; margin: 0; padding: 24px; color: #1e293b; }
-    .card { max-width: 600px; margin: 0 auto; background: #ffffff; border-radius: 14px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.06); border: 1px solid #e2e8f0; }
-    .header { background: #0f172a; padding: 28px 32px; color: #ffffff; text-align: left; }
-    .badge { display: inline-block; background: rgba(59,186,147,0.2); color: #3BBA93; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; padding: 4px 10px; border-radius: 9999px; margin-bottom: 10px; border: 1px solid rgba(59,186,147,0.4); }
-    .title { margin: 0; font-size: 22px; font-weight: 800; color: #ffffff; }
-    .body { padding: 32px; }
-    .greeting { font-size: 16px; font-weight: 600; color: #0f172a; margin-bottom: 12px; }
-    .lead { font-size: 14px; line-height: 1.6; color: #475569; margin-bottom: 24px; }
-    .btn-wrap { text-align: center; margin: 28px 0; }
-    .cta-btn { display: inline-block; background: #3BBA93; color: #ffffff !important; text-decoration: none; padding: 14px 28px; border-radius: 8px; font-weight: 700; font-size: 15px; box-shadow: 0 4px 12px rgba(59,186,147,0.3); }
-    .notice { background: #f8fafc; border-left: 4px solid #94a3b8; padding: 14px; border-radius: 6px; font-size: 12px; color: #64748b; line-height: 1.5; margin-bottom: 24px; }
-    .footer { padding: 20px 32px; background: #f8fafc; font-size: 12px; color: #94a3b8; text-align: center; border-top: 1px solid #e2e8f0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #f3f4f6; margin: 0; padding: 20px; color: #1f2937; -webkit-font-smoothing: antialiased; }
+    .card { max-width: 480px; margin: 0 auto; background: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 16px rgba(0,0,0,0.06); border: 1px solid #e5e7eb; }
+    .header { background: #2A292D; padding: 22px 24px; text-align: left; }
+    .logo { font-size: 20px; font-weight: 800; letter-spacing: -0.5px; text-decoration: none; color: #ffffff; }
+    .logo-accent { color: #3BBA93; }
+    .badge { display: inline-block; background: rgba(59,186,147,0.15); border: 1px solid rgba(59,186,147,0.3); color: #3BBA93; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; padding: 3px 8px; border-radius: 9999px; margin-top: 10px; }
+    .title { margin: 6px 0 0 0; font-size: 18px; font-weight: 700; color: #ffffff; line-height: 1.3; }
+    .body { padding: 24px; }
+    .greeting { font-size: 15px; font-weight: 700; color: #111827; margin-bottom: 8px; }
+    .lead { font-size: 13px; line-height: 1.5; color: #4b5563; margin-bottom: 18px; }
+    .btn-wrap { text-align: center; margin: 22px 0 12px 0; }
+    .cta-btn { display: inline-block; background: #3BBA93; color: #ffffff !important; text-decoration: none; padding: 12px 24px; border-radius: 8px; font-weight: 700; font-size: 13px; box-shadow: 0 2px 6px rgba(59,186,147,0.25); }
+    .notice { background: #fdfdfd; border-left: 3px solid #3BBA93; padding: 10px 12px; border-radius: 4px; font-size: 11px; color: #4b5563; line-height: 1.4; margin-bottom: 16px; }
+    .url-hint { font-size: 11px; color: #9ca3af; text-align: center; margin-top: 14px; word-break: break-all; }
+    .footer { padding: 16px 24px; background: #f9fafb; font-size: 11px; color: #9ca3af; text-align: center; border-top: 1px solid #e5e7eb; }
   </style>
 </head>
 <body>
   <div class="card">
     <div class="header">
-      <div class="badge">Security Notification</div>
+      <div class="logo">avada<span class="logo-accent">pay</span></div>
+      <div><span class="badge">Security Notification</span></div>
       <h1 class="title">Password Reset Request</h1>
     </div>
     <div class="body">
       <div class="greeting">Hello ${escapeHtml(data.name)},</div>
       <p class="lead">
-        We received a request to reset the password associated with your corporate account (<strong>${escapeHtml(data.email)}</strong>).
+        We received a request to reset your password for your AvadaPay CMS account (<strong>${escapeHtml(data.email)}</strong>).
       </p>
 
       <div class="btn-wrap">
@@ -409,13 +435,12 @@ This link is valid for ${expireMinutes} minutes. If you did not request this pas
       </div>
 
       <div class="notice">
-        <strong>Important Security Notice:</strong><br>
-        This link is only valid for <strong>${expireMinutes} minutes</strong>. If you did not initiate this request, you can safely disregard this email; your account and credentials remain protected.
+        <strong>Security Notice:</strong><br>
+        This link expires in <strong>${expireMinutes} minutes</strong>. If you did not initiate this request, you can safely ignore this email; your credentials remain secure.
       </div>
 
-      <p style="font-size: 12px; color: #64748b; text-align: center; margin-top: 16px;">
-        If the button does not work, copy and paste this link in your browser: <br>
-        <a href="${data.resetUrl}" style="color: #3BBA93; word-break: break-all;">${data.resetUrl}</a>
+      <p class="url-hint">
+        Direct link: <a href="${data.resetUrl}" style="color: #3BBA93;">${data.resetUrl}</a>
       </p>
     </div>
     <div class="footer">
@@ -446,6 +471,105 @@ This link is valid for ${expireMinutes} minutes. If you did not request this pas
       return true;
     } catch (err) {
       console.error('[EmailService] Failed to send password reset via SMTP:', err);
+      return false;
+    }
+  }
+
+  /**
+   * Sends a two-factor authentication (2FA) verification code email.
+   * Strictly branded in AvadaPay dark charcoal (#2A292D) and emerald (#3BBA93) with zero blue.
+   */
+  public static async sendTwoFactorOtp(data: TwoFactorOtpData): Promise<boolean> {
+    const subject = `[AvadaPay] Your Verification Code: ${data.otpCode}`;
+    const expireMinutes = data.expiresInMinutes || 10;
+
+    const textContent = `
+AVADAPAY CMS VERIFICATION CODE
+======================================================
+Hello ${data.name},
+
+Your two-factor authentication code is:
+${data.otpCode}
+
+This code is valid for ${expireMinutes} minutes.
+Do not share this code with anyone. AvadaPay staff will never ask for your verification code.
+`.trim();
+
+    const htmlContent = `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #f3f4f6; margin: 0; padding: 20px; color: #1f2937; -webkit-font-smoothing: antialiased; }
+    .card { max-width: 480px; margin: 0 auto; background: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 16px rgba(0,0,0,0.06); border: 1px solid #e5e7eb; }
+    .header { background: #2A292D; padding: 22px 24px; text-align: left; }
+    .logo { font-size: 20px; font-weight: 800; letter-spacing: -0.5px; text-decoration: none; color: #ffffff; }
+    .logo-accent { color: #3BBA93; }
+    .badge { display: inline-block; background: rgba(59,186,147,0.15); border: 1px solid rgba(59,186,147,0.3); color: #3BBA93; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; padding: 3px 8px; border-radius: 9999px; margin-top: 10px; }
+    .title { margin: 6px 0 0 0; font-size: 18px; font-weight: 700; color: #ffffff; line-height: 1.3; }
+    .body { padding: 24px; }
+    .greeting { font-size: 15px; font-weight: 700; color: #111827; margin-bottom: 8px; }
+    .lead { font-size: 13px; line-height: 1.5; color: #4b5563; margin-bottom: 20px; }
+    .otp-box { background: #f9fafb; border: 2px dashed #a7f3d0; border-radius: 10px; padding: 20px; text-align: center; margin-bottom: 20px; }
+    .otp-label { color: #6b7280; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px; }
+    .otp-code { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; font-size: 32px; font-weight: 800; letter-spacing: 0.25em; color: #3BBA93; }
+    .notice { background: #fdfdfd; border-left: 3px solid #3BBA93; padding: 10px 12px; border-radius: 4px; font-size: 11px; color: #4b5563; line-height: 1.4; }
+    .footer { padding: 16px 24px; background: #f9fafb; font-size: 11px; color: #9ca3af; text-align: center; border-top: 1px solid #e5e7eb; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="header">
+      <div class="logo">avada<span class="logo-accent">pay</span></div>
+      <div><span class="badge">Security Verification</span></div>
+      <h1 class="title">Two-Factor Authentication</h1>
+    </div>
+    <div class="body">
+      <div class="greeting">Hello ${escapeHtml(data.name)},</div>
+      <p class="lead">
+        A sign-in attempt was initiated for your AvadaPay CMS account. Use the verification code below to complete your sign-in:
+      </p>
+
+      <div class="otp-box">
+        <div class="otp-label">Verification Code</div>
+        <div class="otp-code">${escapeHtml(data.otpCode)}</div>
+      </div>
+
+      <div class="notice">
+        <strong>Security Notice:</strong><br>
+        This code is valid for <strong>${expireMinutes} minutes</strong>. If you did not attempt to sign in, please contact your administrator immediately.
+      </div>
+    </div>
+    <div class="footer">
+      Sent securely by AvadaPay CMS Platform.
+    </div>
+  </div>
+</body>
+</html>
+`.trim();
+
+    const fromAddress = process.env.SMTP_FROM || `"AvadaPay Security" <${process.env.SMTP_USER || 'no-reply@avadapay.com'}>`;
+    const transporter = this.getTransporter();
+
+    if (!transporter) {
+      console.log(`[EmailService] (Local/Mock) 2FA OTP code would be sent to [${data.email}] with code "${data.otpCode}"`);
+      return true;
+    }
+
+    try {
+      await transporter.sendMail({
+        from: fromAddress,
+        to: data.email,
+        subject,
+        text: textContent,
+        html: htmlContent,
+      });
+      console.log(`[EmailService] Successfully sent 2FA OTP email to [${data.email}]`);
+      return true;
+    } catch (err) {
+      console.error('[EmailService] Failed to send 2FA OTP via SMTP:', err);
       return false;
     }
   }
