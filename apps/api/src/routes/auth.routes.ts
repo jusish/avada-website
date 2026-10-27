@@ -31,7 +31,11 @@ router.post('/login', async (req: Request, res: Response): Promise<void> => {
 
     const user = await prisma.user.findUnique({
       where: { email: email.toLowerCase() },
-      include: { role: true },
+      include: {
+        role: true,
+        countries: true,
+        managedCountries: true,
+      },
     });
 
     if (!user) {
@@ -65,6 +69,20 @@ router.post('/login', async (req: Request, res: Response): Promise<void> => {
       { expiresIn: '7d' }
     );
 
+    const isSuperAdmin =
+      user.email.toLowerCase() === 'admin@avada.com' ||
+      user.email.toLowerCase().startsWith('admin@') ||
+      user.role?.name?.toLowerCase().includes('super admin') ||
+      user.role?.name === 'Super Administrator';
+
+    const userCountries = [...(user.countries || []), ...(user.managedCountries || [])];
+    const countryMap = new Map<string, (typeof userCountries)[0]>();
+    for (const c of userCountries) {
+      countryMap.set(c.id, c);
+    }
+    const uniqueCountries = Array.from(countryMap.values());
+    const assignedCountryIds = uniqueCountries.map((c) => c.id);
+
     // Audit log login
     await logAudit({
       req: {
@@ -76,6 +94,10 @@ router.post('/login', async (req: Request, res: Response): Promise<void> => {
           roleId: user.roleId || undefined,
           roleName: user.role?.name || 'Administrator',
           permissions: (user.role?.permissions as unknown as PermissionMatrix) || ({} as PermissionMatrix),
+          isSuperAdmin,
+          assignedCountryIds,
+          assignedCountryNames: uniqueCountries.map((c) => c.name),
+          assignedCountrySlugs: uniqueCountries.map((c) => c.slug.toLowerCase()),
         },
       } as AuthenticatedRequest,
       action: 'USER_LOGIN',
@@ -95,6 +117,15 @@ router.post('/login', async (req: Request, res: Response): Promise<void> => {
           roleId: user.roleId,
           role: user.role,
           status: user.status,
+          isSuperAdmin,
+          assignedCountryIds,
+          countries: uniqueCountries.map((c) => ({
+            ...c,
+            telcoPartners: (c.telcoPartners as string[]) || [],
+            paymentRails: (c.paymentRails as string[]) || [],
+            createdAt: c.createdAt.toISOString(),
+            updatedAt: c.updatedAt.toISOString(),
+          })),
         },
       },
     });
@@ -116,13 +147,31 @@ router.get('/me', requireAuth, async (req: AuthenticatedRequest, res: Response):
 
     const user = await prisma.user.findUnique({
       where: { id: req.user.id },
-      include: { role: true },
+      include: {
+        role: true,
+        countries: true,
+        managedCountries: true,
+      },
     });
 
     if (!user) {
       res.status(404).json({ success: false, error: 'User not found' });
       return;
     }
+
+    const isSuperAdmin =
+      user.email.toLowerCase() === 'admin@avada.com' ||
+      user.email.toLowerCase().startsWith('admin@') ||
+      user.role?.name?.toLowerCase().includes('super admin') ||
+      user.role?.name === 'Super Administrator';
+
+    const userCountries = [...(user.countries || []), ...(user.managedCountries || [])];
+    const countryMap = new Map<string, (typeof userCountries)[0]>();
+    for (const c of userCountries) {
+      countryMap.set(c.id, c);
+    }
+    const uniqueCountries = Array.from(countryMap.values());
+    const assignedCountryIds = uniqueCountries.map((c) => c.id);
 
     res.json({
       success: true,
@@ -134,6 +183,15 @@ router.get('/me', requireAuth, async (req: AuthenticatedRequest, res: Response):
           roleId: user.roleId,
           role: user.role,
           status: user.status,
+          isSuperAdmin,
+          assignedCountryIds,
+          countries: uniqueCountries.map((c) => ({
+            ...c,
+            telcoPartners: (c.telcoPartners as string[]) || [],
+            paymentRails: (c.paymentRails as string[]) || [],
+            createdAt: c.createdAt.toISOString(),
+            updatedAt: c.updatedAt.toISOString(),
+          })),
         },
       },
     });

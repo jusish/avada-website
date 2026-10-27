@@ -41,6 +41,10 @@ export interface User {
   roleId: string;
   role?: Role;
   status: UserStatus;
+  countries?: Country[];
+  assignedCountryIds?: string[];
+  managedCountries?: Country[];
+  isSuperAdmin?: boolean;
   createdAt: string;
   updatedAt: string;
 }
@@ -53,6 +57,9 @@ export interface AuthResponse {
     roleId: string;
     role: Role;
     status: UserStatus;
+    countries?: Country[];
+    assignedCountryIds?: string[];
+    isSuperAdmin?: boolean;
   };
   token: string;
 }
@@ -82,6 +89,14 @@ export interface Country {
   officePhone?: string | null;
   officeEmail?: string | null;
   mapEmbedUrl?: string | null;
+  managerId?: string | null;
+  manager?: {
+    id: string;
+    name: string;
+    email: string;
+  } | null;
+  users?: User[];
+  assignedUserIds?: string[];
   active: boolean;
   displayOrder: number;
   createdAt: string;
@@ -103,6 +118,7 @@ export interface CreateCountryPayload {
   officePhone?: string;
   officeEmail?: string;
   mapEmbedUrl?: string;
+  managerId?: string | null;
   active?: boolean;
   displayOrder?: number;
 }
@@ -144,6 +160,8 @@ export interface ContactInquiry {
   orgName?: string | null;
   roleTitle?: string | null;
   country: string;
+  countryId?: string | null;
+  routedEmail?: string | null;
   inquiryType: string;
   message: string;
   status: InquiryStatus;
@@ -168,6 +186,8 @@ export interface SubmitInquiryPayload {
   orgName?: string;
   roleTitle?: string;
   country: string;
+  countryId?: string | null;
+  routedEmail?: string | null;
   inquiryType: string;
   message: string;
 }

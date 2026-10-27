@@ -2,6 +2,7 @@ import { Router, Request, Response } from 'express';
 import { z } from 'zod';
 import { prisma } from '../prisma';
 import { PublicSiteConfig, SocialLink, GeneralContacts, FooterConfig } from '@avada/shared';
+import { EmailService } from '../services/email.service';
 
 const router = Router();
 
@@ -166,6 +167,53 @@ router.post('/contact', async (req: Request, res: Response): Promise<void> => {
     const ipAddress = (req.headers['x-forwarded-for'] as string) || req.socket.remoteAddress || 'unknown';
     const userAgent = req.headers['user-agent'] || 'unknown';
 
+    // Match country in database to retrieve office email and country manager
+    const trimmedCountry = country.trim();
+    const matchingCountry = await prisma.country.findFirst({
+      where: {
+        OR: [
+          { name: { equals: trimmedCountry, mode: 'insensitive' } },
+          { slug: { equals: trimmedCountry.toLowerCase() } },
+          { code: { equals: trimmedCountry.toLowerCase() } },
+          { name: { contains: trimmedCountry, mode: 'insensitive' } },
+        ],
+      },
+      include: {
+        manager: {
+          select: { id: true, name: true, email: true },
+        },
+      },
+    });
+
+    let routedEmail: string | null = null;
+    try {
+      routedEmail = await EmailService.sendInquiryNotification(
+        {
+          id: '',
+          fullName,
+          email,
+          phone,
+          orgName,
+          roleTitle,
+          country,
+          inquiryType,
+          message,
+          createdAt: new Date(),
+        },
+        matchingCountry
+          ? {
+              name: matchingCountry.name,
+              code: matchingCountry.code,
+              officeEmail: matchingCountry.officeEmail,
+              managerEmail: matchingCountry.manager?.email,
+              managerName: matchingCountry.manager?.name,
+            }
+          : null
+      );
+    } catch (emailErr) {
+      console.error('[PublicRoutes] Failed to send routed inquiry email:', emailErr);
+    }
+
     const inquiry = await prisma.contactInquiry.create({
       data: {
         fullName,
@@ -174,6 +222,8 @@ router.post('/contact', async (req: Request, res: Response): Promise<void> => {
         orgName,
         roleTitle,
         country,
+        countryId: matchingCountry?.id || null,
+        routedEmail: routedEmail || matchingCountry?.officeEmail || null,
         inquiryType,
         message,
         status: 'UNREAD',
@@ -184,7 +234,7 @@ router.post('/contact', async (req: Request, res: Response): Promise<void> => {
 
     res.status(201).json({
       success: true,
-      data: { id: inquiry.id },
+      data: { id: inquiry.id, routedEmail: inquiry.routedEmail },
       message: 'Inquiry received successfully. An AvadaPay specialist will follow up shortly.',
     });
   } catch (error) {

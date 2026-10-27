@@ -8,30 +8,78 @@ import { logAudit } from '../lib/audit';
 const router = Router();
 router.use(requireAuth);
 
+function getUserCountryScope(user: AuthenticatedRequest['user']): Prisma.ContactInquiryWhereInput | null {
+  if (!user || user.isSuperAdmin) {
+    return null;
+  }
+  if (!user.assignedCountryIds || user.assignedCountryIds.length === 0) {
+    return { id: 'no-access-assigned' };
+  }
+  return {
+    OR: [
+      { countryId: { in: user.assignedCountryIds } },
+      ...user.assignedCountryNames.map((name) => ({ country: { contains: name, mode: 'insensitive' as const } })),
+      ...user.assignedCountrySlugs.map((slug) => ({ country: { contains: slug, mode: 'insensitive' as const } })),
+    ],
+  };
+}
+
+function isUserAuthorizedForInquiry(
+  user: AuthenticatedRequest['user'],
+  inquiry: { countryId?: string | null; country: string }
+): boolean {
+  if (!user || user.isSuperAdmin) {
+    return true;
+  }
+  if (!user.assignedCountryIds || user.assignedCountryIds.length === 0) {
+    return false;
+  }
+  if (inquiry.countryId && user.assignedCountryIds.includes(inquiry.countryId)) {
+    return true;
+  }
+  const inqCountry = inquiry.country.toLowerCase().trim();
+  const matchedName = user.assignedCountryNames.some(
+    (n) => inqCountry.includes(n.toLowerCase()) || n.toLowerCase().includes(inqCountry)
+  );
+  const matchedSlug = user.assignedCountrySlugs.some(
+    (s) => inqCountry.includes(s) || s.includes(inqCountry)
+  );
+  return matchedName || matchedSlug;
+}
+
 // GET /api/admin/inquiries
 router.get('/', requirePermission('inquiries', 'view'), async (req: AuthenticatedRequest, res: Response): Promise<void> => {
   try {
     const { country, inquiryType, status, search } = req.query;
 
-    const where: Prisma.ContactInquiryWhereInput = {};
+    const whereConditions: Prisma.ContactInquiryWhereInput[] = [];
+
+    const scopeFilter = getUserCountryScope(req.user);
+    if (scopeFilter) {
+      whereConditions.push(scopeFilter);
+    }
 
     if (country && typeof country === 'string' && country !== 'all') {
-      where.country = { contains: country, mode: 'insensitive' };
+      whereConditions.push({ country: { contains: country, mode: 'insensitive' } });
     }
     if (inquiryType && typeof inquiryType === 'string' && inquiryType !== 'all') {
-      where.inquiryType = inquiryType;
+      whereConditions.push({ inquiryType });
     }
     if (status && typeof status === 'string' && status !== 'all') {
-      where.status = status as InquiryStatus;
+      whereConditions.push({ status: status as InquiryStatus });
     }
     if (search && typeof search === 'string') {
-      where.OR = [
-        { fullName: { contains: search, mode: 'insensitive' } },
-        { email: { contains: search, mode: 'insensitive' } },
-        { orgName: { contains: search, mode: 'insensitive' } },
-        { message: { contains: search, mode: 'insensitive' } },
-      ];
+      whereConditions.push({
+        OR: [
+          { fullName: { contains: search, mode: 'insensitive' } },
+          { email: { contains: search, mode: 'insensitive' } },
+          { orgName: { contains: search, mode: 'insensitive' } },
+          { message: { contains: search, mode: 'insensitive' } },
+        ],
+      });
     }
+
+    const where: Prisma.ContactInquiryWhereInput = whereConditions.length > 0 ? { AND: whereConditions } : {};
 
     const items = await prisma.contactInquiry.findMany({
       where,
@@ -59,13 +107,16 @@ router.get('/', requirePermission('inquiries', 'view'), async (req: Authenticate
 });
 
 // GET /api/admin/inquiries/stats
-router.get('/stats', requirePermission('inquiries', 'view'), async (_req: AuthenticatedRequest, res: Response): Promise<void> => {
+router.get('/stats', requirePermission('inquiries', 'view'), async (req: AuthenticatedRequest, res: Response): Promise<void> => {
   try {
+    const scopeFilter = getUserCountryScope(req.user);
+    const baseWhere: Prisma.ContactInquiryWhereInput = scopeFilter || {};
+
     const [total, unread, contacted, resolved] = await Promise.all([
-      prisma.contactInquiry.count(),
-      prisma.contactInquiry.count({ where: { status: 'UNREAD' } }),
-      prisma.contactInquiry.count({ where: { status: 'CONTACTED' } }),
-      prisma.contactInquiry.count({ where: { status: 'RESOLVED' } }),
+      prisma.contactInquiry.count({ where: baseWhere }),
+      prisma.contactInquiry.count({ where: { ...baseWhere, status: 'UNREAD' } }),
+      prisma.contactInquiry.count({ where: { ...baseWhere, status: 'CONTACTED' } }),
+      prisma.contactInquiry.count({ where: { ...baseWhere, status: 'RESOLVED' } }),
     ]);
 
     res.json({
@@ -93,6 +144,11 @@ router.get('/:id', requirePermission('inquiries', 'view'), async (req: Authentic
 
     if (!item) {
       res.status(404).json({ success: false, error: 'Inquiry not found' });
+      return;
+    }
+
+    if (!isUserAuthorizedForInquiry(req.user, item)) {
+      res.status(403).json({ success: false, error: 'Access denied. You do not have permissions for this market.' });
       return;
     }
 
@@ -134,6 +190,11 @@ router.patch('/:id/status', requirePermission('inquiries', 'edit'), async (req: 
     const existing = await prisma.contactInquiry.findUnique({ where: { id } });
     if (!existing) {
       res.status(404).json({ success: false, error: 'Inquiry not found' });
+      return;
+    }
+
+    if (!isUserAuthorizedForInquiry(req.user, existing)) {
+      res.status(403).json({ success: false, error: 'Access denied. You do not have permissions for this market.' });
       return;
     }
 
@@ -184,6 +245,11 @@ router.patch('/:id/notes', requirePermission('inquiries', 'edit'), async (req: A
       return;
     }
 
+    if (!isUserAuthorizedForInquiry(req.user, existing)) {
+      res.status(403).json({ success: false, error: 'Access denied. You do not have permissions for this market.' });
+      return;
+    }
+
     const updated = await prisma.contactInquiry.update({
       where: { id },
       data: {
@@ -223,6 +289,11 @@ router.delete('/:id', requirePermission('inquiries', 'edit'), async (req: Authen
     const existing = await prisma.contactInquiry.findUnique({ where: { id } });
     if (!existing) {
       res.status(404).json({ success: false, error: 'Inquiry not found' });
+      return;
+    }
+
+    if (!isUserAuthorizedForInquiry(req.user, existing)) {
+      res.status(403).json({ success: false, error: 'Access denied. You do not have permissions for this market.' });
       return;
     }
 

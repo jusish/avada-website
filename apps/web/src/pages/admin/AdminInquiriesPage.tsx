@@ -35,7 +35,7 @@ import {
 } from 'lucide-react';
 
 export const AdminInquiriesPage: React.FC = () => {
-  const { token, canEdit } = useAuth();
+  const { user, token, canEdit, isSuperAdmin } = useAuth();
   const [inquiries, setInquiries] = useState<ContactInquiry[]>([]);
   const [countries, setCountries] = useState<Country[]>([]);
   const [inquiryTypes, setInquiryTypes] = useState<InquiryType[]>([]);
@@ -199,6 +199,12 @@ export const AdminInquiriesPage: React.FC = () => {
     }
   };
 
+  const selectableCountries = useMemo(() => {
+    if (isSuperAdmin) return countries;
+    if (!user?.assignedCountryIds || user.assignedCountryIds.length === 0) return [];
+    return countries.filter((c) => user.assignedCountryIds?.includes(c.id));
+  }, [countries, isSuperAdmin, user]);
+
   // Filtered List
   const filteredInquiries = useMemo(() => {
     return inquiries.filter((inq) => {
@@ -350,12 +356,12 @@ export const AdminInquiriesPage: React.FC = () => {
           {/* Country & Type Shadcn Dropdowns */}
           <div className="flex items-center gap-2">
             <Select value={selectedCountry} onValueChange={setSelectedCountry}>
-              <SelectTrigger className="w-36 h-9 text-xs bg-gray-50 border-gray-200 rounded-lg">
-                <SelectValue placeholder="All Countries" />
+              <SelectTrigger className="w-40 h-9 text-xs bg-gray-50 border-gray-200 rounded-lg">
+                <SelectValue placeholder={isSuperAdmin ? 'All Countries' : 'All My Markets'} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="ALL">All Countries</SelectItem>
-                {countries.map((c) => (
+                <SelectItem value="ALL">{isSuperAdmin ? 'All Countries' : 'All My Markets'}</SelectItem>
+                {selectableCountries.map((c) => (
                   <SelectItem key={c.id} value={c.name}>
                     {c.name}
                   </SelectItem>
@@ -604,6 +610,24 @@ export const AdminInquiriesPage: React.FC = () => {
                     <div className="mt-0.5">{getStatusBadge(activeInquiry.status)}</div>
                   </div>
                 </div>
+
+                {activeInquiry.routedEmail && (
+                  <div className="p-3 rounded-lg bg-blue-50/80 border border-blue-200/70 flex items-center justify-between">
+                    <span className="text-xs text-blue-900 font-medium flex items-center gap-1.5">
+                      <Mail className="w-3.5 h-3.5 text-blue-600" />
+                      <span>
+                        Routed Notification: <strong className="font-semibold text-blue-950">{activeInquiry.routedEmail}</strong>
+                      </span>
+                    </span>
+                    <button
+                      type="button"
+                      onClick={(e) => handleCopy(activeInquiry.routedEmail!, 'routed-email', e)}
+                      className="text-[11px] text-blue-600 hover:text-blue-800 font-bold cursor-pointer"
+                    >
+                      {copiedField === 'routed-email' ? 'Copied!' : 'Copy'}
+                    </button>
+                  </div>
+                )}
 
                 {/* Message Content */}
                 <div>
