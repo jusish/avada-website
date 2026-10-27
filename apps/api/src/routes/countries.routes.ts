@@ -30,6 +30,7 @@ const countrySchema = z.object({
   officePhone: z.string().optional().nullable(),
   officeEmail: z.string().optional().nullable(),
   mapEmbedUrl: z.string().optional().nullable(),
+  managerId: z.string().optional().nullable(),
   active: z.boolean().default(true),
   displayOrder: z.number().int().default(0),
 });
@@ -39,6 +40,14 @@ router.get('/', requirePermission('countries', 'view'), async (_req: Authenticat
   try {
     const countries = await prisma.country.findMany({
       orderBy: { displayOrder: 'asc' },
+      include: {
+        manager: {
+          select: { id: true, name: true, email: true },
+        },
+        users: {
+          select: { id: true, name: true, email: true },
+        },
+      },
     });
 
     res.json({
@@ -49,6 +58,7 @@ router.get('/', requirePermission('countries', 'view'), async (_req: Authenticat
         currencyCode: c.currencyCode.toUpperCase(),
         telcoPartners: (c.telcoPartners as string[]) || [],
         paymentRails: (c.paymentRails as string[]) || [],
+        assignedUserIds: c.users.map((u) => u.id),
         createdAt: c.createdAt.toISOString(),
         updatedAt: c.updatedAt.toISOString(),
       })),
@@ -62,6 +72,11 @@ router.get('/', requirePermission('countries', 'view'), async (_req: Authenticat
 // POST /api/admin/countries
 router.post('/', requirePermission('countries', 'edit'), async (req: AuthenticatedRequest, res: Response): Promise<void> => {
   try {
+    if (!req.user?.isSuperAdmin) {
+      res.status(403).json({ success: false, error: 'Only Super Administrators can create new country market hubs.' });
+      return;
+    }
+
     const parse = countrySchema.safeParse(req.body);
     if (!parse.success) {
       res.status(400).json({ success: false, error: 'Validation failed', details: parse.error.errors });
@@ -92,6 +107,14 @@ router.post('/', requirePermission('countries', 'edit'), async (req: Authenticat
         telcoPartners: data.telcoPartners,
         paymentRails: data.paymentRails,
       },
+      include: {
+        manager: {
+          select: { id: true, name: true, email: true },
+        },
+        users: {
+          select: { id: true, name: true, email: true },
+        },
+      },
     });
 
     await logAudit({
@@ -117,6 +140,14 @@ router.post('/', requirePermission('countries', 'edit'), async (req: Authenticat
 router.put('/:id', requirePermission('countries', 'edit'), async (req: AuthenticatedRequest, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
+
+    const isSuper = req.user?.isSuperAdmin;
+    const isAssigned = req.user?.assignedCountryIds?.includes(id);
+    if (!isSuper && !isAssigned) {
+      res.status(403).json({ success: false, error: 'Access denied. You can only edit country hubs assigned to your profile.' });
+      return;
+    }
+
     const parse = countrySchema.partial().safeParse(req.body);
     if (!parse.success) {
       res.status(400).json({ success: false, error: 'Validation failed', details: parse.error.errors });
@@ -145,9 +176,23 @@ router.put('/:id', requirePermission('countries', 'edit'), async (req: Authentic
       }
     }
 
+    // Only super admin can reassign country manager
+    const updatePayload = { ...parse.data };
+    if (!isSuper && updatePayload.managerId !== undefined) {
+      delete updatePayload.managerId;
+    }
+
     const updated = await prisma.country.update({
       where: { id },
-      data: parse.data,
+      data: updatePayload,
+      include: {
+        manager: {
+          select: { id: true, name: true, email: true },
+        },
+        users: {
+          select: { id: true, name: true, email: true },
+        },
+      },
     });
 
     await logAudit({
@@ -173,6 +218,13 @@ router.put('/:id', requirePermission('countries', 'edit'), async (req: Authentic
 router.patch('/:id/toggle', requirePermission('countries', 'edit'), async (req: AuthenticatedRequest, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
+    const isSuper = req.user?.isSuperAdmin;
+    const isAssigned = req.user?.assignedCountryIds?.includes(id);
+    if (!isSuper && !isAssigned) {
+      res.status(403).json({ success: false, error: 'Access denied. You cannot modify status for unassigned countries.' });
+      return;
+    }
+
     const existing = await prisma.country.findUnique({ where: { id } });
     if (!existing) {
       res.status(404).json({ success: false, error: 'Country not found' });
@@ -207,6 +259,11 @@ router.patch('/:id/toggle', requirePermission('countries', 'edit'), async (req: 
 router.delete('/:id', requirePermission('countries', 'edit'), async (req: AuthenticatedRequest, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
+    if (!req.user?.isSuperAdmin) {
+      res.status(403).json({ success: false, error: 'Only Super Administrators can delete country market hubs.' });
+      return;
+    }
+
     const existing = await prisma.country.findUnique({ where: { id } });
     if (!existing) {
       res.status(404).json({ success: false, error: 'Country not found' });

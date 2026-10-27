@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
-import { Country } from '@avada/shared';
+import { Country, User } from '@avada/shared';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -26,12 +26,15 @@ import {
   Phone,
   Mail,
   Sparkles,
+  Lock,
+  UserCheck,
 } from 'lucide-react';
 import { resolveMapEmbedUrl, getMapExternalLink } from '@/lib/maps';
 
 export const AdminCountriesPage: React.FC = () => {
-  const { token, canEdit } = useAuth();
+  const { token, canEdit, isSuperAdmin, canManageCountry } = useAuth();
   const [countries, setCountries] = useState<Country[]>([]);
+  const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
 
@@ -52,6 +55,7 @@ export const AdminCountriesPage: React.FC = () => {
     officePhone: '',
     officeEmail: '',
     mapEmbedUrl: '',
+    managerId: '',
   });
   const [saving, setSaving] = useState(false);
 
@@ -74,8 +78,24 @@ export const AdminCountriesPage: React.FC = () => {
     }
   };
 
+  const fetchUsers = async () => {
+    if (!token) return;
+    try {
+      const res = await fetch('/api/admin/users', {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const data = await res.json();
+      if (data.success && Array.isArray(data.data)) {
+        setUsers(data.data);
+      }
+    } catch (err) {
+      console.error('Failed to load users:', err);
+    }
+  };
+
   useEffect(() => {
     fetchCountries();
+    fetchUsers();
   }, [token]);
 
   // Open Create
@@ -95,6 +115,7 @@ export const AdminCountriesPage: React.FC = () => {
       officePhone: '+260 968 332 766',
       officeEmail: '',
       mapEmbedUrl: '',
+      managerId: '',
     });
     setIsModalOpen(true);
   };
@@ -116,6 +137,7 @@ export const AdminCountriesPage: React.FC = () => {
       officePhone: c.officePhone || '',
       officeEmail: c.officeEmail || '',
       mapEmbedUrl: c.mapEmbedUrl || '',
+      managerId: c.managerId || '',
     });
     setIsModalOpen(true);
   };
@@ -164,6 +186,7 @@ export const AdminCountriesPage: React.FC = () => {
         officePhone: form.officePhone.trim() || null,
         officeEmail: form.officeEmail.trim() || null,
         mapEmbedUrl: resolvedMap || null,
+        managerId: form.managerId ? form.managerId : null,
         telcoPartners: form.telcoPartners
           .split(',')
           .map((s) => s.trim())
@@ -270,7 +293,7 @@ export const AdminCountriesPage: React.FC = () => {
         </div>
 
         <div className="flex items-center gap-2">
-          {canEdit('countries') && (
+          {isSuperAdmin && canEdit('countries') && (
             <Button
               variant="gradient"
               size="sm"
@@ -387,6 +410,16 @@ export const AdminCountriesPage: React.FC = () => {
                     </div>
                   )}
 
+                  {/* Designated Country Manager */}
+                  {country.manager && (
+                    <div className="flex items-center gap-1.5 p-2 rounded-lg bg-emerald-50/70 border border-emerald-100 text-gray-700">
+                      <UserCheck className="w-3.5 h-3.5 text-[#3BBA93] shrink-0" />
+                      <span className="text-[11px] truncate">
+                        Manager: <strong className="font-semibold text-[#2A292D]">{country.manager.name}</strong> ({country.manager.email})
+                      </span>
+                    </div>
+                  )}
+
                   {/* Telecom & Carrier Partners */}
                   <div>
                     <span className="text-[11px] text-gray-500 font-semibold tracking-wide flex items-center gap-1 mb-1.5">
@@ -446,7 +479,7 @@ export const AdminCountriesPage: React.FC = () => {
                 </a>
 
                 <div className="flex items-center gap-1">
-                  {canEdit('countries') && (
+                  {canEdit('countries') && canManageCountry(country.id) ? (
                     <>
                       <button
                         onClick={() => handleToggle(country.id)}
@@ -466,14 +499,21 @@ export const AdminCountriesPage: React.FC = () => {
                       >
                         <Edit2 className="w-3.5 h-3.5" />
                       </button>
-                      <button
-                        onClick={() => handleDelete(country.id, country.name)}
-                        title="Delete Country"
-                        className="p-1.5 rounded-lg hover:bg-red-50 text-gray-400 hover:text-red-600 transition-colors"
-                      >
-                        <Trash2 className="w-3.5 h-3.5" />
-                      </button>
+                      {isSuperAdmin && (
+                        <button
+                          onClick={() => handleDelete(country.id, country.name)}
+                          title="Delete Country"
+                          className="p-1.5 rounded-lg hover:bg-red-50 text-gray-400 hover:text-red-600 transition-colors"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      )}
                     </>
+                  ) : (
+                    <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-gray-400 bg-gray-100 px-2 py-1 rounded-md">
+                      <Lock className="w-3 h-3 text-gray-400" />
+                      <span>Read-only</span>
+                    </span>
                   )}
                 </div>
               </div>
@@ -584,6 +624,29 @@ export const AdminCountriesPage: React.FC = () => {
                 />
               </div>
             </div>
+
+            {isSuperAdmin && (
+              <div>
+                <label className="block text-xs font-bold text-gray-700 mb-1">
+                  Designated Country Manager / CEO
+                </label>
+                <select
+                  value={form.managerId}
+                  onChange={(e) => setForm({ ...form, managerId: e.target.value })}
+                  className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#3BBA93] focus:bg-white text-[#2A292D]"
+                >
+                  <option value="">-- No Designated Manager --</option>
+                  {users.map((u) => (
+                    <option key={u.id} value={u.id}>
+                      {u.name} ({u.email})
+                    </option>
+                  ))}
+                </select>
+                <span className="text-[10px] text-gray-400 mt-1 block">
+                  The designated manager will receive incoming inquiries and have exclusive editing rights for this country.
+                </span>
+              </div>
+            )}
 
             {/* Google Maps Location & Instant Live Preview */}
             <div className="space-y-2 pt-1">

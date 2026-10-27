@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
-import { User, Role } from '@avada/shared';
+import { User, Role, Country } from '@avada/shared';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -27,12 +27,15 @@ import {
   ToggleRight,
   Eye,
   EyeOff,
+  Globe2,
+  ShieldCheck,
 } from 'lucide-react';
 
 export const AdminUsersPage: React.FC = () => {
   const { token, user: currentUser, canEdit } = useAuth();
   const [users, setUsers] = useState<User[]>([]);
   const [roles, setRoles] = useState<Role[]>([]);
+  const [countries, setCountries] = useState<Country[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
 
@@ -45,24 +48,33 @@ export const AdminUsersPage: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [roleId, setRoleId] = useState('');
   const [status, setStatus] = useState<'ACTIVE' | 'INVITED' | 'SUSPENDED'>('ACTIVE');
+  const [selectedCountryIds, setSelectedCountryIds] = useState<string[]>([]);
   const [saving, setSaving] = useState(false);
 
-  // Fetch Users and Roles
+  // Fetch Users, Roles and Countries
   const fetchData = async () => {
     if (!token) return;
     try {
       setLoading(true);
-      const [usersRes, rolesRes] = await Promise.all([
+      const [usersRes, rolesRes, countriesRes] = await Promise.all([
         fetch('/api/admin/users', { headers: { Authorization: `Bearer ${token}` } }),
         fetch('/api/admin/roles', { headers: { Authorization: `Bearer ${token}` } }),
+        fetch('/api/admin/countries', { headers: { Authorization: `Bearer ${token}` } }),
       ]);
-      const [usersData, rolesData] = await Promise.all([usersRes.json(), rolesRes.json()]);
+      const [usersData, rolesData, countriesData] = await Promise.all([
+        usersRes.json(),
+        rolesRes.json(),
+        countriesRes.json(),
+      ]);
 
       if (usersData.success && Array.isArray(usersData.data)) {
         setUsers(usersData.data);
       }
       if (rolesData.success && Array.isArray(rolesData.data)) {
         setRoles(rolesData.data);
+      }
+      if (countriesData.success && Array.isArray(countriesData.data)) {
+        setCountries(countriesData.data);
       }
     } catch (err) {
       console.error('Failed to load users:', err);
@@ -84,6 +96,7 @@ export const AdminUsersPage: React.FC = () => {
     setShowPassword(false);
     setRoleId(roles[0]?.id || '');
     setStatus('ACTIVE');
+    setSelectedCountryIds([]);
     setIsModalOpen(true);
   };
 
@@ -96,6 +109,7 @@ export const AdminUsersPage: React.FC = () => {
     setShowPassword(false);
     setRoleId(u.roleId);
     setStatus(u.status || 'ACTIVE');
+    setSelectedCountryIds(u.assignedCountryIds || u.countries?.map((c) => c.id) || []);
     setIsModalOpen(true);
   };
 
@@ -113,6 +127,7 @@ export const AdminUsersPage: React.FC = () => {
         email,
         roleId,
         status,
+        countryIds: selectedCountryIds,
       };
       if (password) body.password = password;
 
@@ -257,6 +272,7 @@ export const AdminUsersPage: React.FC = () => {
               <tr className="bg-gray-50/80 border-b border-gray-200/80 text-[11px] font-semibold text-gray-500 tracking-wider">
                 <th className="py-3 px-4">User</th>
                 <th className="py-3 px-4">Assigned Role</th>
+                <th className="py-3 px-4">Assigned Markets</th>
                 <th className="py-3 px-4">Status</th>
                 <th className="py-3 px-4">Last Login</th>
                 <th className="py-3 px-4">Date Joined</th>
@@ -266,7 +282,7 @@ export const AdminUsersPage: React.FC = () => {
             <tbody className="divide-y divide-gray-100 text-xs">
               {loading ? (
                 <tr>
-                  <td colSpan={6} className="py-10 text-center text-gray-400">
+                  <td colSpan={7} className="py-10 text-center text-gray-400">
                     <div className="flex items-center justify-center space-x-2">
                       <div className="w-4 h-4 border-2 border-[#3BBA93] border-t-transparent rounded-full animate-spin"></div>
                       <span>Loading team members...</span>
@@ -275,13 +291,19 @@ export const AdminUsersPage: React.FC = () => {
                 </tr>
               ) : filtered.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="py-10 text-center text-gray-400">
+                  <td colSpan={7} className="py-10 text-center text-gray-400">
                     No team members found.
                   </td>
                 </tr>
               ) : (
                 filtered.map((u) => {
                   const isCurrent = currentUser?.id === u.id;
+                  const isUserSuperAdmin =
+                    u.isSuperAdmin ||
+                    u.email.toLowerCase() === 'admin@avada.com' ||
+                    u.role?.name?.toLowerCase().includes('super admin') ||
+                    u.role?.name === 'Super Administrator';
+
                   return (
                     <tr key={u.id} className="hover:bg-gray-50/60 transition-colors">
                       <td className="py-3.5 px-4">
@@ -307,6 +329,29 @@ export const AdminUsersPage: React.FC = () => {
                         <span className="font-semibold text-gray-800 bg-gray-100 px-2.5 py-1 rounded-lg text-xs">
                           {u.role?.name || 'Assigned Role'}
                         </span>
+                      </td>
+
+                      <td className="py-3.5 px-4">
+                        {isUserSuperAdmin ? (
+                          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-purple-50 text-purple-700 border border-purple-200 text-[11px] font-bold">
+                            <ShieldCheck className="w-3.5 h-3.5 text-purple-600" />
+                            <span>All Markets (Super Admin)</span>
+                          </span>
+                        ) : u.countries && u.countries.length > 0 ? (
+                          <div className="flex flex-wrap gap-1 max-w-xs">
+                            {u.countries.map((c) => (
+                              <span
+                                key={c.id}
+                                className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-800 border border-emerald-200 text-[10px] font-bold"
+                              >
+                                <Globe2 className="w-2.5 h-2.5 text-emerald-600" />
+                                <span>{c.name}</span>
+                              </span>
+                            ))}
+                          </div>
+                        ) : (
+                          <span className="text-gray-400 text-[11px] italic">No assigned markets</span>
+                        )}
                       </td>
 
                       <td className="py-3.5 px-4">{getStatusBadge(u.status || 'ACTIVE')}</td>
@@ -438,6 +483,55 @@ export const AdminUsersPage: React.FC = () => {
                   ))}
                 </SelectContent>
               </Select>
+            </div>
+
+            <div>
+              <label className="block text-xs font-semibold text-gray-700 mb-1.5 flex items-center justify-between">
+                <span className="flex items-center gap-1.5">
+                  <Globe2 className="w-3.5 h-3.5 text-[#3BBA93]" />
+                  <span>Assigned Country Markets</span>
+                </span>
+                <span className="text-[10px] text-gray-400 font-normal">
+                  {selectedCountryIds.length} market(s) selected
+                </span>
+              </label>
+              <div className="p-2.5 bg-gray-50/80 border border-gray-200 rounded-lg max-h-40 overflow-y-auto space-y-1.5">
+                {countries.length === 0 ? (
+                  <span className="text-gray-400 text-[11px] italic">No countries available.</span>
+                ) : (
+                  countries.map((c) => {
+                    const isChecked = selectedCountryIds.includes(c.id);
+                    return (
+                      <label
+                        key={c.id}
+                        className={`flex items-center justify-between p-2 rounded-md border cursor-pointer transition-all text-xs ${
+                          isChecked
+                            ? 'bg-emerald-50/80 border-emerald-300 text-emerald-950 font-semibold'
+                            : 'bg-white border-gray-200 text-gray-700 hover:bg-gray-100/70'
+                        }`}
+                      >
+                        <span className="flex items-center gap-2">
+                          <input
+                            type="checkbox"
+                            checked={isChecked}
+                            onChange={() => {
+                              setSelectedCountryIds((prev) =>
+                                prev.includes(c.id) ? prev.filter((id) => id !== c.id) : [...prev, c.id]
+                              );
+                            }}
+                            className="rounded text-[#3BBA93] focus:ring-[#3BBA93] w-3.5 h-3.5"
+                          />
+                          <span>{c.name}</span>
+                        </span>
+                        <span className="text-[10px] font-mono text-gray-400">{c.code.toUpperCase()}</span>
+                      </label>
+                    );
+                  })
+                )}
+              </div>
+              <span className="text-[10px] text-gray-400 mt-1 block">
+                Users will only see and manage incoming inquiries for their assigned markets.
+              </span>
             </div>
 
             <div>

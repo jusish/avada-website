@@ -59,30 +59,36 @@ model User {
   contentItems     ContentItem[]
   handledInquiries ContactInquiry[] @relation("HandledBy")
   auditLogs        AuditLog[]
+  countries        Country[]        @relation("UserCountries")
+  managedCountries Country[]        @relation("CountryManager")
 
   @@map("users")
 }
 
 model Country {
-  id             String   @id @default(uuid())
-  code           String   @unique // ISO-2 e.g. "ke", "rw", "tz", "ug"
-  slug           String   @unique // e.g. "kenya", "rwanda", "uganda"
-  name           String   // e.g. "Kenya"
-  currencyCode   String   @default("USD")
+  id             String           @id @default(uuid())
+  code           String           @unique // ISO-2 e.g. "ke", "rw", "tz", "ug"
+  slug           String           @unique // e.g. "kenya", "rwanda", "uganda"
+  name           String           // e.g. "Kenya"
+  currencyCode   String           @default("USD")
   headline       String
-  tagline        String   @default("")
-  description    String   @db.Text
-  telcoPartners  Json     // Array of partner names e.g. ["MTN", "Airtel"]
-  paymentRails   Json     // Array of rails e.g. ["Mobile Money", "Cards"]
-  pricingSummary String?  @db.Text
+  tagline        String           @default("")
+  description    String           @db.Text
+  telcoPartners  Json             // Array of partner names e.g. ["MTN", "Airtel"]
+  paymentRails   Json             // Array of rails e.g. ["Mobile Money", "Cards"]
+  pricingSummary String?          @db.Text
   officeAddress  String?
   officePhone    String?
   officeEmail    String?
-  mapEmbedUrl    String?  @db.Text
-  active         Boolean  @default(true)
-  displayOrder   Int      @default(0)
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+  mapEmbedUrl    String?          @db.Text
+  active         Boolean          @default(true)
+  displayOrder   Int              @default(0)
+  managerId      String?
+  manager        User?            @relation("CountryManager", fields: [managerId], references: [id], onDelete: SetNull)
+  users          User[]           @relation("UserCountries")
+  inquiries      ContactInquiry[]
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
 
   @@map("countries")
 }
@@ -108,6 +114,9 @@ model ContactInquiry {
   orgName     String?
   roleTitle   String?
   country     String
+  countryId   String?
+  countryRef  Country?      @relation(fields: [countryId], references: [id], onDelete: SetNull)
+  routedEmail String?
   inquiryType String
   message     String        @db.Text
   status      InquiryStatus @default(UNREAD)

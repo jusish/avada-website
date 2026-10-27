@@ -21,6 +21,8 @@ interface AuthContextType {
   hasPermission: (module: CmsModule, action: 'view' | 'edit') => boolean;
   canView: (module: CmsModule) => boolean;
   canEdit: (module: CmsModule) => boolean;
+  canManageCountry: (countryId: string) => boolean;
+  isSuperAdmin: boolean;
   verifySession: () => Promise<boolean>;
 }
 
@@ -197,6 +199,22 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const canView = useCallback((module: CmsModule) => hasPermission(module, 'view'), [hasPermission]);
   const canEdit = useCallback((module: CmsModule) => hasPermission(module, 'edit'), [hasPermission]);
 
+  const isSuperAdmin =
+    user?.isSuperAdmin ??
+    (user?.email?.toLowerCase() === 'admin@avada.com' ||
+      user?.email?.toLowerCase().startsWith('admin@') ||
+      user?.role?.name?.toLowerCase().includes('super admin') ||
+      user?.role?.name === 'Super Administrator');
+
+  const canManageCountry = useCallback(
+    (countryId: string): boolean => {
+      if (!user) return false;
+      if (isSuperAdmin) return true;
+      return !!user.assignedCountryIds?.includes(countryId);
+    },
+    [user, isSuperAdmin]
+  );
+
   return (
     <AuthContext.Provider
       value={{
@@ -208,6 +226,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         hasPermission,
         canView,
         canEdit,
+        canManageCountry,
+        isSuperAdmin,
         verifySession,
       }}
     >

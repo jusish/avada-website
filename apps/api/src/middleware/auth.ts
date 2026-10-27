@@ -12,6 +12,10 @@ export interface AuthenticatedUser {
   roleId?: string;
   roleName?: string;
   permissions: PermissionMatrix;
+  isSuperAdmin: boolean;
+  assignedCountryIds: string[];
+  assignedCountryNames: string[];
+  assignedCountrySlugs: string[];
 }
 
 export interface AuthenticatedRequest extends Request {
@@ -44,7 +48,11 @@ export const requireAuth = async (
     const decoded = jwt.verify(token, JWT_SECRET) as JwtTokenPayload;
     const user = await prisma.user.findUnique({
       where: { id: decoded.id },
-      include: { role: true },
+      include: {
+        role: true,
+        countries: true,
+        managedCountries: true,
+      },
     });
 
     if (!user || user.status === 'SUSPENDED') {
@@ -75,6 +83,22 @@ export const requireAuth = async (
       rolePerms.integrations = { ...rolePerms.settings };
     }
 
+    const isSuperAdmin =
+      user.email.toLowerCase() === 'admin@avada.com' ||
+      user.email.toLowerCase().startsWith('admin@') ||
+      user.role?.name?.toLowerCase().includes('super admin') ||
+      user.role?.name === 'Super Administrator';
+
+    const userCountries = [...(user.countries || []), ...(user.managedCountries || [])];
+    const countryMap = new Map<string, (typeof userCountries)[0]>();
+    for (const c of userCountries) {
+      countryMap.set(c.id, c);
+    }
+    const uniqueCountries = Array.from(countryMap.values());
+    const assignedCountryIds = uniqueCountries.map((c) => c.id);
+    const assignedCountryNames = uniqueCountries.map((c) => c.name);
+    const assignedCountrySlugs = uniqueCountries.map((c) => c.slug.toLowerCase());
+
     req.user = {
       id: user.id,
       email: user.email,
@@ -82,6 +106,10 @@ export const requireAuth = async (
       roleId: user.roleId || undefined,
       roleName: user.role?.name || 'Administrator',
       permissions: (rolePerms as unknown as PermissionMatrix) || defaultPermissions,
+      isSuperAdmin,
+      assignedCountryIds,
+      assignedCountryNames,
+      assignedCountrySlugs,
     };
 
     next();

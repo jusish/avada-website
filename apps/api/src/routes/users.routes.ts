@@ -16,6 +16,7 @@ const createUserSchema = z.object({
   password: z.string().min(6),
   roleId: z.string().min(1),
   status: z.enum(['ACTIVE', 'INVITED', 'SUSPENDED']).default('ACTIVE'),
+  countryIds: z.array(z.string()).optional(),
 });
 
 const updateUserSchema = z.object({
@@ -24,6 +25,7 @@ const updateUserSchema = z.object({
   roleId: z.string().optional(),
   password: z.string().min(6).optional(),
   status: z.enum(['ACTIVE', 'INVITED', 'SUSPENDED']).optional(),
+  countryIds: z.array(z.string()).optional(),
 });
 
 // GET /api/admin/users
@@ -33,21 +35,36 @@ router.get('/', requirePermission('users', 'view'), async (_req: AuthenticatedRe
       orderBy: { createdAt: 'desc' },
       include: {
         role: true,
+        countries: true,
+        managedCountries: true,
       },
     });
 
     res.json({
       success: true,
-      data: users.map((u) => ({
-        id: u.id,
-        email: u.email,
-        name: u.name,
-        roleId: u.roleId,
-        role: u.role,
-        status: u.status,
-        createdAt: u.createdAt.toISOString(),
-        updatedAt: u.updatedAt.toISOString(),
-      })),
+      data: users.map((u) => {
+        const userCountries = [...(u.countries || []), ...(u.managedCountries || [])];
+        const countryMap = new Map<string, (typeof userCountries)[0]>();
+        for (const c of userCountries) {
+          countryMap.set(c.id, c);
+        }
+        const uniqueCountries = Array.from(countryMap.values());
+        const assignedCountryIds = uniqueCountries.map((c) => c.id);
+
+        return {
+          id: u.id,
+          email: u.email,
+          name: u.name,
+          roleId: u.roleId,
+          role: u.role,
+          status: u.status,
+          countries: uniqueCountries,
+          assignedCountryIds,
+          managedCountries: u.managedCountries,
+          createdAt: u.createdAt.toISOString(),
+          updatedAt: u.updatedAt.toISOString(),
+        };
+      }),
     });
   } catch (error) {
     console.error('Fetch users error:', error);
@@ -64,7 +81,7 @@ router.post('/', requirePermission('users', 'edit'), async (req: AuthenticatedRe
       return;
     }
 
-    const { email, name, password, roleId, status } = parse.data;
+    const { email, name, password, roleId, status, countryIds } = parse.data;
 
     const existing = await prisma.user.findUnique({ where: { email: email.toLowerCase() } });
     if (existing) {
@@ -87,8 +104,19 @@ router.post('/', requirePermission('users', 'edit'), async (req: AuthenticatedRe
         passwordHash,
         roleId,
         status,
+        ...(countryIds && countryIds.length > 0
+          ? {
+              countries: {
+                connect: countryIds.map((id) => ({ id })),
+              },
+            }
+          : {}),
       },
-      include: { role: true },
+      include: {
+        role: true,
+        countries: true,
+        managedCountries: true,
+      },
     });
 
     await logAudit({
@@ -96,7 +124,7 @@ router.post('/', requirePermission('users', 'edit'), async (req: AuthenticatedRe
       action: 'CREATE_USER',
       entityType: 'User',
       entityId: created.id,
-      details: { email: created.email, name: created.name, role: created.role?.name },
+      details: { email: created.email, name: created.name, role: created.role?.name, assignedCountries: countryIds },
     });
 
     res.status(201).json({
@@ -108,6 +136,8 @@ router.post('/', requirePermission('users', 'edit'), async (req: AuthenticatedRe
         roleId: created.roleId,
         role: created.role,
         status: created.status,
+        countries: created.countries,
+        assignedCountryIds: created.countries.map((c) => c.id),
       },
       message: `User '${created.name}' created successfully`,
     });
@@ -133,16 +163,25 @@ router.put('/:id', requirePermission('users', 'edit'), async (req: Authenticated
       return;
     }
 
-    const { password, ...fields } = parse.data;
+    const { password, countryIds, ...fields } = parse.data;
     const updateData: Prisma.UserUpdateInput = { ...fields };
     if (password) {
       updateData.passwordHash = await bcrypt.hash(password, 10);
+    }
+    if (countryIds !== undefined) {
+      updateData.countries = {
+        set: countryIds.map((cid) => ({ id: cid })),
+      };
     }
 
     const updated = await prisma.user.update({
       where: { id },
       data: updateData,
-      include: { role: true },
+      include: {
+        role: true,
+        countries: true,
+        managedCountries: true,
+      },
     });
 
     await logAudit({
@@ -150,8 +189,15 @@ router.put('/:id', requirePermission('users', 'edit'), async (req: Authenticated
       action: 'UPDATE_USER',
       entityType: 'User',
       entityId: id,
-      details: { email: updated.email, role: updated.role?.name, status: updated.status },
+      details: { email: updated.email, role: updated.role?.name, status: updated.status, assignedCountries: countryIds },
     });
+
+    const userCountries = [...(updated.countries || []), ...(updated.managedCountries || [])];
+    const countryMap = new Map<string, (typeof userCountries)[0]>();
+    for (const c of userCountries) {
+      countryMap.set(c.id, c);
+    }
+    const uniqueCountries = Array.from(countryMap.values());
 
     res.json({
       success: true,
@@ -162,6 +208,8 @@ router.put('/:id', requirePermission('users', 'edit'), async (req: Authenticated
         roleId: updated.roleId,
         role: updated.role,
         status: updated.status,
+        countries: uniqueCountries,
+        assignedCountryIds: uniqueCountries.map((c) => c.id),
       },
       message: `User '${updated.name}' updated successfully`,
     });
