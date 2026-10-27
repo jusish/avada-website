@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate, useLocation, Link, Navigate } from 'react-router-dom';
+import { useNavigate, useLocation, useSearchParams, Link, Navigate } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
 import { getAndClearSessionNotice } from '@/lib/auth-interceptor';
 import { useAdminTitle } from '@/lib/useAdminTitle';
@@ -18,7 +18,10 @@ export const AdminLoginPage: React.FC = () => {
   // In development, provide prefilled demo credentials for convenience.
   // In production, strictly leave blank and hide any helper credentials box.
   const isDev = import.meta.env.DEV;
-  const [email, setEmail] = useState(isDev ? 'admin@avada.com' : '');
+  const [searchParams] = useSearchParams();
+  const emailParam = searchParams.get('email') || '';
+
+  const [email, setEmail] = useState(emailParam || (isDev ? 'admin@avada.com' : ''));
   const [password, setPassword] = useState(isDev ? 'admin123' : '');
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -29,7 +32,7 @@ export const AdminLoginPage: React.FC = () => {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // If already authenticated, redirect straight to dashboard
+  // If already authenticated, redirect straight to dashboard or set-password
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[#2A292D]">
@@ -62,6 +65,12 @@ export const AdminLoginPage: React.FC = () => {
       }
 
       login(data.data.token, data.data.user);
+
+      // If user has mandatory temporary password change flag, force redirect to set-password
+      if (data.data.user?.mustChangePassword) {
+        navigate('/admin/set-password', { replace: true });
+        return;
+      }
 
       // Restore user to intended page or dashboard
       const state = location.state as { from?: { pathname?: string; search?: string } } | null;
@@ -141,7 +150,15 @@ export const AdminLoginPage: React.FC = () => {
               </div>
 
               <div className="space-y-1.5">
-                <Label htmlFor="admin-password" className="text-xs text-white/80">Password</Label>
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="admin-password" className="text-xs text-white/80">Password</Label>
+                  <Link
+                    to="/admin/forgot-password"
+                    className="text-[11px] text-[#3BBA93] hover:underline hover:text-[#32a481] transition-colors"
+                  >
+                    Forgot password?
+                  </Link>
+                </div>
                 <div className="relative">
                   <Lock className="w-4 h-4 text-white/40 absolute left-3 top-2.5" />
                   <Input

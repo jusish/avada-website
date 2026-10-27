@@ -47,20 +47,23 @@ model Role {
 }
 
 model User {
-  id               String           @id @default(uuid())
-  email            String           @unique
-  passwordHash     String
-  name             String
-  roleId           String?
-  role             Role?            @relation(fields: [roleId], references: [id], onDelete: SetNull)
-  status           UserStatus       @default(ACTIVE)
-  createdAt        DateTime         @default(now())
-  updatedAt        DateTime         @updatedAt
-  contentItems     ContentItem[]
-  handledInquiries ContactInquiry[] @relation("HandledBy")
-  auditLogs        AuditLog[]
-  countries        Country[]        @relation("UserCountries")
-  managedCountries Country[]        @relation("CountryManager")
+  id                 String               @id @default(uuid())
+  email              String               @unique
+  passwordHash       String
+  name               String
+  roleId             String?
+  role               Role?                @relation(fields: [roleId], references: [id], onDelete: SetNull)
+  status             UserStatus           @default(ACTIVE)
+  mustChangePassword Boolean              @default(false)
+  twoFactorEnabled   Boolean              @default(false)
+  resetTokens        PasswordResetToken[]
+  createdAt          DateTime             @default(now())
+  updatedAt          DateTime             @updatedAt
+  contentItems       ContentItem[]
+  handledInquiries   ContactInquiry[]     @relation("HandledBy")
+  auditLogs          AuditLog[]
+  countries          Country[]            @relation("UserCountries")
+  managedCountries   Country[]            @relation("CountryManager")
 
   @@map("users")
 }
@@ -262,4 +265,18 @@ model JobVacancy {
   updatedAt      DateTime @updatedAt
 
   @@map("job_vacancies")
+}
+
+model PasswordResetToken {
+  id        String    @id @default(uuid())
+  token     String    @unique
+  userId    String
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  @@index([token])
+  @@index([userId])
+  @@map("password_reset_tokens")
 }
