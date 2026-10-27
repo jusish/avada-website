@@ -197,6 +197,7 @@ const OFFICES: OfficeItem[] = [
   { country: 'Rwanda', address: 'BHC Building, KG 7 Ave Kacyiru, Gasabo, Kigali, Rwanda', to: '/rwanda' },
   { country: 'DRC', address: 'SILIKIN VILLAGE, Local A012, Bâtiment Phase 3', to: 'https://avadapay.cd' },
   { country: 'Benin', address: 'Cotonou, Littoral, Benin', to: '/benin', disabled: true },
+  { country: 'Burundi', address: 'Bujumbura, Burundi', to: '/burundi', disabled: true },
 ];
 
 export const HomePage: React.FC = () => {

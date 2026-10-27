@@ -119,6 +119,15 @@ const svgStar = (cx: number, cy: number, r: number, fill: string) => {
   return <polygon points={pts} fill={fill} />;
 };
 
+const svgSixStar = (cx: number, cy: number, r: number) => {
+  const pts = Array.from({ length: 12 }, (_, i) => {
+    const rad = (i * 30 - 90) * (Math.PI / 180);
+    const rr = i % 2 === 0 ? r : r * 0.55;
+    return `${(cx + rr * Math.cos(rad)).toFixed(2)},${(cy + rr * Math.sin(rad)).toFixed(2)}`;
+  }).join(' ');
+  return <polygon points={pts} fill="#CE1126" stroke="#1EB53A" strokeWidth="0.35" />;
+};
+
 /**
  * Democratic Republic of Congo Flag SVG Vector
  */
@@ -195,8 +204,34 @@ export const FlagUAE: React.FC<{ className?: string }> = ({ className = 'w-6 h-4
   </svg>
 );
 
+/**
+ * Burundi National Flag SVG Vector
+ */
+export const FlagBurundi: React.FC<{ className?: string }> = ({ className = 'w-6 h-4' }) => (
+  <svg
+    viewBox="0 0 60 40"
+    className={`inline-block shrink-0 rounded-[2px] shadow-xs border border-black/15 overflow-hidden ${className}`}
+    aria-label="Burundi Flag"
+  >
+    {/* Base Green Quadrants */}
+    <rect width="60" height="40" fill="#1EB53A" />
+    {/* Red Top and Bottom Triangles */}
+    <polygon points="0,0 60,0 30,20" fill="#CE1126" />
+    <polygon points="0,40 60,40 30,20" fill="#CE1126" />
+    {/* White Saltire Bands */}
+    <line x1="0" y1="0" x2="60" y2="40" stroke="#FFFFFF" strokeWidth="5.5" />
+    <line x1="0" y1="40" x2="60" y2="0" stroke="#FFFFFF" strokeWidth="5.5" />
+    {/* Central White Disk */}
+    <circle cx="30" cy="20" r="8.5" fill="#FFFFFF" />
+    {/* Three 6-pointed red stars outlined in green */}
+    {svgSixStar(30, 16.2, 1.8)}
+    {svgSixStar(26.6, 22.2, 1.8)}
+    {svgSixStar(33.4, 22.2, 1.8)}
+  </svg>
+);
+
 export interface CountryFlagProps {
-  country: 'kenya' | 'rwanda' | 'tanzania' | 'drc' | 'benin' | 'togo' | 'uae' | string;
+  country: 'kenya' | 'rwanda' | 'tanzania' | 'drc' | 'benin' | 'burundi' | 'togo' | 'uae' | string;
   className?: string;
 }
 
@@ -220,6 +255,9 @@ export const CountryFlag: React.FC<CountryFlagProps> = ({ country, className }) 
   }
   if (c === 'benin' || c === 'bj') {
     return <FlagBenin className={className} />;
+  }
+  if (c === 'burundi' || c === 'bi' || c === 'bu') {
+    return <FlagBurundi className={className} />;
   }
   if (c === 'togo' || c === 'tg') {
     return <FlagTogo className={className} />;

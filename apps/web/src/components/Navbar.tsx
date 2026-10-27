@@ -18,6 +18,7 @@ export const COUNTRIES: CountryInfo[] = [
   { code: 'rwanda', name: 'Rwanda', path: '/rwanda' },
   { code: 'drc', name: 'DRC', path: 'https://avadapay.cd' },
   { code: 'benin', name: 'Benin', path: '/benin', disabled: true },
+  { code: 'burundi', name: 'Burundi', path: '/burundi', disabled: true },
 ];
 
 export const Navbar: React.FC = () => {
