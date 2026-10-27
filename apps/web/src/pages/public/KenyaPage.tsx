@@ -67,10 +67,6 @@ const KenyaHeroVisual: React.FC = () => (
         <CountryFlag country="kenya" className="w-6 h-4" />
         <span className="text-sm font-bold tracking-wide">Kenya Gateway</span>
       </div>
-      <span className="inline-flex items-center gap-1.5 text-[11px] font-semibold text-[#3BBA93] bg-[#3BBA93]/15 px-2.5 py-0.5 rounded-full">
-        <span className="w-1.5 h-1.5 rounded-full bg-[#3BBA93] animate-pulse" />
-        CBK Compliant
-      </span>
     </div>
 
     {/* Live Stream Simulation */}
