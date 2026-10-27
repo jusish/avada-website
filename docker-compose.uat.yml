@@ -34,6 +34,13 @@ services:
       NODE_ENV: production
       DATABASE_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@postgres:5432/${POSTGRES_DB:-avada_uat_db}?schema=public
       JWT_SECRET: ${JWT_SECRET:-avada_uat_super_secure_jwt_secret_key_2026_isolated}
+      SMTP_HOST: ${SMTP_HOST:-smtp.gmail.com}
+      SMTP_PORT: ${SMTP_PORT:-465}
+      SMTP_SECURE: ${SMTP_SECURE:-true}
+      SMTP_USER: ${SMTP_USER:-justin@avadapay.com}
+      SMTP_PASS: ${SMTP_PASS:-gkzxkpfmbevfgeaq}
+      SMTP_FROM: ${SMTP_FROM:-"AvadaPay Platform" <justin@avadapay.com>}
+      APP_URL: ${APP_URL:-https://uat.avadapay.rw}
     networks:
       - default
 

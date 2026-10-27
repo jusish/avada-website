@@ -29,6 +29,9 @@ import {
   EyeOff,
   Globe2,
   ShieldCheck,
+  Send,
+  Sparkles,
+  Loader2,
 } from 'lucide-react';
 
 export const AdminUsersPage: React.FC = () => {
@@ -50,6 +53,7 @@ export const AdminUsersPage: React.FC = () => {
   const [status, setStatus] = useState<'ACTIVE' | 'INVITED' | 'SUSPENDED'>('ACTIVE');
   const [selectedCountryIds, setSelectedCountryIds] = useState<string[]>([]);
   const [saving, setSaving] = useState(false);
+  const [resendingId, setResendingId] = useState<string | null>(null);
 
   // Fetch Users, Roles and Countries
   const fetchData = async () => {
@@ -191,6 +195,30 @@ export const AdminUsersPage: React.FC = () => {
       }
     } catch (err) {
       console.error('Delete error:', err);
+    }
+  };
+
+  // Resend Invite
+  const handleResendInvite = async (id: string, emailStr: string) => {
+    if (!token || !canEdit('users')) return;
+    setResendingId(id);
+    try {
+      const res = await fetch(`/api/admin/users/${id}/resend-invite`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const data = await res.json();
+      if (data.success) {
+        alert(data.message || `A new temporary password invitation has been sent to ${emailStr}.`);
+        fetchData();
+      } else {
+        alert(data.error || 'Failed to resend invitation.');
+      }
+    } catch (err) {
+      console.error('Resend error:', err);
+      alert('Network error while resending invitation.');
+    } finally {
+      setResendingId(null);
     }
   };
 
@@ -365,9 +393,24 @@ export const AdminUsersPage: React.FC = () => {
                       </td>
 
                       <td className="py-3.5 px-4 text-right whitespace-nowrap">
-                        <div className="inline-flex items-center gap-1">
+                        <div className="inline-flex items-center gap-1.5">
                           {canEdit('users') && (
                             <>
+                              {u.status === 'INVITED' && (
+                                <button
+                                  onClick={() => handleResendInvite(u.id, u.email)}
+                                  disabled={resendingId === u.id}
+                                  title="Resend Invitation Email with New Temporary Password"
+                                  className="p-1 px-2 rounded-lg bg-blue-50 hover:bg-blue-100 text-blue-700 hover:text-blue-800 transition-colors flex items-center gap-1 text-[11px] font-bold border border-blue-200"
+                                >
+                                  {resendingId === u.id ? (
+                                    <Loader2 className="w-3 h-3 animate-spin" />
+                                  ) : (
+                                    <Send className="w-3 h-3" />
+                                  )}
+                                  <span>Resend</span>
+                                </button>
+                              )}
                               <button
                                 onClick={() => handleToggleStatus(u.id)}
                                 title={u.status === 'ACTIVE' ? 'Suspend Account' : 'Activate Account'}
@@ -445,29 +488,40 @@ export const AdminUsersPage: React.FC = () => {
               />
             </div>
 
-            <div>
-              <label className="block text-xs font-semibold text-gray-700 mb-1">
-                {editingUser ? 'Update Password (leave blank to keep current)' : 'Account Password *'}
-              </label>
-              <div className="relative">
-                <input
-                  type={showPassword ? 'text' : 'password'}
-                  required={!editingUser}
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder={editingUser ? '••••••••' : 'Minimum 8 characters'}
-                  className="w-full p-2.5 pr-10 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#3BBA93] focus:bg-white text-[#2A292D]"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-2.5 text-gray-400 hover:text-gray-600 transition-colors"
-                  aria-label={showPassword ? 'Hide password' : 'Show password'}
-                >
-                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                </button>
+            {!editingUser ? (
+              <div className="p-3.5 rounded-xl bg-blue-50 border border-blue-200 text-blue-900 text-xs space-y-1.5">
+                <div className="flex items-center gap-1.5 font-bold text-blue-800">
+                  <Sparkles className="w-4 h-4 text-blue-600" />
+                  <span>Automated Invitation & Temporary Password</span>
+                </div>
+                <p className="text-[11px] text-blue-700/90 leading-relaxed">
+                  The system will automatically generate a secure temporary password and email a branded invitation link to this address. The team member will set their permanent password upon first login.
+                </p>
               </div>
-            </div>
+            ) : (
+              <div>
+                <label className="block text-xs font-semibold text-gray-700 mb-1">
+                  Update Password (leave blank to keep current)
+                </label>
+                <div className="relative">
+                  <input
+                    type={showPassword ? 'text' : 'password'}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="••••••••"
+                    className="w-full p-2.5 pr-10 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#3BBA93] focus:bg-white text-[#2A292D]"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-2.5 text-gray-400 hover:text-gray-600 transition-colors"
+                    aria-label={showPassword ? 'Hide password' : 'Show password'}
+                  >
+                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </button>
+                </div>
+              </div>
+            )}
 
             <div>
               <label className="block text-xs font-semibold text-gray-700 mb-1">Assigned Security Role *</label>

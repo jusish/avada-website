@@ -19,6 +19,7 @@ import {
   ExternalLink,
   LogOut,
   User as UserIcon,
+  ChevronRight,
 } from 'lucide-react';
 import { CmsModule } from '@avada/shared';
 
@@ -259,24 +260,35 @@ export const AdminSidebar: React.FC = () => {
       </div>
 
       {/* User profile & logout footer */}
-      <div className="p-4 border-t border-white/10 bg-black/20 flex-shrink-0">
-        <div className="flex items-center space-x-3 mb-3">
-          <div className="w-8 h-8 rounded-full bg-[#3BBA93]/20 text-[#3BBA93] flex items-center justify-center font-bold text-xs border border-[#3BBA93]/30">
+      <div className="p-3 border-t border-white/10 bg-black/20 flex-shrink-0 space-y-2">
+        <Link
+          to="/admin/profile"
+          title="Open Profile & Security Settings"
+          className={`flex items-center space-x-3 p-2 rounded-xl transition-all group border ${
+            location.pathname === '/admin/profile'
+              ? 'bg-white/15 border-[#3BBA93]/60 shadow-sm'
+              : 'hover:bg-white/10 border-transparent hover:border-white/10'
+          }`}
+        >
+          <div className="w-8 h-8 rounded-full bg-[#3BBA93]/20 text-[#3BBA93] flex items-center justify-center font-bold text-xs border border-[#3BBA93]/30 flex-shrink-0 group-hover:scale-105 transition-transform">
             {user?.name ? user.name.slice(0, 2).toUpperCase() : <UserIcon className="w-4 h-4" />}
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-xs font-semibold text-white truncate">{user?.name || 'Administrator'}</p>
-            <p className="text-[10px] text-[#3BBA93] truncate font-medium">
-              {user?.role?.name || 'Super Administrator'}
+            <p className="text-xs font-semibold text-white truncate group-hover:text-[#3BBA93] transition-colors">
+              {user?.name || 'Administrator'}
+            </p>
+            <p className="text-[10px] text-white/50 truncate font-medium">
+              {user?.email || user?.role?.name || 'My Profile'}
             </p>
           </div>
-        </div>
+          <ChevronRight className="w-3.5 h-3.5 text-white/30 group-hover:text-white group-hover:translate-x-0.5 transition-all flex-shrink-0" />
+        </Link>
 
         <Button
           variant="outline"
           size="sm"
           onClick={handleLogout}
-          className="w-full justify-center space-x-2 text-xs bg-transparent border-white/15 text-white/75 hover:text-red-400 hover:border-red-500/40 hover:bg-red-500/10 transition-colors"
+          className="w-full justify-center space-x-2 text-xs bg-transparent border-white/15 text-white/75 hover:text-red-400 hover:border-red-500/40 hover:bg-red-500/10 transition-colors h-8"
         >
           <LogOut className="w-3.5 h-3.5" />
           <span>Sign Out</span>

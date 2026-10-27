@@ -22,6 +22,10 @@ import { NotFoundPage } from '@/pages/public/NotFoundPage';
 
 // Admin CMS & Operations Pages
 import { AdminLoginPage } from '@/pages/admin/AdminLoginPage';
+import { AdminForgotPasswordPage } from '@/pages/admin/AdminForgotPasswordPage';
+import { AdminResetPasswordPage } from '@/pages/admin/AdminResetPasswordPage';
+import { AdminSetPasswordPage } from '@/pages/admin/AdminSetPasswordPage';
+import { AdminProfilePage } from '@/pages/admin/AdminProfilePage';
 import { AdminDashboardPage } from '@/pages/admin/AdminDashboardPage';
 import { AdminAnalyticsPage } from '@/pages/admin/AdminAnalyticsPage';
 import { AdminSecurityPage } from '@/pages/admin/AdminSecurityPage';
@@ -76,11 +80,12 @@ const ADMIN_ROUTE_TITLES: Record<string, string> = {
   '/admin/roles': 'Role Permissions | AvadaPay CMS',
   '/admin/users': 'User Directory | AvadaPay CMS',
   '/admin/audit-logs': 'Audit Logs | AvadaPay CMS',
+  '/admin/profile': 'My Profile & Security | AvadaPay CMS',
 };
 
 // Admin Protected Layout
 const AdminProtectedLayout: React.FC = () => {
-  const { token, isLoading } = useAuth();
+  const { user, token, isLoading } = useAuth();
   const location = useLocation();
 
   useEffect(() => {
@@ -109,6 +114,11 @@ const AdminProtectedLayout: React.FC = () => {
 
   if (!token) {
     return <Navigate to="/admin/login" state={{ from: location }} replace />;
+  }
+
+  // Force users with pending initial temporary password to set their permanent password
+  if (user?.mustChangePassword) {
+    return <Navigate to="/admin/set-password" replace />;
   }
 
   return (
@@ -159,8 +169,11 @@ export const App: React.FC = () => {
             <Route path="/:countrySlug" element={<CountryPage />} />
           </Route>
 
-          {/* Admin Login Route */}
+          {/* Admin Login & Password Recovery Routes */}
           <Route path="/admin/login" element={<AdminLoginPage />} />
+          <Route path="/admin/forgot-password" element={<AdminForgotPasswordPage />} />
+          <Route path="/admin/reset-password" element={<AdminResetPasswordPage />} />
+          <Route path="/admin/set-password" element={<AdminSetPasswordPage />} />
 
           {/* Admin CMS Protected Routes */}
           <Route path="/admin" element={<AdminProtectedLayout />}>
@@ -284,6 +297,9 @@ export const App: React.FC = () => {
                 </AdminPermissionGuard>
               }
             />
+
+            {/* Administrator Profile & Security */}
+            <Route path="profile" element={<AdminProfilePage />} />
 
             {/* Convenience redirects */}
             <Route path="roles" element={<Navigate to="/admin/governance/roles" replace />} />

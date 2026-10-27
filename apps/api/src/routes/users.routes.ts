@@ -1,4 +1,5 @@
 import { Router, Response } from 'express';
+import crypto from 'crypto';
 import { Prisma } from '@prisma/client';
 import bcrypt from 'bcryptjs';
 import { z } from 'zod';
@@ -6,6 +7,7 @@ import { prisma } from '../prisma';
 import { requireAuth, AuthenticatedRequest } from '../middleware/auth';
 import { requirePermission } from '../middleware/permission';
 import { logAudit } from '../lib/audit';
+import { EmailService } from '../services/email.service';
 
 const router = Router();
 router.use(requireAuth);
@@ -13,9 +15,9 @@ router.use(requireAuth);
 const createUserSchema = z.object({
   email: z.string().email(),
   name: z.string().min(2),
-  password: z.string().min(6),
+  password: z.string().min(6).optional(),
   roleId: z.string().min(1),
-  status: z.enum(['ACTIVE', 'INVITED', 'SUSPENDED']).default('ACTIVE'),
+  status: z.enum(['ACTIVE', 'INVITED', 'SUSPENDED']).default('INVITED'),
   countryIds: z.array(z.string()).optional(),
 });
 
@@ -58,6 +60,8 @@ router.get('/', requirePermission('users', 'view'), async (_req: AuthenticatedRe
           roleId: u.roleId,
           role: u.role,
           status: u.status,
+          mustChangePassword: u.mustChangePassword,
+          twoFactorEnabled: u.twoFactorEnabled,
           countries: uniqueCountries,
           assignedCountryIds,
           managedCountries: u.managedCountries,
@@ -95,7 +99,11 @@ router.post('/', requirePermission('users', 'edit'), async (req: AuthenticatedRe
       return;
     }
 
-    const passwordHash = await bcrypt.hash(password, 10);
+    // Generate clean temporary password if not provided or when creating an invited team member
+    const tempPassword = password?.trim() || ('Avada#' + crypto.randomBytes(4).toString('hex').toUpperCase() + '!');
+    const passwordHash = await bcrypt.hash(tempPassword, 10);
+    const userStatus = status || 'INVITED';
+    const mustChangePassword = userStatus === 'INVITED' || !password;
 
     const created = await prisma.user.create({
       data: {
@@ -103,7 +111,8 @@ router.post('/', requirePermission('users', 'edit'), async (req: AuthenticatedRe
         name,
         passwordHash,
         roleId,
-        status,
+        status: userStatus,
+        mustChangePassword,
         ...(countryIds && countryIds.length > 0
           ? {
               countries: {
@@ -124,7 +133,17 @@ router.post('/', requirePermission('users', 'edit'), async (req: AuthenticatedRe
       action: 'CREATE_USER',
       entityType: 'User',
       entityId: created.id,
-      details: { email: created.email, name: created.name, role: created.role?.name, assignedCountries: countryIds },
+      details: { email: created.email, name: created.name, role: created.role?.name, assignedCountries: countryIds, status: userStatus },
+    });
+
+    // Automatically send invitation email with temporary credentials
+    const marketHubs = created.countries.map((c) => c.name);
+    await EmailService.sendTeamInvitation({
+      email: created.email,
+      name: created.name,
+      temporaryPassword: tempPassword,
+      roleName: role.name,
+      marketHubs,
     });
 
     res.status(201).json({
@@ -136,14 +155,85 @@ router.post('/', requirePermission('users', 'edit'), async (req: AuthenticatedRe
         roleId: created.roleId,
         role: created.role,
         status: created.status,
+        mustChangePassword: created.mustChangePassword,
+        twoFactorEnabled: created.twoFactorEnabled,
         countries: created.countries,
         assignedCountryIds: created.countries.map((c) => c.id),
       },
-      message: `User '${created.name}' created successfully`,
+      message: `Team member '${created.name}' created and invitation email dispatched successfully.`,
     });
   } catch (error) {
     console.error('Create user error:', error);
     res.status(500).json({ success: false, error: 'Failed to create user' });
+  }
+});
+
+// POST /api/admin/users/:id/resend-invite
+router.post('/:id/resend-invite', requirePermission('users', 'edit'), async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+  try {
+    const { id } = req.params;
+    const user = await prisma.user.findUnique({
+      where: { id },
+      include: {
+        role: true,
+        countries: true,
+        managedCountries: true,
+      },
+    });
+
+    if (!user) {
+      res.status(404).json({ success: false, error: 'User not found' });
+      return;
+    }
+
+    if (user.status === 'SUSPENDED') {
+      res.status(400).json({ success: false, error: 'Cannot send invitation to a suspended account.' });
+      return;
+    }
+
+    // Generate a fresh new temporary password
+    const newTempPassword = 'Avada#' + crypto.randomBytes(4).toString('hex').toUpperCase() + '!';
+    const passwordHash = await bcrypt.hash(newTempPassword, 10);
+
+    const updated = await prisma.user.update({
+      where: { id },
+      data: {
+        passwordHash,
+        mustChangePassword: true,
+        status: 'INVITED',
+      },
+      include: {
+        role: true,
+        countries: true,
+        managedCountries: true,
+      },
+    });
+
+    const marketHubs = [...(updated.countries || []), ...(updated.managedCountries || [])].map((c) => c.name);
+
+    await EmailService.sendTeamInvitation({
+      email: updated.email,
+      name: updated.name,
+      temporaryPassword: newTempPassword,
+      roleName: updated.role?.name || 'Team Member',
+      marketHubs,
+    });
+
+    await logAudit({
+      req,
+      action: 'INVITATION_RESENT',
+      entityType: 'User',
+      entityId: updated.id,
+      details: { email: updated.email },
+    });
+
+    res.json({
+      success: true,
+      message: `A fresh invitation email with new temporary credentials has been sent to ${updated.email}.`,
+    });
+  } catch (error) {
+    console.error('Resend invite error:', error);
+    res.status(500).json({ success: false, error: 'Failed to resend invitation' });
   }
 });
 

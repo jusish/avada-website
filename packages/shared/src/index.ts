@@ -41,6 +41,8 @@ export interface User {
   roleId: string;
   role?: Role;
   status: UserStatus;
+  mustChangePassword?: boolean;
+  twoFactorEnabled?: boolean;
   countries?: Country[];
   assignedCountryIds?: string[];
   managedCountries?: Country[];
@@ -57,6 +59,8 @@ export interface AuthResponse {
     roleId: string;
     role: Role;
     status: UserStatus;
+    mustChangePassword?: boolean;
+    twoFactorEnabled?: boolean;
     countries?: Country[];
     assignedCountryIds?: string[];
     isSuperAdmin?: boolean;
