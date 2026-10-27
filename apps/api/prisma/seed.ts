@@ -520,7 +520,7 @@ You can modify your browser settings to decline non-essential cookies. Disabling
       body: 'At Avada, we are building the next generation of financial infrastructure across East and Central Africa.',
       category: 'announcements',
       status: ContentStatus.PUBLISHED,
-      authorId: adminUser.id,
+      authorId: winnieUser.id,
     },
     {
       slug: 'seamless-global-payouts',
@@ -529,7 +529,7 @@ You can modify your browser settings to decline non-essential cookies. Disabling
       body: 'Cross-border commerce demands agile solutions. Avada connects with localized banking rails across Africa.',
       category: 'products',
       status: ContentStatus.PUBLISHED,
-      authorId: adminUser.id,
+      authorId: winnieUser.id,
     },
     {
       slug: 'security-and-compliance-at-avada',
@@ -538,7 +538,7 @@ You can modify your browser settings to decline non-essential cookies. Disabling
       body: 'Security is at the heart of everything we build. Learn more about our multi-layered encryption protocols.',
       category: 'security',
       status: ContentStatus.PUBLISHED,
-      authorId: adminUser.id,
+      authorId: winnieUser.id,
     },
   ];
 
