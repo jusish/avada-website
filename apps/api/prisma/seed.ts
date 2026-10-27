@@ -190,42 +190,23 @@ async function main() {
       displayOrder: 5,
     },
     {
-      code: 'TG',
-      slug: 'togo',
-      name: 'Togo',
-      currencyCode: 'XOF',
-      headline: 'Togo Digital Payments & Carrier Aggregation',
-      tagline: 'Reliable payment processing across Togocom TMoney and Moov Money.',
+      code: 'BI',
+      slug: 'burundi',
+      name: 'Burundi',
+      currencyCode: 'BIF',
+      headline: 'Burundi Digital Payments & Telco Integration',
+      tagline: 'Direct mobile money integration with Lumicash and Ecocash.',
       description:
-        'Expand your business across Togo with AvadaPay single-API access for collections, payouts, and automated transactional alerts.',
-      telcoPartners: ['Togocom TMoney', 'Moov Money Togo'],
-      paymentRails: ['TMoney & Moov Money Payouts', 'Omnichannel In-Store & Online Checkout', 'SMS Notifications'],
-      pricingSummary: 'Low-friction integration with transparent per-transaction pricing.',
-      officeAddress: 'Lomé, Maritime, Togo',
-      officePhone: '+228 90 00 00 00',
-      officeEmail: 'togo@avadapay.com',
-      mapEmbedUrl: 'https://maps.google.com/maps?q=Lome,%20Togo&t=&z=15&ie=UTF8&iwloc=&output=embed',
+        'AvadaPay connects merchants and businesses in Burundi to major mobile money operators and card networks with instant settlement and automated reconciliation.',
+      telcoPartners: ['Lumicash', 'Ecocash'],
+      paymentRails: ['Mobile Money (Collections & Payouts)', 'Cards (Visa, Mastercard)', 'Bulk SMS'],
+      pricingSummary: 'Competitive collection and payout fees with local currency settlement.',
+      officeAddress: 'Bujumbura, Burundi',
+      officePhone: '+257 968 332 766',
+      officeEmail: 'burundi@avadapay.com',
+      mapEmbedUrl: '',
       active: true,
       displayOrder: 6,
-    },
-    {
-      code: 'AE',
-      slug: 'uae',
-      name: 'UAE (Headquarters)',
-      currencyCode: 'AED',
-      headline: 'AvadaPay Corporate Headquarters — Dubai, UAE',
-      tagline: 'Global treasury, compliance, and international settlement operations.',
-      description:
-        'AvadaPay global headquarters in Dubai coordinates our pan-African financial operations, treasury infrastructure, and international enterprise relationships.',
-      telcoPartners: ['Global Banking Rails', 'Pan-African Switch Network'],
-      paymentRails: ['International Wire Transfers', 'Treasury & Liquidity Management', 'Multi-Currency Settlement (USD, AED, EUR)'],
-      pricingSummary: 'Custom enterprise volume pricing and bespoke treasury solutions.',
-      officeAddress: '25th floor, SORP Business Centre, Tameem House, Barsha Heights, Dubai, United Arab Emirates (UAE)',
-      officePhone: '+971 4 000 0000',
-      officeEmail: 'dubai@avadapay.com',
-      mapEmbedUrl: 'https://maps.google.com/maps?q=SORP+Business+Centre+Tameem+House+Barsha+Heights+Dubai&output=embed',
-      active: true,
-      displayOrder: 7,
     },
   ];
 
@@ -236,7 +217,14 @@ async function main() {
       create: country,
     });
   }
-  console.log('✅ Seeded Regional Presence: Rwanda, Kenya, Tanzania, DRC, Benin, Togo, UAE');
+
+  // Deactivate non-operational markets (Togo, UAE)
+  await prisma.country.updateMany({
+    where: { slug: { in: ['togo', 'uae'] } },
+    data: { active: false },
+  });
+
+  console.log('✅ Seeded Regional Presence: Rwanda, Kenya, Tanzania, DRC, Benin, Burundi');
 
   // 4. Seed Default Inquiry Types
   const defaultInquiryTypes = [

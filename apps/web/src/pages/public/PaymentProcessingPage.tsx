@@ -269,7 +269,7 @@ const PaymentProcessingHeroVisual: React.FC = () => (
       {/* 1. M-Pesa STK Push */}
       <div className="p-3.5 rounded-xl bg-white/5 border border-white/10 flex items-center justify-between transition-all hover:border-[#3BBA93]/50 hover:bg-white/[0.08]">
         <div className="flex items-center space-x-3">
-          <div className="w-9 h-9 rounded-lg bg-[#00A34F]/20 text-[#00A34F] flex items-center justify-center font-black text-xs">
+          <div className="w-9 h-9 rounded-lg bg-[#00A34F]/20 text-[#00A34F] flex items-center justify-center font-black text-[8.5px] tracking-tight leading-none shrink-0">
             MPESA
           </div>
           <div>

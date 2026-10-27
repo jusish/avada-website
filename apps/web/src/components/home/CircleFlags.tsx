@@ -36,6 +36,15 @@ const star = (cx: number, cy: number, r: number, fill: string) => {
   return <polygon points={pts} fill={fill} />;
 };
 
+const sixStar = (cx: number, cy: number, r: number) => {
+  const pts = Array.from({ length: 12 }, (_, i) => {
+    const rad = (i * 30 - 90) * (Math.PI / 180);
+    const rr = i % 2 === 0 ? r : r * 0.55;
+    return `${(cx + rr * Math.cos(rad)).toFixed(2)},${(cy + rr * Math.sin(rad)).toFixed(2)}`;
+  }).join(' ');
+  return <polygon points={pts} fill="#CE1126" stroke="#1EB53A" strokeWidth="0.8" />;
+};
+
 export const CircleKenya: React.FC<Props> = (p) => (
   <Circle {...p} label="Kenya">
     <rect width="100" height="100" fill="#fff" />
@@ -117,6 +126,20 @@ export const CircleBenin: React.FC<Props> = (p) => (
   </Circle>
 );
 
+export const CircleBurundi: React.FC<Props> = (p) => (
+  <Circle {...p} label="Burundi">
+    <rect width="100" height="100" fill="#1EB53A" />
+    <polygon points="0,0 100,0 50,50" fill="#CE1126" />
+    <polygon points="0,100 100,100 50,50" fill="#CE1126" />
+    <line x1="0" y1="0" x2="100" y2="100" stroke="#FFFFFF" strokeWidth="12" />
+    <line x1="0" y1="100" x2="100" y2="0" stroke="#FFFFFF" strokeWidth="12" />
+    <circle cx="50" cy="50" r="22" fill="#FFFFFF" />
+    {sixStar(50, 40, 4.5)}
+    {sixStar(41.5, 55, 4.5)}
+    {sixStar(58.5, 55, 4.5)}
+  </Circle>
+);
+
 export const CircleTogo: React.FC<Props> = (p) => (
   <Circle {...p} label="Togo">
     <rect width="100" height="20" fill="#006A4E" />
@@ -144,5 +167,6 @@ export const CIRCLE_FLAGS: React.FC<Props>[] = [
   CircleRwanda,
   CircleDRC,
   CircleBenin,
+  CircleBurundi,
 ];
 
