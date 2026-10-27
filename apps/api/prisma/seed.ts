@@ -48,7 +48,7 @@ async function main() {
     },
   });
 
-  await prisma.role.upsert({
+  const editorRole = await prisma.role.upsert({
     where: { name: 'Content Editor' },
     update: { permissions: editorPermissions },
     create: {
@@ -59,7 +59,7 @@ async function main() {
     },
   });
 
-  await prisma.role.upsert({
+  const supportRole = await prisma.role.upsert({
     where: { name: 'Customer Support' },
     update: { permissions: supportPermissions },
     create: {
@@ -72,25 +72,70 @@ async function main() {
 
   console.log('✅ Seeded Roles: Super Administrator, Content Editor, Customer Support');
 
-  // 2. Create or ensure Default Super Admin User
-  const adminEmail = 'admin@avada.com';
-  const passwordHash = await bcrypt.hash('admin123', 10);
+  // 2. Remove deprecated admin@avada.com account
+  await prisma.user.deleteMany({
+    where: { email: 'admin@avada.com' },
+  });
 
-  const adminUser = await prisma.user.upsert({
-    where: { email: adminEmail },
+  // Seed Primary Users
+  // A. Winnie Odede (Global Super Admin & Manager of KE/TZ)
+  const winniePasswordHash = await bcrypt.hash('pPlJ41K48U_V', 10);
+  const winnieUser = await prisma.user.upsert({
+    where: { email: 'winnie.odede@avadapay.com' },
     update: {
+      name: 'Global Admin',
+      passwordHash: winniePasswordHash,
       roleId: superAdminRole.id,
       status: UserStatus.ACTIVE,
     },
     create: {
-      email: adminEmail,
-      name: 'Avada Administrator',
-      passwordHash,
+      email: 'winnie.odede@avadapay.com',
+      name: 'Global Admin',
+      passwordHash: winniePasswordHash,
       roleId: superAdminRole.id,
       status: UserStatus.ACTIVE,
     },
   });
-  console.log(`✅ Seeded Admin user: ${adminEmail} (role: Super Administrator)`);
+
+  // B. Florien Maniraho (CEO/Manager of Rwanda)
+  const florienPasswordHash = await bcrypt.hash('Floman05!', 10);
+  const florienUser = await prisma.user.upsert({
+    where: { email: 'florien.maniraho@avadapay.com' },
+    update: {
+      name: 'Florien Maniraho',
+      passwordHash: florienPasswordHash,
+      roleId: editorRole.id,
+      status: UserStatus.ACTIVE,
+    },
+    create: {
+      email: 'florien.maniraho@avadapay.com',
+      name: 'Florien Maniraho',
+      passwordHash: florienPasswordHash,
+      roleId: editorRole.id,
+      status: UserStatus.ACTIVE,
+    },
+  });
+
+  // C. Justin Ishimwe (Team member of Rwanda)
+  const justinPasswordHash = await bcrypt.hash('b99X[(I3T/K2', 10);
+  const justinUser = await prisma.user.upsert({
+    where: { email: 'justin@avadapay.com' },
+    update: {
+      name: 'Justin Ishimwe',
+      passwordHash: justinPasswordHash,
+      roleId: editorRole.id,
+      status: UserStatus.ACTIVE,
+    },
+    create: {
+      email: 'justin@avadapay.com',
+      name: 'Justin Ishimwe',
+      passwordHash: justinPasswordHash,
+      roleId: editorRole.id,
+      status: UserStatus.ACTIVE,
+    },
+  });
+
+  console.log(`✅ Seeded Core Users: Global Admin (Winnie), Florien Maniraho, Justin Ishimwe`);
 
   // 3. Seed Default African Countries & Market Hubs
   const defaultCountries = [
@@ -107,8 +152,9 @@ async function main() {
       paymentRails: ['Mobile Money (Collections & Payouts)', 'Cards (Visa, Mastercard)', 'Bulk Airtime & SMS'],
       pricingSummary: 'Competitive 1.5% flat collection rate with zero setup fees for registered enterprises.',
       officeAddress: 'BHC Building, KG 7 Ave Kacyiru, Gasabo, Kigali, Rwanda',
-      officePhone: '+250 788 123 456',
-      officeEmail: 'rwanda@avadapay.com',
+      officePhone: '+250796510061',
+      officeEmail: 'avada.rwanda@avadapay.com',
+      managerId: florienUser.id,
       mapEmbedUrl: 'https://maps.google.com/maps?q=BHC%20Building,%20KG%207%20Ave%20Kacyiru,%20Gasabo,%20Kigali,%20Rwanda&output=embed',
       active: true,
       displayOrder: 1,
@@ -126,8 +172,9 @@ async function main() {
       paymentRails: ['M-Pesa Express (STK Push)', 'Paybill & Till Integration', 'B2C Payouts', 'Bulk SMS'],
       pricingSummary: 'Volume-tiered transaction pricing starting from 1.4% with automatic daily sweeps.',
       officeAddress: '8th Floor Westpark Towers, Westlands, Nairobi, Kenya',
-      officePhone: '+254 700 987 654',
-      officeEmail: 'kenya@avadapay.com',
+      officePhone: null,
+      officeEmail: 'avada.kenya@avadapay.com',
+      managerId: winnieUser.id,
       mapEmbedUrl: 'https://maps.google.com/maps?q=Westpark%20Towers%20Westlands%20Nairobi&output=embed',
       active: true,
       displayOrder: 2,
@@ -145,8 +192,9 @@ async function main() {
       paymentRails: ['Unified Mobile Money Gateway', 'Bank Payouts via TIPS', 'Transactional SMS'],
       pricingSummary: 'Transparent pricing with automated reconciliation and multi-currency payout options.',
       officeAddress: 'Ali Hassan Mwinyi Rd, Victoria Place, Dar es Salaam, Tanzania',
-      officePhone: '+255 754 321 098',
-      officeEmail: 'tanzania@avadapay.com',
+      officePhone: null,
+      officeEmail: 'avada.tanzania@avadapay.com',
+      managerId: winnieUser.id,
       mapEmbedUrl: 'https://maps.google.com/maps?q=Dar%20es%20Salaam,%20Tanzania&t=&z=15&ie=UTF8&iwloc=&output=embed',
       active: true,
       displayOrder: 3,
@@ -223,6 +271,53 @@ async function main() {
     where: { slug: { in: ['togo', 'uae'] } },
     data: { active: false },
   });
+
+  // Assign user market relations
+  const rwandaCountry = await prisma.country.findUnique({ where: { slug: 'rwanda' } });
+  const kenyaCountry = await prisma.country.findUnique({ where: { slug: 'kenya' } });
+  const tanzaniaCountry = await prisma.country.findUnique({ where: { slug: 'tanzania' } });
+
+  if (rwandaCountry) {
+    await prisma.user.update({
+      where: { id: florienUser.id },
+      data: {
+        countries: {
+          set: [{ id: rwandaCountry.id }],
+        },
+      },
+    });
+    await prisma.user.update({
+      where: { id: justinUser.id },
+      data: {
+        countries: {
+          set: [{ id: rwandaCountry.id }],
+        },
+      },
+    });
+    await prisma.country.update({
+      where: { id: rwandaCountry.id },
+      data: { managerId: florienUser.id },
+    });
+  }
+
+  if (kenyaCountry && tanzaniaCountry) {
+    await prisma.user.update({
+      where: { id: winnieUser.id },
+      data: {
+        countries: {
+          set: [{ id: kenyaCountry.id }, { id: tanzaniaCountry.id }],
+        },
+      },
+    });
+    await prisma.country.update({
+      where: { id: kenyaCountry.id },
+      data: { managerId: winnieUser.id },
+    });
+    await prisma.country.update({
+      where: { id: tanzaniaCountry.id },
+      data: { managerId: winnieUser.id },
+    });
+  }
 
   console.log('✅ Seeded Regional Presence: Rwanda, Kenya, Tanzania, DRC, Benin, Burundi');
 
