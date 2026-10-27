@@ -44,6 +44,9 @@ export interface TwoFactorOtpData {
   expiresInMinutes?: number;
 }
 
+const APP_URL = process.env.APP_URL || 'https://avadapay.com';
+const LOGO_URL = `${APP_URL}/logo-horizontal.png`;
+
 export class EmailService {
   private static transporter: Transporter | null = null;
 
@@ -77,7 +80,7 @@ export class EmailService {
 
   /**
    * Sends an inquiry notification to the country-specific office and manager emails.
-   * Fully branded in AvadaPay charcoal (#2A292D) and emerald (#3BBA93) with zero blue.
+   * Fully branded in AvadaPay charcoal (#2A292D) and emerald (#3BBA93) with the official logo.
    */
   public static async sendInquiryNotification(
     inquiry: InquiryEmailData,
@@ -135,9 +138,9 @@ Manage this inquiry in AvadaPay Admin: https://avadapay.com/admin/inquiries
   <style>
     body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #f3f4f6; margin: 0; padding: 20px; color: #1f2937; -webkit-font-smoothing: antialiased; }
     .card { max-width: 480px; margin: 0 auto; background: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 16px rgba(0,0,0,0.06); border: 1px solid #e5e7eb; }
-    .header { background: #2A292D; padding: 20px 24px; text-align: left; }
-    .logo { font-size: 20px; font-weight: 800; letter-spacing: -0.5px; text-decoration: none; color: #ffffff; }
-    .logo-accent { color: #3BBA93; }
+    .header { background: #2A292D; padding: 22px 24px; text-align: left; }
+    .header-logo { display: inline-block; margin-bottom: 6px; }
+    .header-logo img { display: block; width: 145px; max-width: 145px; height: auto; border: 0; outline: none; }
     .badge { display: inline-block; background: rgba(59,186,147,0.15); border: 1px solid rgba(59,186,147,0.3); color: #3BBA93; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; padding: 3px 8px; border-radius: 9999px; margin-top: 10px; }
     .title { margin: 6px 0 0 0; font-size: 18px; font-weight: 700; color: #ffffff; line-height: 1.3; }
     .body { padding: 24px; }
@@ -155,7 +158,9 @@ Manage this inquiry in AvadaPay Admin: https://avadapay.com/admin/inquiries
 <body>
   <div class="card">
     <div class="header">
-      <div class="logo">avada<span class="logo-accent">pay</span></div>
+      <a href="${APP_URL}" target="_blank" class="header-logo" style="text-decoration: none; display: inline-block;">
+        <img src="${LOGO_URL}" alt="AvadaPay" width="145" height="26" style="display: block; width: 145px; max-width: 145px; height: auto; border: 0; outline: none; text-decoration: none;" />
+      </a>
       <div><span class="badge">${escapeHtml(countryLabel)} Hub</span></div>
       <h1 class="title">New Contact Inquiry</h1>
     </div>
@@ -232,7 +237,7 @@ Manage this inquiry in AvadaPay Admin: https://avadapay.com/admin/inquiries
   }
 
   /**
-   * Sends a compact branded team member invitation with temporary credentials.
+   * Sends a compact branded team member invitation with the official AvadaPay logo and temporary credentials.
    * Strictly branded in AvadaPay dark charcoal (#2A292D) and emerald (#3BBA93) with zero blue.
    */
   public static async sendTeamInvitation(data: TeamInvitationData): Promise<boolean> {
@@ -275,8 +280,8 @@ Do not share your temporary password with anyone.
     body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #f3f4f6; margin: 0; padding: 20px; color: #1f2937; -webkit-font-smoothing: antialiased; }
     .card { max-width: 480px; margin: 0 auto; background: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 16px rgba(0,0,0,0.06); border: 1px solid #e5e7eb; }
     .header { background: #2A292D; padding: 22px 24px; text-align: left; }
-    .logo { font-size: 20px; font-weight: 800; letter-spacing: -0.5px; text-decoration: none; color: #ffffff; }
-    .logo-accent { color: #3BBA93; }
+    .header-logo { display: inline-block; margin-bottom: 6px; }
+    .header-logo img { display: block; width: 145px; max-width: 145px; height: auto; border: 0; outline: none; }
     .badge { display: inline-block; background: rgba(59,186,147,0.15); border: 1px solid rgba(59,186,147,0.3); color: #3BBA93; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; padding: 3px 8px; border-radius: 9999px; margin-top: 10px; }
     .title { margin: 6px 0 0 0; font-size: 18px; font-weight: 700; color: #ffffff; line-height: 1.3; }
     .body { padding: 24px; }
@@ -298,7 +303,9 @@ Do not share your temporary password with anyone.
 <body>
   <div class="card">
     <div class="header">
-      <div class="logo">avada<span class="logo-accent">pay</span></div>
+      <a href="${APP_URL}" target="_blank" class="header-logo" style="text-decoration: none; display: inline-block;">
+        <img src="${LOGO_URL}" alt="AvadaPay" width="145" height="26" style="display: block; width: 145px; max-width: 145px; height: auto; border: 0; outline: none; text-decoration: none;" />
+      </a>
       <div><span class="badge">Team Onboarding</span></div>
       <h1 class="title">You're Invited to AvadaPay CMS</h1>
     </div>
@@ -373,7 +380,7 @@ Do not share your temporary password with anyone.
   }
 
   /**
-   * Sends a compact branded password reset email with a secure one-time link.
+   * Sends a compact branded password reset email with the official AvadaPay logo and a secure one-time link.
    * Strictly branded in AvadaPay dark charcoal (#2A292D) and emerald (#3BBA93) with zero blue.
    */
   public static async sendPasswordReset(data: PasswordResetData): Promise<boolean> {
@@ -403,8 +410,8 @@ This link is valid for ${expireMinutes} minutes. If you did not request this, yo
     body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #f3f4f6; margin: 0; padding: 20px; color: #1f2937; -webkit-font-smoothing: antialiased; }
     .card { max-width: 480px; margin: 0 auto; background: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 16px rgba(0,0,0,0.06); border: 1px solid #e5e7eb; }
     .header { background: #2A292D; padding: 22px 24px; text-align: left; }
-    .logo { font-size: 20px; font-weight: 800; letter-spacing: -0.5px; text-decoration: none; color: #ffffff; }
-    .logo-accent { color: #3BBA93; }
+    .header-logo { display: inline-block; margin-bottom: 6px; }
+    .header-logo img { display: block; width: 145px; max-width: 145px; height: auto; border: 0; outline: none; }
     .badge { display: inline-block; background: rgba(59,186,147,0.15); border: 1px solid rgba(59,186,147,0.3); color: #3BBA93; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; padding: 3px 8px; border-radius: 9999px; margin-top: 10px; }
     .title { margin: 6px 0 0 0; font-size: 18px; font-weight: 700; color: #ffffff; line-height: 1.3; }
     .body { padding: 24px; }
@@ -420,7 +427,9 @@ This link is valid for ${expireMinutes} minutes. If you did not request this, yo
 <body>
   <div class="card">
     <div class="header">
-      <div class="logo">avada<span class="logo-accent">pay</span></div>
+      <a href="${APP_URL}" target="_blank" class="header-logo" style="text-decoration: none; display: inline-block;">
+        <img src="${LOGO_URL}" alt="AvadaPay" width="145" height="26" style="display: block; width: 145px; max-width: 145px; height: auto; border: 0; outline: none; text-decoration: none;" />
+      </a>
       <div><span class="badge">Security Notification</span></div>
       <h1 class="title">Password Reset Request</h1>
     </div>
@@ -476,7 +485,7 @@ This link is valid for ${expireMinutes} minutes. If you did not request this, yo
   }
 
   /**
-   * Sends a two-factor authentication (2FA) verification code email.
+   * Sends a two-factor authentication (2FA) verification code email with the official AvadaPay logo.
    * Strictly branded in AvadaPay dark charcoal (#2A292D) and emerald (#3BBA93) with zero blue.
    */
   public static async sendTwoFactorOtp(data: TwoFactorOtpData): Promise<boolean> {
@@ -505,8 +514,8 @@ Do not share this code with anyone. AvadaPay staff will never ask for your verif
     body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #f3f4f6; margin: 0; padding: 20px; color: #1f2937; -webkit-font-smoothing: antialiased; }
     .card { max-width: 480px; margin: 0 auto; background: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 16px rgba(0,0,0,0.06); border: 1px solid #e5e7eb; }
     .header { background: #2A292D; padding: 22px 24px; text-align: left; }
-    .logo { font-size: 20px; font-weight: 800; letter-spacing: -0.5px; text-decoration: none; color: #ffffff; }
-    .logo-accent { color: #3BBA93; }
+    .header-logo { display: inline-block; margin-bottom: 6px; }
+    .header-logo img { display: block; width: 145px; max-width: 145px; height: auto; border: 0; outline: none; }
     .badge { display: inline-block; background: rgba(59,186,147,0.15); border: 1px solid rgba(59,186,147,0.3); color: #3BBA93; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; padding: 3px 8px; border-radius: 9999px; margin-top: 10px; }
     .title { margin: 6px 0 0 0; font-size: 18px; font-weight: 700; color: #ffffff; line-height: 1.3; }
     .body { padding: 24px; }
@@ -522,7 +531,9 @@ Do not share this code with anyone. AvadaPay staff will never ask for your verif
 <body>
   <div class="card">
     <div class="header">
-      <div class="logo">avada<span class="logo-accent">pay</span></div>
+      <a href="${APP_URL}" target="_blank" class="header-logo" style="text-decoration: none; display: inline-block;">
+        <img src="${LOGO_URL}" alt="AvadaPay" width="145" height="26" style="display: block; width: 145px; max-width: 145px; height: auto; border: 0; outline: none; text-decoration: none;" />
+      </a>
       <div><span class="badge">Security Verification</span></div>
       <h1 class="title">Two-Factor Authentication</h1>
     </div>
