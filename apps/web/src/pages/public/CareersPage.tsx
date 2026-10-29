@@ -30,7 +30,6 @@ import {
   Share2,
   Check,
   Globe2,
-  Sparkles,
   TrendingUp,
   Shield,
   X,
@@ -266,11 +265,6 @@ export const CareersPage: React.FC = () => {
         <div className="absolute bottom-0 left-10 w-80 h-80 bg-emerald-500/5 rounded-full blur-2xl pointer-events-none" />
 
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <div className="inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-full bg-[#3BBA93]/15 border border-[#3BBA93]/30 text-[#3BBA93] text-xs font-bold mb-6">
-            <Sparkles className="w-3.5 h-3.5" />
-            <span>We are hiring across Africa & the Middle East</span>
-          </div>
-
           <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-white max-w-3xl mx-auto leading-tight">
             Build the Future of <span className="text-[#3BBA93]">Pan-African Fintech</span>
           </h1>
@@ -283,7 +277,7 @@ export const CareersPage: React.FC = () => {
           <div className="mt-10 max-w-4xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-4 p-4 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-md">
             <div className="p-3 text-center">
               <span className="text-2xl sm:text-3xl font-black text-[#3BBA93] block">
-                {vacancies.length}+
+                {vacancies.length}
               </span>
               <span className="text-[11px] text-gray-400 font-semibold uppercase tracking-wider">
                 Open Positions
@@ -307,7 +301,7 @@ export const CareersPage: React.FC = () => {
             </div>
             <div className="p-3 text-center border-l border-white/10">
               <span className="text-2xl sm:text-3xl font-black text-white block">
-                4 Hubs
+                4 Countries
               </span>
               <span className="text-[11px] text-gray-400 font-semibold uppercase tracking-wider">
                 Global Offices
@@ -347,10 +341,10 @@ export const CareersPage: React.FC = () => {
               </div>
             </div>
 
-            {/* Country / Hub Filter with Vector Country Flags */}
+            {/* Country / Location Filter with Vector Country Flags */}
             <div>
               <label className="text-[11px] font-bold text-gray-500 uppercase tracking-wider block mb-1.5">
-                Country & Office Hub
+                Country / Location
               </label>
               <Select value={selectedCountry} onValueChange={setSelectedCountry}>
                 <SelectTrigger className="h-11 rounded-xl bg-gray-50/80 border-gray-200 text-xs font-medium">
@@ -360,19 +354,19 @@ export const CareersPage: React.FC = () => {
                   <SelectItem value="all">
                     <span className="flex items-center space-x-2">
                       <Globe2 className="w-3.5 h-3.5 text-[#3BBA93]" />
-                      <span>All Countries & Hubs</span>
+                      <span>All Countries</span>
                     </span>
                   </SelectItem>
                   <SelectItem value="rw">
                     <span className="flex items-center space-x-2">
                       <CountryFlag country="rw" className="w-4 h-3" />
-                      <span>Rwanda (Kigali Hub)</span>
+                      <span>Rwanda (Kigali)</span>
                     </span>
                   </SelectItem>
                   <SelectItem value="ke">
                     <span className="flex items-center space-x-2">
                       <CountryFlag country="ke" className="w-4 h-3" />
-                      <span>Kenya (Nairobi Hub)</span>
+                      <span>Kenya (Nairobi)</span>
                     </span>
                   </SelectItem>
                   <SelectItem value="tz">

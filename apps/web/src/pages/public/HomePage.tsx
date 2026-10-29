@@ -65,7 +65,7 @@ const INTRO_CAPABILITIES = [
     tag: 'Single API Gateway',
     description:
       'Eliminate the complexity of negotiating separate telco agreements, maintaining fragmented SDKs, and managing disjointed escrow balances across multiple countries.',
-    badge: '1 Contract • 17+ Hubs',
+    badge: '1 Contract • 17+ Countries',
     points: [
       'Single commercial agreement covers all operating African corridors',
       'One unified REST API & signed webhook standard for every payment method',
