@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import {
   ArrowRight,
   ChevronUp,
@@ -65,7 +65,7 @@ const INTRO_CAPABILITIES = [
     tag: 'Single API Gateway',
     description:
       'Eliminate the complexity of negotiating separate telco agreements, maintaining fragmented SDKs, and managing disjointed escrow balances across multiple countries.',
-    badge: '1 Contract • 17+ Hubs',
+    badge: '1 Contract • 17+ Countries',
     points: [
       'Single commercial agreement covers all operating African corridors',
       'One unified REST API & signed webhook standard for every payment method',
@@ -203,6 +203,50 @@ const OFFICES: OfficeItem[] = [
 export const HomePage: React.FC = () => {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
   const [activeCapability, setActiveCapability] = useState(0);
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+
+  useEffect(() => {
+    // 1. If explicit query parameter tells us to stay on global, persist and don't redirect
+    if (searchParams.get('ref') === 'global' || searchParams.get('stay') === 'true') {
+      localStorage.setItem('avada_country_preference', 'global');
+      return;
+    }
+
+    // 2. Check stored preference
+    const storedPref = localStorage.getItem('avada_country_preference');
+    if (storedPref === 'global') {
+      return;
+    }
+    if (storedPref && ['kenya', 'tanzania', 'rwanda', 'drc'].includes(storedPref.toLowerCase())) {
+      navigate(`/${storedPref.toLowerCase()}`);
+      return;
+    }
+
+    // 3. Skip bots / SEO crawlers
+    if (typeof navigator !== 'undefined' && /bot|googlebot|crawler|spider|robot|crawling/i.test(navigator.userAgent)) {
+      return;
+    }
+
+    // 4. Auto-detect visitor location
+    const detect = async () => {
+      try {
+        const res = await fetch('/api/public/detect-country');
+        const json = await res.json();
+        if (json.success && json.data && json.data.slug) {
+          if (json.data.slug === 'drc') {
+            window.location.href = json.data.externalUrl || 'https://avadapay.cd';
+            return;
+          }
+          navigate(`/${json.data.slug}`);
+        }
+      } catch {
+        // Silently stay on global if detection fails
+      }
+    };
+
+    detect();
+  }, [navigate, searchParams]);
 
   return (
     <div className="flex flex-col bg-white text-[#2A292D] font-sans overflow-x-hidden">

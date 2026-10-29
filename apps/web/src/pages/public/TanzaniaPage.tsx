@@ -25,12 +25,8 @@ const TanzaniaHeroVisual: React.FC = () => (
     <div className="flex items-center justify-between border-b border-white/10 pb-4">
       <div className="flex items-center space-x-2.5">
         <CountryFlag country="tanzania" className="w-6 h-4" />
-        <span className="text-sm font-bold tracking-wide">Tanzania Aggregator</span>
+        <span className="text-sm font-bold tracking-wide">Tanzania</span>
       </div>
-      <span className="inline-flex items-center gap-1.5 text-[11px] font-semibold text-[#3BBA93] bg-[#3BBA93]/15 px-2.5 py-0.5 rounded-full">
-        <span className="w-1.5 h-1.5 rounded-full bg-[#3BBA93] animate-pulse" />
-        BOT & TCRA Live
-      </span>
     </div>
 
     {/* Live Stream Simulation */}
@@ -246,11 +242,6 @@ export const TanzaniaPage: React.FC = () => {
                   {language === 'sw' ? 'Wasiliana Nasi' : 'Contact Us'}
                 </Link>
               </Button>
-              <Button asChild className="h-[3.1rem] px-7 rounded-md bg-transparent border border-[#3BBA93] text-[#3BBA93] hover:bg-[#3BBA93]/10 text-base font-bold shadow-none">
-                <Link to="/contact?country=Tanzania&inquiry=pricing">
-                  {language === 'sw' ? 'Bei za Tanzania' : 'Get Tanzania Pricing'}
-                </Link>
-              </Button>
             </div>
           </div>
 
@@ -262,13 +253,13 @@ export const TanzaniaPage: React.FC = () => {
       </section>
 
       {/* 2 — ONE PLATFORM FOR ALL YOUR PAYMENT NEEDS */}
-      <section className="py-16 sm:py-20 px-4 max-w-7xl mx-auto">
-        <div className="text-center max-w-3xl mx-auto mb-10 sm:mb-12">
+      <section className="pt-10 sm:pt-14 pb-10 sm:pb-12 px-4 max-w-7xl mx-auto">
+        <div className="text-center max-w-3xl mx-auto mb-6 sm:mb-8">
           <h2 className="font-extrabold tracking-tight leading-[1.15] text-3xl sm:text-4xl md:text-[44px] text-[#2A292D]">
             <span className="text-[#3BBA93]">One Platform</span> for all your <br />
             payment needs
           </h2>
-          <p className="mt-6 text-base sm:text-lg font-semibold leading-relaxed text-[#2A292D]/85">
+          <p className="mt-4 text-base sm:text-lg font-semibold leading-relaxed text-[#2A292D]/85">
             Most African mobile money markets are dominated by one operator. Tanzania has four: Tigo
             Pesa, Vodacom M-Pesa, Airtel Money and Halopesa. Your customers will pay through whichever
             one they already use, and your business needs to accept all of them without four
@@ -278,22 +269,23 @@ export const TanzaniaPage: React.FC = () => {
         </div>
 
         {/* Coastal Tanzania Image Banner */}
-        <FadeIn className="w-full max-w-5xl mx-auto overflow-hidden rounded-2xl border border-gray-100 shadow-xl">
+        <FadeIn className="relative w-full max-w-5xl mx-auto h-[200px] sm:h-[260px] md:h-[300px] overflow-hidden rounded-2xl sm:rounded-3xl border border-gray-200/80 shadow-[0_12px_36px_rgba(0,0,0,0.08)] group">
           <OptimizedImage
             src="/media/tanzania-coast.jpg"
             alt="Dar es Salaam coastal cityscape with blue ocean"
             priority={true}
-            className="w-full h-auto object-cover max-h-[500px]"
+            containerClassName="h-full w-full"
+            className="w-full h-full object-cover object-center transition-transform duration-700 ease-out group-hover:scale-[1.02]"
           />
         </FadeIn>
       </section>
 
       {/* 3 — 4 TELCOS ROW & 3 NUMBERED CARDS */}
-      <section className="py-14 sm:py-18 px-4 max-w-7xl mx-auto">
+      <section className="pt-6 sm:pt-8 pb-14 sm:pb-18 px-4 max-w-7xl mx-auto">
         <FadeIn className="text-center max-w-3xl mx-auto mb-10 sm:mb-12">
           <h2 className="font-extrabold tracking-tight leading-[1.15] text-3xl sm:text-4xl md:text-[44px] text-[#2A292D]">
-            <span className="text-[#3BBA93]">One Platform</span> for all your <br />
-            payment needs
+            All 4 mobile money networks, <br />
+            <span className="text-[#3BBA93]">one unified integration</span>
           </h2>
         </FadeIn>
 
@@ -409,7 +401,7 @@ export const TanzaniaPage: React.FC = () => {
                 Live Transaction Monitor
               </span>
               <span className="bg-[#3BBA93]/20 text-[#3BBA93] text-xs font-bold px-2.5 py-0.5 rounded-full">
-                Dar es Salaam Hub
+                Tanzania
               </span>
             </div>
             <div className="flex items-center space-x-2 text-xs text-gray-400 font-semibold">

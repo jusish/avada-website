@@ -5,6 +5,7 @@ import { requirePermission } from '../middleware/permission';
 import { logAudit } from '../lib/audit';
 import { PeopleForceService } from '../services/peopleforce.service';
 import { IntegrationLogger } from '../services/integration-logger';
+import { EmailService } from '../services/email.service';
 
 const router = Router();
 router.use(requireAuth);
@@ -18,6 +19,30 @@ router.get(
   requirePermission('integrations', 'view'),
   async (_req: AuthenticatedRequest, res: Response): Promise<void> => {
     try {
+      // Ensure SMTP integration exists in database
+      const existingSmtp = await prisma.integration.findUnique({ where: { key: 'smtp' } });
+      if (!existingSmtp) {
+        await prisma.integration.create({
+          data: {
+            key: 'smtp',
+            name: 'SMTP Email Delivery Relay',
+            category: 'Transactional Communications',
+            description: 'Direct SMTP mail server integration powering contact inquiry alerts, team invitations, and password reset dispatches.',
+            enabled: true,
+            status: 'DISCONNECTED',
+            config: {
+              host: process.env.SMTP_HOST || 'mail.avadapay.com',
+              port: parseInt(process.env.SMTP_PORT || '587', 10),
+              secure: process.env.SMTP_SECURE === 'true',
+              user: process.env.SMTP_USER || 'justin@avadapay.com',
+              pass: process.env.SMTP_PASS || '',
+              fromName: 'AvadaPay Inquiries',
+              fromEmail: process.env.SMTP_USER || 'justin@avadapay.com',
+            },
+          },
+        });
+      }
+
       const dbIntegrations = await prisma.integration.findMany({
         orderBy: { createdAt: 'asc' },
         include: {
@@ -39,11 +64,14 @@ router.get(
               ? '••••••••'
               : '';
 
+        const maskedPass = rawConfig.pass ? '••••••••' : '';
+
         return {
           ...item,
           config: {
             ...rawConfig,
             apiKeyMasked: maskedKey,
+            passMasked: maskedPass,
           },
           stats: {
             totalLogs: item._count.logs,
@@ -52,17 +80,8 @@ router.get(
         };
       });
 
-      // Planned future integrations to showcase extensible architecture
+      // Planned future integrations
       const plannedIntegrations = [
-        {
-          key: 'mailgun_smtp',
-          name: 'Mailgun & SMTP Email Gateway',
-          category: 'Transactional Communications',
-          description: 'High-deliverability transactional customer emails, notification receipts, and automated alerts.',
-          status: 'DISCONNECTED',
-          enabled: false,
-          isPlanned: true,
-        },
         {
           key: 'slack_webhooks',
           name: 'Slack Notification Alerts',
@@ -169,17 +188,28 @@ router.put(
         ...prevConfig,
       };
 
-      if (apiKey !== undefined && apiKey.trim() !== '') {
-        newConfig.apiKey = apiKey.trim();
-      }
-      if (baseUrl !== undefined) {
-        newConfig.baseUrl = baseUrl.trim();
-      }
-      if (autoSync !== undefined) {
-        newConfig.autoSync = Boolean(autoSync);
-      }
-      if (syncIntervalMinutes !== undefined) {
-        newConfig.syncIntervalMinutes = Number(syncIntervalMinutes);
+      if (key === 'smtp') {
+        const { host, port, secure, user, pass, fromEmail, fromName } = req.body;
+        if (host !== undefined) newConfig.host = String(host).trim();
+        if (port !== undefined) newConfig.port = Number(port);
+        if (secure !== undefined) newConfig.secure = Boolean(secure);
+        if (user !== undefined) newConfig.user = String(user).trim();
+        if (pass !== undefined && String(pass).trim() !== '') newConfig.pass = String(pass).trim();
+        if (fromEmail !== undefined) newConfig.fromEmail = String(fromEmail).trim();
+        if (fromName !== undefined) newConfig.fromName = String(fromName).trim();
+      } else {
+        if (apiKey !== undefined && apiKey.trim() !== '') {
+          newConfig.apiKey = apiKey.trim();
+        }
+        if (baseUrl !== undefined) {
+          newConfig.baseUrl = baseUrl.trim();
+        }
+        if (autoSync !== undefined) {
+          newConfig.autoSync = Boolean(autoSync);
+        }
+        if (syncIntervalMinutes !== undefined) {
+          newConfig.syncIntervalMinutes = Number(syncIntervalMinutes);
+        }
       }
 
       const updated = await prisma.integration.update({
@@ -234,10 +264,123 @@ router.post(
         return;
       }
 
+      if (key === 'smtp') {
+        const dbIntegration = await prisma.integration.findUnique({ where: { key: 'smtp' } });
+        const cfg = (dbIntegration?.config as Record<string, any>) || {};
+        const testResult = await EmailService.testConnection({
+          host: cfg.host || '',
+          port: cfg.port || 587,
+          secure: cfg.secure || false,
+          user: cfg.user || '',
+          pass: cfg.pass || '',
+          fromEmail: cfg.fromEmail,
+          fromName: cfg.fromName,
+        });
+
+        await prisma.integration.update({
+          where: { key: 'smtp' },
+          data: {
+            status: testResult.success ? 'HEALTHY' : 'ERROR',
+            lastHealthCheck: new Date(),
+            healthMessage: testResult.message,
+            latencyMs: testResult.latencyMs,
+          },
+        });
+
+        await IntegrationLogger.logCall({
+          integrationKey: 'smtp',
+          integrationId: dbIntegration?.id,
+          method: 'VERIFY',
+          endpoint: '/smtp/verify',
+          url: `smtp://${cfg.host}:${cfg.port}`,
+          responseStatus: testResult.success ? 200 : 500,
+          responsePayload: testResult,
+          durationMs: testResult.latencyMs,
+          status: testResult.success ? 'SUCCESS' : 'ERROR',
+          errorMessage: testResult.success ? null : testResult.message,
+        });
+
+        res.json({
+          success: testResult.success,
+          data: {
+            healthy: testResult.success,
+            latencyMs: testResult.latencyMs,
+            message: testResult.message,
+            statusCode: testResult.success ? 200 : 500,
+          },
+          message: testResult.message,
+        });
+        return;
+      }
+
       res.status(400).json({ success: false, error: `Health check not implemented for integration "${key}".` });
     } catch (err) {
       console.error('Integration health test error:', err);
       res.status(500).json({ success: false, error: 'Failed to execute health check.' });
+    }
+  }
+);
+
+/**
+ * POST /api/admin/integrations/:key/test-email
+ * Sends a live verification test email through the configured SMTP server
+ */
+router.post(
+  '/:key/test-email',
+  requirePermission('integrations', 'edit'),
+  async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+    try {
+      const { key } = req.params;
+      if (key !== 'smtp') {
+        res.status(400).json({ success: false, error: 'Test email is only supported for the SMTP integration.' });
+        return;
+      }
+
+      const { recipient } = req.body;
+      const targetEmail = recipient?.trim() || req.user?.email;
+
+      if (!targetEmail || !targetEmail.includes('@')) {
+        res.status(400).json({ success: false, error: 'Valid recipient email required.' });
+        return;
+      }
+
+      const dbIntegration = await prisma.integration.findUnique({ where: { key: 'smtp' } });
+      const cfg = (dbIntegration?.config as Record<string, any>) || {};
+
+      const testResult = await EmailService.testConnection(
+        {
+          host: cfg.host || '',
+          port: cfg.port || 587,
+          secure: cfg.secure || false,
+          user: cfg.user || '',
+          pass: cfg.pass || '',
+          fromEmail: cfg.fromEmail,
+          fromName: cfg.fromName,
+        },
+        targetEmail
+      );
+
+      await IntegrationLogger.logCall({
+        integrationKey: 'smtp',
+        integrationId: dbIntegration?.id,
+        method: 'SEND',
+        endpoint: '/smtp/test-send',
+        url: `smtp://${cfg.host}:${cfg.port} -> ${targetEmail}`,
+        responseStatus: testResult.success ? 200 : 500,
+        responsePayload: testResult,
+        durationMs: testResult.latencyMs,
+        status: testResult.success ? 'SUCCESS' : 'ERROR',
+        errorMessage: testResult.success ? null : testResult.message,
+      });
+
+      res.json({
+        success: testResult.success,
+        data: testResult,
+        message: testResult.message,
+      });
+    } catch (err: any) {
+      console.error('Test email dispatch error:', err);
+      res.status(500).json({ success: false, error: err?.message || 'Failed to dispatch test email.' });
     }
   }
 );

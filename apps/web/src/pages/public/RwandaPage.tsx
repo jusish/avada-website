@@ -25,7 +25,7 @@ const RwandaHeroVisual: React.FC = () => (
     <div className="flex items-center justify-between border-b border-white/10 pb-4">
       <div className="flex items-center space-x-2.5">
         <CountryFlag country="rwanda" className="w-6 h-4" />
-        <span className="text-sm font-bold tracking-wide">Rwanda Gateway</span>
+        <span className="text-sm font-bold tracking-wide">Rwanda</span>
       </div>
       <span className="inline-flex items-center gap-1.5 text-[11px] font-semibold text-[#3BBA93] bg-[#3BBA93]/15 px-2.5 py-0.5 rounded-full">
         <span className="w-1.5 h-1.5 rounded-full bg-[#3BBA93] animate-pulse" />
@@ -226,11 +226,6 @@ export const RwandaPage: React.FC = () => {
                   Contact Us
                 </Link>
               </Button>
-              <Button asChild className="h-[3.1rem] px-7 rounded-md bg-transparent border border-[#3BBA93] text-[#3BBA93] hover:bg-[#3BBA93]/10 text-base font-bold shadow-none">
-                <Link to="/contact?country=Rwanda&inquiry=pricing">
-                  Get Rwanda Pricing
-                </Link>
-              </Button>
             </div>
           </div>
 
@@ -242,12 +237,12 @@ export const RwandaPage: React.FC = () => {
       </section>
 
       {/* 2 — BUILT FOR RWANDA'S CASHLESS PUSH */}
-      <section className="py-16 sm:py-20 px-4 max-w-7xl mx-auto">
-        <div className="text-center max-w-3xl mx-auto mb-10 sm:mb-12">
+      <section className="pt-10 sm:pt-14 pb-10 sm:pb-12 px-4 max-w-7xl mx-auto">
+        <div className="text-center max-w-3xl mx-auto mb-6 sm:mb-8">
           <h2 className="font-extrabold tracking-tight leading-[1.15] text-3xl sm:text-4xl md:text-[44px] text-[#2A292D]">
             Built for Rwanda's <span className="text-[#3BBA93]">cashless push</span>
           </h2>
-          <p className="mt-6 text-base sm:text-lg font-semibold leading-relaxed text-[#2A292D]/85">
+          <p className="mt-4 text-base sm:text-lg font-semibold leading-relaxed text-[#2A292D]/85">
             Rwanda is one of Africa's fastest-digitising economies. Customers expect to pay through
             MTN MoMo or Airtel Money. Businesses expect clean reporting, fast reconciliation, and
             regulatory clarity. AvadaPay was built for that environment. Collect through every
@@ -257,18 +252,19 @@ export const RwandaPage: React.FC = () => {
         </div>
 
         {/* Kigali Convention Centre Banner */}
-        <FadeIn className="w-full max-w-5xl mx-auto overflow-hidden rounded-2xl border border-gray-100 shadow-xl">
+        <FadeIn className="relative w-full max-w-5xl mx-auto h-[200px] sm:h-[260px] md:h-[300px] overflow-hidden rounded-2xl sm:rounded-3xl border border-gray-200/80 shadow-[0_12px_36px_rgba(0,0,0,0.08)] group">
           <OptimizedImage
             src="/media/kigali-skyline.jpg"
             alt="Kigali Convention Centre glowing at night"
             priority={true}
-            className="w-full h-auto object-cover max-h-[460px]"
+            containerClassName="h-full w-full"
+            className="w-full h-full object-cover object-center transition-transform duration-700 ease-out group-hover:scale-[1.02]"
           />
         </FadeIn>
       </section>
 
       {/* 3 — TIMELINE: FROM PAYMENT TO CONFIRMATION */}
-      <section className="py-16 sm:py-22 px-4 max-w-4xl mx-auto">
+      <section className="pt-8 sm:pt-10 pb-16 sm:pb-22 px-4 max-w-4xl mx-auto">
         <FadeIn className="text-center mb-14 sm:mb-18">
           <h2 className="font-extrabold tracking-tight leading-[1.15] text-3xl sm:text-4xl md:text-[44px] text-[#2A292D]">
             From payment to confirmation, <br />

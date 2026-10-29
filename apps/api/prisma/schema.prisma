@@ -88,6 +88,7 @@ model Country {
   mapEmbedUrl    String?          @db.Text
   active         Boolean          @default(true)
   displayOrder   Int              @default(0)
+  notificationSettings Json?
   managerId      String?
   manager        User?            @relation("CountryManager", fields: [managerId], references: [id], onDelete: SetNull)
   users          User[]           @relation("UserCountries")

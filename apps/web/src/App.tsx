@@ -32,6 +32,7 @@ import { AdminSecurityPage } from '@/pages/admin/AdminSecurityPage';
 import { AdminInquiriesPage } from '@/pages/admin/AdminInquiriesPage';
 import { AdminInquiryTypesPage } from '@/pages/admin/AdminInquiryTypesPage';
 import { AdminCountriesPage } from '@/pages/admin/AdminCountriesPage';
+import { AdminCountryDetailsPage } from '@/pages/admin/AdminCountryDetailsPage';
 import { AdminContentPage } from '@/pages/admin/AdminContentPage';
 import { AdminPoliciesPage } from '@/pages/admin/AdminPoliciesPage';
 import { AdminSettingsPage } from '@/pages/admin/AdminSettingsPage';
@@ -68,6 +69,7 @@ const ADMIN_ROUTE_TITLES: Record<string, string> = {
   '/admin/inquiries': 'Inquiries CRM | AvadaPay CMS',
   '/admin/inquiries/types': 'Inquiry Categories | AvadaPay CMS',
   '/admin/content/countries': 'Regional Markets | AvadaPay CMS',
+  '/admin/content/countries/new': 'New Regional Market | AvadaPay CMS',
   '/admin/content/articles': 'Articles & Announcements | AvadaPay CMS',
   '/admin/content/policies': 'Legal Policies | AvadaPay CMS',
   '/admin/content/settings': 'Global Site Settings | AvadaPay CMS',
@@ -229,6 +231,22 @@ export const App: React.FC = () => {
               element={
                 <AdminPermissionGuard module="countries">
                   <AdminCountriesPage />
+                </AdminPermissionGuard>
+              }
+            />
+            <Route
+              path="content/countries/new"
+              element={
+                <AdminPermissionGuard module="countries">
+                  <AdminCountryDetailsPage isNew />
+                </AdminPermissionGuard>
+              }
+            />
+            <Route
+              path="content/countries/:id"
+              element={
+                <AdminPermissionGuard module="countries">
+                  <AdminCountryDetailsPage />
                 </AdminPermissionGuard>
               }
             />

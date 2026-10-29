@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useCallback } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
 import { Integration, IntegrationLog, JobVacancy } from '@avada/shared';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
@@ -32,17 +33,21 @@ import {
   ToggleRight,
   Building2,
   MapPin,
+  Mail,
+  Send,
+  ShieldCheck,
 } from 'lucide-react';
 
 interface IntegrationWithStats extends Integration {
   stats?: {
     totalLogs: number;
-    activeVacancies: number;
+    activeVacancies?: number;
   };
 }
 
 export const AdminIntegrationsPage: React.FC = () => {
-  const { token, canEdit } = useAuth();
+  const { token, canEdit, user } = useAuth();
+  const [searchParams] = useSearchParams();
 
   // State
   const [integrations, setIntegrations] = useState<IntegrationWithStats[]>([]);
@@ -60,7 +65,18 @@ export const AdminIntegrationsPage: React.FC = () => {
   const [savingConfig, setSavingConfig] = useState<boolean>(false);
   const [configSuccess, setConfigSuccess] = useState<string | null>(null);
 
-  // Health Test State
+  // SMTP Config State (Dynamic DB Relay)
+  const [smtpHost, setSmtpHost] = useState<string>('smtp.zoho.com');
+  const [smtpPort, setSmtpPort] = useState<number>(465);
+  const [smtpSecure, setSmtpSecure] = useState<boolean>(true);
+  const [smtpUser, setSmtpUser] = useState<string>('justin@avadapay.com');
+  const [smtpPass, setSmtpPass] = useState<string>('');
+  const [smtpFromEmail, setSmtpFromEmail] = useState<string>('justin@avadapay.com');
+  const [smtpFromName, setSmtpFromName] = useState<string>('AvadaPay Notifications');
+  const [smtpEnabled, setSmtpEnabled] = useState<boolean>(true);
+  const [showSmtpPass, setShowSmtpPass] = useState<boolean>(false);
+
+  // Live Health Test State
   const [testingHealth, setTestingHealth] = useState<boolean>(false);
   const [healthResult, setHealthResult] = useState<{
     healthy: boolean;
@@ -69,7 +85,15 @@ export const AdminIntegrationsPage: React.FC = () => {
     message: string;
   } | null>(null);
 
-  // Vacancy Sync State
+  // Live Test Email Dispatch State
+  const [testEmailRecipient, setTestEmailRecipient] = useState<string>('justin@avadapay.com');
+  const [sendingTestEmail, setSendingTestEmail] = useState<boolean>(false);
+  const [testEmailResult, setTestEmailResult] = useState<{
+    success: boolean;
+    message: string;
+  } | null>(null);
+
+  // Vacancy Sync State (PeopleForce)
   const [syncingVacancies, setSyncingVacancies] = useState<boolean>(false);
   const [syncedVacancies, setSyncedVacancies] = useState<JobVacancy[]>([]);
   const [syncSuccess, setSyncSuccess] = useState<string | null>(null);
@@ -83,6 +107,21 @@ export const AdminIntegrationsPage: React.FC = () => {
   const [totalPages, setTotalPages] = useState<number>(1);
   const [selectedLog, setSelectedLog] = useState<IntegrationLog | null>(null);
 
+  // Query Param handling for direct deeplink (e.g. from Settings: /admin/integrations?open=smtp)
+  useEffect(() => {
+    const openKey = searchParams.get('open');
+    if (openKey && (openKey === 'smtp' || openKey === 'peopleforce')) {
+      setSelectedKey(openKey);
+    }
+  }, [searchParams]);
+
+  // Set default recipient to logged-in user if available
+  useEffect(() => {
+    if (user?.email) {
+      setTestEmailRecipient(user.email);
+    }
+  }, [user]);
+
   // Fetch Integrations List
   const fetchIntegrations = useCallback(async () => {
     if (!token) return;
@@ -95,6 +134,7 @@ export const AdminIntegrationsPage: React.FC = () => {
         setIntegrations(data.data.active || []);
         setPlannedIntegrations(data.data.planned || []);
 
+        // Load PeopleForce config
         const pf = (data.data.active || []).find((i: Integration) => i.key === 'peopleforce');
         if (pf) {
           const cfg = (pf.config as Record<string, unknown>) || {};
@@ -102,6 +142,20 @@ export const AdminIntegrationsPage: React.FC = () => {
           setBaseUrl((cfg.baseUrl as string) || 'https://app.peopleforce.io/api/careers/v1');
           setEnabled(pf.enabled);
           setAutoSync(typeof cfg.autoSync === 'boolean' ? cfg.autoSync : true);
+        }
+
+        // Load SMTP config
+        const smtp = (data.data.active || []).find((i: Integration) => i.key === 'smtp');
+        if (smtp) {
+          const cfg = (smtp.config as Record<string, unknown>) || {};
+          setSmtpHost((cfg.host as string) || 'smtp.zoho.com');
+          setSmtpPort(Number(cfg.port) || 465);
+          setSmtpSecure(typeof cfg.secure === 'boolean' ? cfg.secure : true);
+          setSmtpUser((cfg.user as string) || 'justin@avadapay.com');
+          setSmtpPass((cfg.pass as string) || '');
+          setSmtpFromEmail((cfg.fromEmail as string) || 'justin@avadapay.com');
+          setSmtpFromName((cfg.fromName as string) || 'AvadaPay Notifications');
+          setSmtpEnabled(smtp.enabled);
         }
       }
     } catch (err) {
@@ -111,7 +165,7 @@ export const AdminIntegrationsPage: React.FC = () => {
     }
   }, [token]);
 
-  // Fetch Synced Vacancies
+  // Fetch Synced Vacancies (PeopleForce)
   const fetchVacancies = useCallback(async () => {
     try {
       const res = await fetch('/api/public/careers/vacancies');
@@ -163,9 +217,9 @@ export const AdminIntegrationsPage: React.FC = () => {
     if (activeTab === 'logs') {
       fetchLogs(1, statusFilter, searchQuery);
     }
-  }, [activeTab, statusFilter, fetchLogs, searchQuery]);
+  }, [activeTab, statusFilter, fetchLogs, searchQuery, selectedKey]);
 
-  // Handle Live Health Check
+  // Handle Live Health Check (PeopleForce or SMTP)
   const handleTestHealth = async () => {
     if (!token) return;
     setTestingHealth(true);
@@ -192,7 +246,46 @@ export const AdminIntegrationsPage: React.FC = () => {
     }
   };
 
-  // Handle Manual Vacancy Sync
+  // Handle Live Test Email Dispatch (SMTP)
+  const handleSendTestEmail = async () => {
+    if (!token) return;
+    setSendingTestEmail(true);
+    setTestEmailResult(null);
+    try {
+      const res = await fetch('/api/admin/integrations/smtp/test-email', {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ recipientEmail: testEmailRecipient }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setTestEmailResult({
+          success: true,
+          message: data.message || `Test verification email dispatched to ${testEmailRecipient}`,
+        });
+        fetchIntegrations();
+        if (activeTab === 'logs') fetchLogs();
+      } else {
+        setTestEmailResult({
+          success: false,
+          message: data.error || 'Failed to dispatch test verification email.',
+        });
+      }
+    } catch (err) {
+      console.error('Send test email error:', err);
+      setTestEmailResult({
+        success: false,
+        message: 'Network error occurred while requesting test email dispatch.',
+      });
+    } finally {
+      setSendingTestEmail(false);
+    }
+  };
+
+  // Handle Manual Vacancy Sync (PeopleForce)
   const handleSyncVacancies = async () => {
     if (!token) return;
     setSyncingVacancies(true);
@@ -220,28 +313,42 @@ export const AdminIntegrationsPage: React.FC = () => {
     }
   };
 
-  // Handle Save Configuration
+  // Handle Save Configuration (PeopleForce or SMTP)
   const handleSaveConfig = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!token || !canEdit('integrations')) return;
     setSavingConfig(true);
     try {
+      const payload =
+        selectedKey === 'smtp'
+          ? {
+              host: smtpHost.trim(),
+              port: Number(smtpPort),
+              secure: smtpSecure,
+              user: smtpUser.trim(),
+              pass: smtpPass,
+              fromEmail: smtpFromEmail.trim(),
+              fromName: smtpFromName.trim(),
+              enabled: smtpEnabled,
+            }
+          : {
+              apiKey,
+              baseUrl,
+              enabled,
+              autoSync,
+            };
+
       const res = await fetch(`/api/admin/integrations/${selectedKey}/config`, {
         method: 'PUT',
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          apiKey,
-          baseUrl,
-          enabled,
-          autoSync,
-        }),
+        body: JSON.stringify(payload),
       });
       const data = await res.json();
       if (data.success) {
-        setConfigSuccess('Integration configuration saved successfully.');
+        setConfigSuccess('Integration configuration saved successfully to CMS database.');
         fetchIntegrations();
         setTimeout(() => setConfigSuccess(null), 4000);
       } else {
@@ -258,7 +365,8 @@ export const AdminIntegrationsPage: React.FC = () => {
   // Handle Clear Logs
   const handleClearLogs = async () => {
     if (!token || !canEdit('integrations')) return;
-    if (!window.confirm('Are you sure you want to clear all integration logs for PeopleForce?')) return;
+    const name = selectedKey === 'smtp' ? 'SMTP Relay' : 'PeopleForce';
+    if (!window.confirm(`Are you sure you want to clear all integration logs for ${name}?`)) return;
     try {
       const res = await fetch(`/api/admin/integrations/${selectedKey}/logs`, {
         method: 'DELETE',
@@ -287,7 +395,7 @@ export const AdminIntegrationsPage: React.FC = () => {
             <span>Integrations & External APIs</span>
           </h1>
           <p className="text-xs text-gray-500 mt-1">
-            Configure external API connections, monitor live health telemetry, and inspect detailed request/response logs.
+            Configure external API connections, outbound SMTP mail relays, monitor live health telemetry, and inspect detailed request/response logs.
           </p>
         </div>
 
@@ -308,7 +416,6 @@ export const AdminIntegrationsPage: React.FC = () => {
 
       {/* Integrations Directory Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        {/* PeopleForce Card */}
         {loading ? (
           <div className="col-span-full py-8 text-center text-xs text-gray-400">
             Loading integrations...
@@ -318,11 +425,16 @@ export const AdminIntegrationsPage: React.FC = () => {
             const isSelected = selectedKey === item.key;
             const isHealthy = item.status === 'HEALTHY';
             const latency = item.latencyMs ? `${item.latencyMs}ms` : '--';
+            const isSmtp = item.key === 'smtp';
 
             return (
               <div
                 key={item.key}
-                onClick={() => setSelectedKey(item.key)}
+                onClick={() => {
+                  setSelectedKey(item.key);
+                  setHealthResult(null);
+                  setTestEmailResult(null);
+                }}
                 className={`p-4 rounded-xl border transition-all cursor-pointer bg-white relative overflow-hidden ${
                   isSelected
                     ? 'border-[#3BBA93] ring-2 ring-[#3BBA93]/10 shadow-md'
@@ -331,8 +443,14 @@ export const AdminIntegrationsPage: React.FC = () => {
               >
                 <div className="flex items-start justify-between">
                   <div className="flex items-center space-x-2.5">
-                    <div className="w-9 h-9 rounded-lg bg-emerald-50 text-[#3BBA93] flex items-center justify-center font-bold text-xs border border-emerald-100">
-                      PF
+                    <div
+                      className={`w-9 h-9 rounded-lg flex items-center justify-center font-bold text-xs border ${
+                        isSmtp
+                          ? 'bg-blue-50 text-blue-600 border-blue-200'
+                          : 'bg-emerald-50 text-[#3BBA93] border-emerald-100'
+                      }`}
+                    >
+                      {isSmtp ? <Mail className="w-4 h-4" /> : 'PF'}
                     </div>
                     <div>
                       <h3 className="font-bold text-sm text-[#2A292D] flex items-center gap-1.5">
@@ -362,7 +480,7 @@ export const AdminIntegrationsPage: React.FC = () => {
                 </div>
 
                 <p className="text-[11px] text-gray-500 mt-3 line-clamp-2">
-                  {item.description || 'Synchronizes open vacancies and recruitment data.'}
+                  {item.description || 'Outbound integration channel.'}
                 </p>
 
                 <div className="mt-4 pt-3 border-t border-gray-100 flex items-center justify-between text-[11px]">
@@ -370,7 +488,9 @@ export const AdminIntegrationsPage: React.FC = () => {
                     Latency: <strong className="text-gray-700">{latency}</strong>
                   </span>
                   <span className="text-[#3BBA93] font-bold">
-                    {item.stats?.activeVacancies || 0} active roles
+                    {isSmtp
+                      ? (item.config as any)?.user || 'Custom SMTP'
+                      : `${item.stats?.activeVacancies || 0} active roles`}
                   </span>
                 </div>
               </div>
@@ -404,7 +524,7 @@ export const AdminIntegrationsPage: React.FC = () => {
         ))}
       </div>
 
-      {/* Management Studio for Selected Integration (PeopleForce) */}
+      {/* Management Studio for Selected Integration (PeopleForce or SMTP) */}
       {selectedIntegration && (
         <Card className="bg-white border-gray-200/90 shadow-sm rounded-xl overflow-hidden">
           {/* Studio Header & Tab Switcher */}
@@ -420,7 +540,15 @@ export const AdminIntegrationsPage: React.FC = () => {
                   </Badge>
                 </div>
                 <p className="text-xs text-gray-500 mt-0.5">
-                  Connected to PeopleForce ATS Cloud • Endpoint: <code className="text-[#3BBA93] font-mono text-[11px]">/api/careers/v1/vacancies</code>
+                  {selectedKey === 'smtp' ? (
+                    <span>
+                      Dynamic Outgoing SMTP Relay • Server: <code className="text-[#3BBA93] font-mono text-[11px]">{smtpHost}:{smtpPort}</code> ({smtpSecure ? 'SSL Encrypted' : 'STARTTLS'}) • Sender: <code className="text-[#2A292D] font-mono text-[11px]">{smtpFromEmail}</code>
+                    </span>
+                  ) : (
+                    <span>
+                      Connected to PeopleForce ATS Cloud • Endpoint: <code className="text-[#3BBA93] font-mono text-[11px]">/api/careers/v1/vacancies</code>
+                    </span>
+                  )}
                 </p>
               </div>
 
@@ -436,7 +564,7 @@ export const AdminIntegrationsPage: React.FC = () => {
                   }`}
                 >
                   <Activity className="w-3.5 h-3.5" />
-                  <span>Health & Sync</span>
+                  <span>{selectedKey === 'smtp' ? 'Health & Test Email' : 'Health & Sync'}</span>
                 </button>
 
                 <button
@@ -474,332 +602,667 @@ export const AdminIntegrationsPage: React.FC = () => {
           </CardHeader>
 
           <CardContent className="p-6">
-            {/* TAB 1: HEALTH & VACANCIES SYNC */}
+            {/* TAB 1: HEALTH & ACTIONS */}
             {activeTab === 'health' && (
               <div className="space-y-6">
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                  {/* Live Connection Diagnostics Card */}
-                  <div className="p-5 rounded-xl border border-gray-200/90 bg-gray-50/50 space-y-4">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center space-x-2">
-                        <Activity className="w-4 h-4 text-[#3BBA93]" />
-                        <h4 className="font-bold text-xs text-gray-800">
-                          Live Endpoint Connection & Latency
-                        </h4>
-                      </div>
-                      <Badge
-                        className={
-                          selectedIntegration.status === 'HEALTHY'
-                            ? 'bg-emerald-100 text-emerald-800 border-emerald-200 text-[10px] font-bold'
-                            : 'bg-amber-100 text-amber-800 border-amber-200 text-[10px] font-bold'
-                        }
-                      >
-                        {selectedIntegration.status}
-                      </Badge>
-                    </div>
+                {selectedKey === 'smtp' ? (
+                  /* SMTP HEALTH & TEST EMAIL DISPATCH */
+                  <div className="space-y-6">
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                      {/* Live SMTP Diagnostics Card */}
+                      <div className="p-5 rounded-xl border border-gray-200/90 bg-gray-50/50 space-y-4">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center space-x-2">
+                            <Activity className="w-4 h-4 text-[#3BBA93]" />
+                            <h4 className="font-bold text-xs text-gray-800">
+                              Live Outgoing SMTP Handshake & Latency
+                            </h4>
+                          </div>
+                          <Badge
+                            className={
+                              selectedIntegration.status === 'HEALTHY'
+                                ? 'bg-emerald-100 text-emerald-800 border-emerald-200 text-[10px] font-bold'
+                                : 'bg-amber-100 text-amber-800 border-amber-200 text-[10px] font-bold'
+                            }
+                          >
+                            {selectedIntegration.status}
+                          </Badge>
+                        </div>
 
-                    <p className="text-xs text-gray-500 leading-relaxed">
-                      Sends an authenticated lightweight ping to PeopleForce Careers API to test latency, TLS certificate validity, and endpoint response.
-                    </p>
+                        <p className="text-xs text-gray-500 leading-relaxed">
+                          Executes an immediate TLS handshake and authentication check with <strong className="text-gray-800">{smtpHost}:{smtpPort}</strong> to verify network reachability and credentials.
+                        </p>
 
-                    <div className="grid grid-cols-3 gap-3 pt-1">
-                      <div className="p-3 rounded-lg bg-white border border-gray-200/80">
-                        <span className="text-[10px] text-gray-400 font-bold block">Roundtrip Latency</span>
-                        <span className="text-base font-black text-[#2A292D]">
-                          {selectedIntegration.latencyMs ? `${selectedIntegration.latencyMs}ms` : '--'}
-                        </span>
-                      </div>
-                      <div className="p-3 rounded-lg bg-white border border-gray-200/80">
-                        <span className="text-[10px] text-gray-400 font-bold block">HTTP Status</span>
-                        <span className="text-base font-black text-emerald-700">200 OK</span>
-                      </div>
-                      <div className="p-3 rounded-lg bg-white border border-gray-200/80">
-                        <span className="text-[10px] text-gray-400 font-bold block">Last Tested</span>
-                        <span className="text-[11px] font-semibold text-gray-700 truncate block">
-                          {selectedIntegration.lastHealthCheck
-                            ? new Date(selectedIntegration.lastHealthCheck).toLocaleTimeString()
-                            : 'Never'}
-                        </span>
-                      </div>
-                    </div>
+                        <div className="grid grid-cols-3 gap-3 pt-1">
+                          <div className="p-3 rounded-lg bg-white border border-gray-200/80">
+                            <span className="text-[10px] text-gray-400 font-bold block">Roundtrip Latency</span>
+                            <span className="text-base font-black text-[#2A292D]">
+                              {selectedIntegration.latencyMs ? `${selectedIntegration.latencyMs}ms` : '--'}
+                            </span>
+                          </div>
+                          <div className="p-3 rounded-lg bg-white border border-gray-200/80">
+                            <span className="text-[10px] text-gray-400 font-bold block">Protocol Mode</span>
+                            <span className="text-sm font-black text-emerald-700">
+                              {smtpSecure ? 'SSL/TLS (465)' : 'STARTTLS (587)'}
+                            </span>
+                          </div>
+                          <div className="p-3 rounded-lg bg-white border border-gray-200/80">
+                            <span className="text-[10px] text-gray-400 font-bold block">Last Tested</span>
+                            <span className="text-[11px] font-semibold text-gray-700 truncate block">
+                              {selectedIntegration.lastHealthCheck
+                                ? new Date(selectedIntegration.lastHealthCheck).toLocaleTimeString()
+                                : 'Never'}
+                            </span>
+                          </div>
+                        </div>
 
-                    {healthResult && (
-                      <div
-                        className={`p-3 rounded-lg text-xs flex items-center space-x-2 ${
-                          healthResult.healthy
-                            ? 'bg-emerald-50 text-emerald-800 border border-emerald-200'
-                            : 'bg-red-50 text-red-800 border border-red-200'
-                        }`}
-                      >
-                        {healthResult.healthy ? (
-                          <CheckCircle2 className="w-4 h-4 text-emerald-600 flex-shrink-0" />
-                        ) : (
-                          <AlertCircle className="w-4 h-4 text-red-600 flex-shrink-0" />
+                        {healthResult && (
+                          <div
+                            className={`p-3 rounded-lg text-xs flex items-center space-x-2 ${
+                              healthResult.healthy
+                                ? 'bg-emerald-50 text-emerald-800 border border-emerald-200'
+                                : 'bg-red-50 text-red-800 border border-red-200'
+                            }`}
+                          >
+                            {healthResult.healthy ? (
+                              <CheckCircle2 className="w-4 h-4 text-emerald-600 flex-shrink-0" />
+                            ) : (
+                              <AlertCircle className="w-4 h-4 text-red-600 flex-shrink-0" />
+                            )}
+                            <span>{healthResult.message}</span>
+                          </div>
                         )}
-                        <span>{healthResult.message}</span>
-                      </div>
-                    )}
 
-                    <div className="pt-2 flex justify-end">
-                      <Button
-                        type="button"
-                        onClick={handleTestHealth}
-                        disabled={testingHealth}
-                        variant="outline"
-                        size="sm"
-                        className="rounded-lg text-xs font-bold border-gray-200 space-x-1.5"
-                      >
-                        <RefreshCw className={`w-3.5 h-3.5 ${testingHealth ? 'animate-spin text-[#3BBA93]' : ''}`} />
-                        <span>{testingHealth ? 'Testing Connection...' : 'Test Connection Now'}</span>
-                      </Button>
+                        <div className="pt-2 flex justify-end">
+                          <Button
+                            type="button"
+                            onClick={handleTestHealth}
+                            disabled={testingHealth}
+                            variant="outline"
+                            size="sm"
+                            className="rounded-lg text-xs font-bold border-gray-200 space-x-1.5"
+                          >
+                            <RefreshCw className={`w-3.5 h-3.5 ${testingHealth ? 'animate-spin text-[#3BBA93]' : ''}`} />
+                            <span>{testingHealth ? 'Testing SMTP Connection...' : 'Test SMTP Connection Now'}</span>
+                          </Button>
+                        </div>
+                      </div>
+
+                      {/* Live Test Email Dispatch Card */}
+                      <div className="p-5 rounded-xl border border-gray-200/90 bg-gray-50/50 space-y-4">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center space-x-2">
+                            <Send className="w-4 h-4 text-[#3BBA93]" />
+                            <h4 className="font-bold text-xs text-gray-800">
+                              Send Test Verification Email
+                            </h4>
+                          </div>
+                          <Badge variant="outline" className="text-[10px] border-gray-300 text-gray-600">
+                            End-to-End
+                          </Badge>
+                        </div>
+
+                        <p className="text-xs text-gray-500 leading-relaxed">
+                          Sends an authentic test verification message through the configured relay to ensure SPF/DKIM acceptance and check recipient inbox deliverability.
+                        </p>
+
+                        <div className="space-y-2 pt-1">
+                          <Label className="text-xs font-bold text-gray-700">Test Destination Recipient</Label>
+                          <Input
+                            type="email"
+                            required
+                            value={testEmailRecipient}
+                            onChange={(e) => setTestEmailRecipient(e.target.value)}
+                            placeholder="Enter recipient email (e.g. justin@avadapay.com)..."
+                            className="bg-white text-xs rounded-xl border-gray-200"
+                          />
+                        </div>
+
+                        {testEmailResult && (
+                          <div
+                            className={`p-3 rounded-lg text-xs flex items-center space-x-2 ${
+                              testEmailResult.success
+                                ? 'bg-emerald-50 text-emerald-800 border border-emerald-200'
+                                : 'bg-red-50 text-red-800 border border-red-200'
+                            }`}
+                          >
+                            {testEmailResult.success ? (
+                              <CheckCircle2 className="w-4 h-4 text-emerald-600 flex-shrink-0" />
+                            ) : (
+                              <AlertCircle className="w-4 h-4 text-red-600 flex-shrink-0" />
+                            )}
+                            <span className="font-medium">{testEmailResult.message}</span>
+                          </div>
+                        )}
+
+                        <div className="pt-2 flex justify-end">
+                          <Button
+                            type="button"
+                            onClick={handleSendTestEmail}
+                            disabled={sendingTestEmail || !testEmailRecipient}
+                            variant="gradient"
+                            size="sm"
+                            className="rounded-lg text-xs font-bold space-x-1.5"
+                          >
+                            <Send className={`w-3.5 h-3.5 ${sendingTestEmail ? 'animate-pulse' : ''}`} />
+                            <span>{sendingTestEmail ? 'Dispatching Test Email...' : 'Send Test Verification Email'}</span>
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Notification Routing Architecture Card */}
+                    <div className="p-5 rounded-xl border border-gray-200 bg-white shadow-xs space-y-3">
+                      <h4 className="font-bold text-xs text-gray-800 flex items-center gap-2">
+                        <ShieldCheck className="w-4 h-4 text-[#3BBA93]" />
+                        <span>How Inbound Inquiries Are Dispatched Through This Relay</span>
+                      </h4>
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs text-gray-600">
+                        <div className="p-3 rounded-lg bg-gray-50 border border-gray-100">
+                          <strong className="text-[#2A292D] block mb-1">1. Global Admin Alert</strong>
+                          <span>Sent to Winnie (<code className="text-gray-700">winnie.odede@avadapay.com</code>) based on the policy configured in Settings (All, Unassigned Only, or Off).</span>
+                        </div>
+                        <div className="p-3 rounded-lg bg-gray-50 border border-gray-100">
+                          <strong className="text-[#2A292D] block mb-1">2. Regional Office Alert</strong>
+                          <span>Sent to the country's contact email (<code className="text-gray-700">officeEmail</code>) if toggled on in that Country's Details page.</span>
+                        </div>
+                        <div className="p-3 rounded-lg bg-gray-50 border border-gray-100">
+                          <strong className="text-[#2A292D] block mb-1">3. Country Manager / CEO</strong>
+                          <span>Sent to the designated country manager's personal work email if enabled in that Country's Details page.</span>
+                        </div>
+                      </div>
                     </div>
                   </div>
+                ) : (
+                  /* PEOPLEFORCE HEALTH & VACANCIES SYNC */
+                  <div className="space-y-6">
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                      {/* Live Connection Diagnostics Card */}
+                      <div className="p-5 rounded-xl border border-gray-200/90 bg-gray-50/50 space-y-4">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center space-x-2">
+                            <Activity className="w-4 h-4 text-[#3BBA93]" />
+                            <h4 className="font-bold text-xs text-gray-800">
+                              Live Endpoint Connection & Latency
+                            </h4>
+                          </div>
+                          <Badge
+                            className={
+                              selectedIntegration.status === 'HEALTHY'
+                                ? 'bg-emerald-100 text-emerald-800 border-emerald-200 text-[10px] font-bold'
+                                : 'bg-amber-100 text-amber-800 border-amber-200 text-[10px] font-bold'
+                            }
+                          >
+                            {selectedIntegration.status}
+                          </Badge>
+                        </div>
 
-                  {/* Vacancy Synchronization Card */}
-                  <div className="p-5 rounded-xl border border-gray-200/90 bg-gray-50/50 space-y-4">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center space-x-2">
-                        <Briefcase className="w-4 h-4 text-[#3BBA93]" />
-                        <h4 className="font-bold text-xs text-gray-800">
-                          Careers Vacancy Synchronization
+                        <p className="text-xs text-gray-500 leading-relaxed">
+                          Sends an authenticated lightweight ping to PeopleForce Careers API to test latency, TLS certificate validity, and endpoint response.
+                        </p>
+
+                        <div className="grid grid-cols-3 gap-3 pt-1">
+                          <div className="p-3 rounded-lg bg-white border border-gray-200/80">
+                            <span className="text-[10px] text-gray-400 font-bold block">Roundtrip Latency</span>
+                            <span className="text-base font-black text-[#2A292D]">
+                              {selectedIntegration.latencyMs ? `${selectedIntegration.latencyMs}ms` : '--'}
+                            </span>
+                          </div>
+                          <div className="p-3 rounded-lg bg-white border border-gray-200/80">
+                            <span className="text-[10px] text-gray-400 font-bold block">HTTP Status</span>
+                            <span className="text-base font-black text-emerald-700">200 OK</span>
+                          </div>
+                          <div className="p-3 rounded-lg bg-white border border-gray-200/80">
+                            <span className="text-[10px] text-gray-400 font-bold block">Last Tested</span>
+                            <span className="text-[11px] font-semibold text-gray-700 truncate block">
+                              {selectedIntegration.lastHealthCheck
+                                ? new Date(selectedIntegration.lastHealthCheck).toLocaleTimeString()
+                                : 'Never'}
+                            </span>
+                          </div>
+                        </div>
+
+                        {healthResult && (
+                          <div
+                            className={`p-3 rounded-lg text-xs flex items-center space-x-2 ${
+                              healthResult.healthy
+                                ? 'bg-emerald-50 text-emerald-800 border border-emerald-200'
+                                : 'bg-red-50 text-red-800 border border-red-200'
+                            }`}
+                          >
+                            {healthResult.healthy ? (
+                              <CheckCircle2 className="w-4 h-4 text-emerald-600 flex-shrink-0" />
+                            ) : (
+                              <AlertCircle className="w-4 h-4 text-red-600 flex-shrink-0" />
+                            )}
+                            <span>{healthResult.message}</span>
+                          </div>
+                        )}
+
+                        <div className="pt-2 flex justify-end">
+                          <Button
+                            type="button"
+                            onClick={handleTestHealth}
+                            disabled={testingHealth}
+                            variant="outline"
+                            size="sm"
+                            className="rounded-lg text-xs font-bold border-gray-200 space-x-1.5"
+                          >
+                            <RefreshCw className={`w-3.5 h-3.5 ${testingHealth ? 'animate-spin text-[#3BBA93]' : ''}`} />
+                            <span>{testingHealth ? 'Testing Connection...' : 'Test Connection Now'}</span>
+                          </Button>
+                        </div>
+                      </div>
+
+                      {/* Vacancy Synchronization Card */}
+                      <div className="p-5 rounded-xl border border-gray-200/90 bg-gray-50/50 space-y-4">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center space-x-2">
+                            <Briefcase className="w-4 h-4 text-[#3BBA93]" />
+                            <h4 className="font-bold text-xs text-gray-800">
+                              Careers Vacancy Synchronization
+                            </h4>
+                          </div>
+                          <span className="text-[11px] font-bold text-[#3BBA93]">
+                            {syncedVacancies.length} Positions Cached
+                          </span>
+                        </div>
+
+                        <p className="text-xs text-gray-500 leading-relaxed">
+                          Pulls all active job postings from PeopleForce into the local database. Keeps the public <code className="text-[#3BBA93] font-mono text-[11px]">/careers</code> page lightning fast with sub-10ms response times.
+                        </p>
+
+                        <div className="grid grid-cols-2 gap-3 pt-1">
+                          <div className="p-3 rounded-lg bg-white border border-gray-200/80">
+                            <span className="text-[10px] text-gray-400 font-bold block">Active Postings</span>
+                            <span className="text-base font-black text-[#2A292D]">
+                              {syncedVacancies.length} Roles
+                            </span>
+                          </div>
+                          <div className="p-3 rounded-lg bg-white border border-gray-200/80">
+                            <span className="text-[10px] text-gray-400 font-bold block">Last Synchronized</span>
+                            <span className="text-[11px] font-semibold text-gray-700 truncate block">
+                              {selectedIntegration.lastSyncAt
+                                ? new Date(selectedIntegration.lastSyncAt).toLocaleString()
+                                : 'Pending Initial Sync'}
+                            </span>
+                          </div>
+                        </div>
+
+                        {syncSuccess && (
+                          <div className="p-3 rounded-lg text-xs bg-emerald-50 text-emerald-800 border border-emerald-200 flex items-center space-x-2">
+                            <CheckCircle2 className="w-4 h-4 text-emerald-600 flex-shrink-0" />
+                            <span>{syncSuccess}</span>
+                          </div>
+                        )}
+
+                        <div className="pt-2 flex justify-end">
+                          <Button
+                            type="button"
+                            onClick={handleSyncVacancies}
+                            disabled={syncingVacancies}
+                            variant="gradient"
+                            size="sm"
+                            className="rounded-lg text-xs font-bold space-x-1.5"
+                          >
+                            <RefreshCw className={`w-3.5 h-3.5 ${syncingVacancies ? 'animate-spin' : ''}`} />
+                            <span>{syncingVacancies ? 'Syncing Vacancies...' : 'Sync Vacancies Now'}</span>
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Synced Vacancies Table Preview */}
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between">
+                        <h4 className="font-bold text-xs text-gray-800 flex items-center gap-1.5">
+                          <Building2 className="w-4 h-4 text-[#3BBA93]" />
+                          <span>Currently Active Vacancies in Database ({syncedVacancies.length})</span>
                         </h4>
-                      </div>
-                      <span className="text-[11px] font-bold text-[#3BBA93]">
-                        {syncedVacancies.length} Positions Cached
-                      </span>
-                    </div>
-
-                    <p className="text-xs text-gray-500 leading-relaxed">
-                      Pulls all active job postings from PeopleForce into the local database. Keeps the public <code className="text-[#3BBA93] font-mono text-[11px]">/careers</code> page lightning fast with sub-10ms response times.
-                    </p>
-
-                    <div className="grid grid-cols-2 gap-3 pt-1">
-                      <div className="p-3 rounded-lg bg-white border border-gray-200/80">
-                        <span className="text-[10px] text-gray-400 font-bold block">Active Postings</span>
-                        <span className="text-base font-black text-[#2A292D]">
-                          {syncedVacancies.length} Roles
+                        <span className="text-[11px] text-gray-400">
+                          Synchronized via PeopleForce API
                         </span>
                       </div>
-                      <div className="p-3 rounded-lg bg-white border border-gray-200/80">
-                        <span className="text-[10px] text-gray-400 font-bold block">Last Synchronized</span>
-                        <span className="text-[11px] font-semibold text-gray-700 truncate block">
-                          {selectedIntegration.lastSyncAt
-                            ? new Date(selectedIntegration.lastSyncAt).toLocaleString()
-                            : 'Pending Initial Sync'}
-                        </span>
-                      </div>
-                    </div>
 
-                    {syncSuccess && (
-                      <div className="p-3 rounded-lg text-xs bg-emerald-50 text-emerald-800 border border-emerald-200 flex items-center space-x-2">
-                        <CheckCircle2 className="w-4 h-4 text-emerald-600 flex-shrink-0" />
-                        <span>{syncSuccess}</span>
-                      </div>
-                    )}
-
-                    <div className="pt-2 flex justify-end">
-                      <Button
-                        type="button"
-                        onClick={handleSyncVacancies}
-                        disabled={syncingVacancies}
-                        variant="gradient"
-                        size="sm"
-                        className="rounded-lg text-xs font-bold space-x-1.5"
-                      >
-                        <RefreshCw className={`w-3.5 h-3.5 ${syncingVacancies ? 'animate-spin' : ''}`} />
-                        <span>{syncingVacancies ? 'Syncing Vacancies...' : 'Sync Vacancies Now'}</span>
-                      </Button>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Synced Vacancies Table Preview */}
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between">
-                    <h4 className="font-bold text-xs text-gray-800 flex items-center gap-1.5">
-                      <Building2 className="w-4 h-4 text-[#3BBA93]" />
-                      <span>Currently Active Vacancies in Database ({syncedVacancies.length})</span>
-                    </h4>
-                    <span className="text-[11px] text-gray-400">
-                      Synchronized via PeopleForce API
-                    </span>
-                  </div>
-
-                  <div className="border border-gray-200 rounded-xl overflow-hidden bg-white shadow-xs">
-                    <table className="w-full text-left border-collapse text-xs">
-                      <thead>
-                        <tr className="bg-gray-50 border-b border-gray-200 text-[11px] font-bold text-gray-500">
-                          <th className="py-2.5 px-4">Role Title</th>
-                          <th className="py-2.5 px-4">Department</th>
-                          <th className="py-2.5 px-4">Location</th>
-                          <th className="py-2.5 px-4">Type</th>
-                          <th className="py-2.5 px-4 text-right">Apply Link</th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-gray-100">
-                        {syncedVacancies.length === 0 ? (
-                          <tr>
-                            <td colSpan={5} className="py-8 text-center text-gray-400">
-                              No vacancies cached. Click "Sync Vacancies Now" above.
-                            </td>
-                          </tr>
-                        ) : (
-                          syncedVacancies.map((vac) => (
-                            <tr key={vac.id} className="hover:bg-gray-50/70 transition-colors">
-                              <td className="py-3 px-4 font-bold text-[#2A292D]">
-                                {vac.title}
-                              </td>
-                              <td className="py-3 px-4 text-gray-600 font-medium">
-                                <Badge variant="secondary" className="text-[10px]">
-                                  {vac.department || 'General'}
-                                </Badge>
-                              </td>
-                              <td className="py-3 px-4 text-gray-600">
-                                <span className="flex items-center space-x-1">
-                                  <MapPin className="w-3 h-3 text-gray-400" />
-                                  <span>{vac.location}</span>
-                                </span>
-                              </td>
-                              <td className="py-3 px-4 text-gray-600 font-medium">
-                                {vac.employmentType}
-                              </td>
-                              <td className="py-3 px-4 text-right">
-                                <a
-                                  href={vac.applyUrl}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  className="inline-flex items-center space-x-1 text-[11px] text-[#3BBA93] hover:underline font-semibold"
-                                >
-                                  <span>View on ATS</span>
-                                  <ExternalLink className="w-3 h-3" />
-                                </a>
-                              </td>
+                      <div className="border border-gray-200 rounded-xl overflow-hidden bg-white shadow-xs">
+                        <table className="w-full text-left border-collapse text-xs">
+                          <thead>
+                            <tr className="bg-gray-50 border-b border-gray-200 text-[11px] font-bold text-gray-500">
+                              <th className="py-2.5 px-4">Role Title</th>
+                              <th className="py-2.5 px-4">Department</th>
+                              <th className="py-2.5 px-4">Location</th>
+                              <th className="py-2.5 px-4">Type</th>
+                              <th className="py-2.5 px-4 text-right">Apply Link</th>
                             </tr>
-                          ))
-                        )}
-                      </tbody>
-                    </table>
+                          </thead>
+                          <tbody className="divide-y divide-gray-100">
+                            {syncedVacancies.length === 0 ? (
+                              <tr>
+                                <td colSpan={5} className="py-8 text-center text-gray-400">
+                                  No vacancies cached. Click "Sync Vacancies Now" above.
+                                </td>
+                              </tr>
+                            ) : (
+                              syncedVacancies.map((vac) => (
+                                <tr key={vac.id} className="hover:bg-gray-50/70 transition-colors">
+                                  <td className="py-3 px-4 font-bold text-[#2A292D]">
+                                    {vac.title}
+                                  </td>
+                                  <td className="py-3 px-4 text-gray-600 font-medium">
+                                    <Badge variant="secondary" className="text-[10px]">
+                                      {vac.department || 'General'}
+                                    </Badge>
+                                  </td>
+                                  <td className="py-3 px-4 text-gray-600">
+                                    <span className="flex items-center space-x-1">
+                                      <MapPin className="w-3 h-3 text-gray-400" />
+                                      <span>{vac.location}</span>
+                                    </span>
+                                  </td>
+                                  <td className="py-3 px-4 text-gray-600 font-medium">
+                                    {vac.employmentType}
+                                  </td>
+                                  <td className="py-3 px-4 text-right">
+                                    <a
+                                      href={vac.applyUrl}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      className="inline-flex items-center space-x-1 text-[11px] text-[#3BBA93] hover:underline font-semibold"
+                                    >
+                                      <span>View on ATS</span>
+                                      <ExternalLink className="w-3 h-3" />
+                                    </a>
+                                  </td>
+                                </tr>
+                              ))
+                            )}
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
                   </div>
-                </div>
+                )}
               </div>
             )}
 
-            {/* TAB 2: CONFIGURATION & CREDENTIALS */}
+            {/* TAB 2: CONFIGURATION */}
             {activeTab === 'config' && (
-              <form onSubmit={handleSaveConfig} className="max-w-2xl space-y-5 text-xs">
+              <div className="max-w-2xl">
                 {configSuccess && (
-                  <div className="p-3 rounded-lg bg-emerald-50 text-emerald-800 border border-emerald-200 flex items-center space-x-2 font-medium">
+                  <div className="p-3 mb-5 rounded-lg bg-emerald-50 text-emerald-800 border border-emerald-200 flex items-center space-x-2 font-medium text-xs">
                     <CheckCircle2 className="w-4 h-4 text-[#3BBA93]" />
                     <span>{configSuccess}</span>
                   </div>
                 )}
 
-                {/* API Key */}
-                <div>
-                  <Label className="text-xs font-bold text-gray-700 block mb-1">
-                    PeopleForce Careers API Key (X-API-KEY) *
-                  </Label>
-                  <div className="relative">
-                    <Input
-                      type={showApiKey ? 'text' : 'password'}
-                      required
-                      value={apiKey}
-                      onChange={(e) => setApiKey(e.target.value)}
-                      placeholder="Enter PeopleForce Careers API key..."
-                      className="pr-20 font-mono text-xs rounded-xl bg-gray-50 border-gray-200 focus:bg-white"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setShowApiKey(!showApiKey)}
-                      className="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-700 p-1"
-                    >
-                      {showApiKey ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                    </button>
-                  </div>
-                  <span className="text-[10px] text-gray-400 mt-1 block">
-                    Saved directly in PostgreSQL database (`integrations` table). Masked in audit logs.
-                  </span>
-                </div>
+                {selectedKey === 'smtp' ? (
+                  /* SMTP CONFIG FORM */
+                  <form onSubmit={handleSaveConfig} className="space-y-5 text-xs">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div>
+                        <Label className="text-xs font-bold text-gray-700 block mb-1">
+                          SMTP Host Relay *
+                        </Label>
+                        <Input
+                          type="text"
+                          required
+                          value={smtpHost}
+                          onChange={(e) => setSmtpHost(e.target.value)}
+                          placeholder="e.g. smtp.zoho.com or mail.avadapay.com"
+                          className="font-mono text-xs rounded-xl bg-gray-50 border-gray-200 focus:bg-white"
+                        />
+                      </div>
 
-                {/* Base URL */}
-                <div>
-                  <Label className="text-xs font-bold text-gray-700 block mb-1">
-                    PeopleForce Careers API Base URL
-                  </Label>
-                  <Input
-                    type="url"
-                    required
-                    value={baseUrl}
-                    onChange={(e) => setBaseUrl(e.target.value)}
-                    placeholder="https://app.peopleforce.io/api/careers/v1"
-                    className="font-mono text-xs rounded-xl bg-gray-50 border-gray-200 focus:bg-white"
-                  />
-                  <span className="text-[10px] text-gray-400 mt-1 block">
-                    Default: <code className="text-[#3BBA93]">https://app.peopleforce.io/api/careers/v1</code>
-                  </span>
-                </div>
+                      <div>
+                        <Label className="text-xs font-bold text-gray-700 block mb-1">
+                          SMTP Port *
+                        </Label>
+                        <Input
+                          type="number"
+                          required
+                          value={smtpPort}
+                          onChange={(e) => setSmtpPort(Number(e.target.value))}
+                          placeholder="465 or 587"
+                          className="font-mono text-xs rounded-xl bg-gray-50 border-gray-200 focus:bg-white"
+                        />
+                      </div>
+                    </div>
 
-                {/* Polling / Sync Interval */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div>
-                    <Label className="text-xs font-bold text-gray-700 block mb-1">
-                      Automated Background Sync
-                    </Label>
-                    <Select
-                      value={autoSync ? 'true' : 'false'}
-                      onValueChange={(val) => setAutoSync(val === 'true')}
-                    >
-                      <SelectTrigger className="w-full rounded-xl bg-gray-50 border-gray-200 text-xs">
-                        <SelectValue placeholder="Sync status" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="true">Enabled (Auto-Sync)</SelectItem>
-                        <SelectItem value="false">Manual Sync Only</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  <div>
-                    <Label className="text-xs font-bold text-gray-700 block mb-1">
-                      Integration Status
-                    </Label>
-                    <div className="pt-2">
+                    <div className="p-3 rounded-xl bg-gray-50 border border-gray-200/80 flex items-center justify-between">
+                      <div>
+                        <span className="font-bold text-gray-800 block">Use SSL/TLS Encryption</span>
+                        <span className="text-[11px] text-gray-500">
+                          Enable for port 465 (SSL direct connection). Disable for port 587 (opportunistic STARTTLS).
+                        </span>
+                      </div>
                       <button
                         type="button"
-                        onClick={() => setEnabled(!enabled)}
-                        className="flex items-center gap-2 cursor-pointer font-semibold text-xs"
+                        onClick={() => setSmtpSecure(!smtpSecure)}
+                        className="cursor-pointer"
                       >
-                        {enabled ? (
-                          <>
-                            <ToggleRight className="w-6 h-6 text-[#3BBA93]" />
-                            <span className="text-emerald-700 font-bold">Integration Active</span>
-                          </>
+                        {smtpSecure ? (
+                          <ToggleRight className="w-7 h-7 text-[#3BBA93]" />
                         ) : (
-                          <>
-                            <ToggleLeft className="w-6 h-6 text-gray-300" />
-                            <span className="text-gray-400">Integration Disabled</span>
-                          </>
+                          <ToggleLeft className="w-7 h-7 text-gray-300" />
                         )}
                       </button>
                     </div>
-                  </div>
-                </div>
 
-                <div className="pt-4 flex justify-end">
-                  {canEdit('integrations') && (
-                    <Button
-                      type="submit"
-                      disabled={savingConfig}
-                      variant="gradient"
-                      size="sm"
-                      className="rounded-xl text-xs font-bold space-x-1.5"
-                    >
-                      <Save className="w-3.5 h-3.5" />
-                      <span>{savingConfig ? 'Saving...' : 'Save Configuration'}</span>
-                    </Button>
-                  )}
-                </div>
-              </form>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div>
+                        <Label className="text-xs font-bold text-gray-700 block mb-1">
+                          SMTP Username / Work Email *
+                        </Label>
+                        <Input
+                          type="text"
+                          required
+                          value={smtpUser}
+                          onChange={(e) => setSmtpUser(e.target.value)}
+                          placeholder="e.g. justin@avadapay.com"
+                          className="font-mono text-xs rounded-xl bg-gray-50 border-gray-200 focus:bg-white"
+                        />
+                      </div>
+
+                      <div>
+                        <Label className="text-xs font-bold text-gray-700 block mb-1">
+                          SMTP Password / App Password *
+                        </Label>
+                        <div className="relative">
+                          <Input
+                            type={showSmtpPass ? 'text' : 'password'}
+                            required
+                            value={smtpPass}
+                            onChange={(e) => setSmtpPass(e.target.value)}
+                            placeholder="Enter SMTP password..."
+                            className="pr-10 font-mono text-xs rounded-xl bg-gray-50 border-gray-200 focus:bg-white"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => setShowSmtpPass(!showSmtpPass)}
+                            className="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-700 p-1"
+                          >
+                            {showSmtpPass ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div>
+                        <Label className="text-xs font-bold text-gray-700 block mb-1">
+                          From Email Address *
+                        </Label>
+                        <Input
+                          type="email"
+                          required
+                          value={smtpFromEmail}
+                          onChange={(e) => setSmtpFromEmail(e.target.value)}
+                          placeholder="e.g. justin@avadapay.com"
+                          className="font-mono text-xs rounded-xl bg-gray-50 border-gray-200 focus:bg-white"
+                        />
+                      </div>
+
+                      <div>
+                        <Label className="text-xs font-bold text-gray-700 block mb-1">
+                          From Sender Name *
+                        </Label>
+                        <Input
+                          type="text"
+                          required
+                          value={smtpFromName}
+                          onChange={(e) => setSmtpFromName(e.target.value)}
+                          placeholder="AvadaPay Notifications"
+                          className="text-xs rounded-xl bg-gray-50 border-gray-200 focus:bg-white"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="p-3 rounded-xl bg-gray-50 border border-gray-200/80 flex items-center justify-between">
+                      <div>
+                        <span className="font-bold text-gray-800 block">Relay Active Status</span>
+                        <span className="text-[11px] text-gray-500">
+                          When active, live transactional emails are dispatched on every contact inquiry submission.
+                        </span>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => setSmtpEnabled(!smtpEnabled)}
+                        className="cursor-pointer"
+                      >
+                        {smtpEnabled ? (
+                          <ToggleRight className="w-7 h-7 text-[#3BBA93]" />
+                        ) : (
+                          <ToggleLeft className="w-7 h-7 text-gray-300" />
+                        )}
+                      </button>
+                    </div>
+
+                    <div className="pt-4 flex justify-end">
+                      {canEdit('integrations') && (
+                        <Button
+                          type="submit"
+                          disabled={savingConfig}
+                          variant="gradient"
+                          size="sm"
+                          className="rounded-xl text-xs font-bold space-x-1.5"
+                        >
+                          <Save className="w-3.5 h-3.5" />
+                          <span>{savingConfig ? 'Saving...' : 'Save SMTP Credentials in CMS'}</span>
+                        </Button>
+                      )}
+                    </div>
+                  </form>
+                ) : (
+                  /* PEOPLEFORCE CONFIG FORM */
+                  <form onSubmit={handleSaveConfig} className="space-y-5 text-xs">
+                    {/* API Key */}
+                    <div>
+                      <Label className="text-xs font-bold text-gray-700 block mb-1">
+                        PeopleForce Careers API Key (X-API-KEY) *
+                      </Label>
+                      <div className="relative">
+                        <Input
+                          type={showApiKey ? 'text' : 'password'}
+                          required
+                          value={apiKey}
+                          onChange={(e) => setApiKey(e.target.value)}
+                          placeholder="Enter PeopleForce Careers API key..."
+                          className="pr-20 font-mono text-xs rounded-xl bg-gray-50 border-gray-200 focus:bg-white"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowApiKey(!showApiKey)}
+                          className="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-700 p-1"
+                        >
+                          {showApiKey ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                        </button>
+                      </div>
+                      <span className="text-[10px] text-gray-400 mt-1 block">
+                        Saved directly in PostgreSQL database (`integrations` table). Masked in audit logs.
+                      </span>
+                    </div>
+
+                    {/* Base URL */}
+                    <div>
+                      <Label className="text-xs font-bold text-gray-700 block mb-1">
+                        PeopleForce Careers API Base URL
+                      </Label>
+                      <Input
+                        type="url"
+                        required
+                        value={baseUrl}
+                        onChange={(e) => setBaseUrl(e.target.value)}
+                        placeholder="https://app.peopleforce.io/api/careers/v1"
+                        className="font-mono text-xs rounded-xl bg-gray-50 border-gray-200 focus:bg-white"
+                      />
+                      <span className="text-[10px] text-gray-400 mt-1 block">
+                        Default: <code className="text-[#3BBA93]">https://app.peopleforce.io/api/careers/v1</code>
+                      </span>
+                    </div>
+
+                    {/* Polling / Sync Interval */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div>
+                        <Label className="text-xs font-bold text-gray-700 block mb-1">
+                          Automated Background Sync
+                        </Label>
+                        <Select
+                          value={autoSync ? 'true' : 'false'}
+                          onValueChange={(val) => setAutoSync(val === 'true')}
+                        >
+                          <SelectTrigger className="w-full rounded-xl bg-gray-50 border-gray-200 text-xs">
+                            <SelectValue placeholder="Sync status" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="true">Enabled (Auto-Sync)</SelectItem>
+                            <SelectItem value="false">Manual Sync Only</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+
+                      <div>
+                        <Label className="text-xs font-bold text-gray-700 block mb-1">
+                          Integration Status
+                        </Label>
+                        <div className="pt-2">
+                          <button
+                            type="button"
+                            onClick={() => setEnabled(!enabled)}
+                            className="flex items-center gap-2 cursor-pointer font-semibold text-xs"
+                          >
+                            {enabled ? (
+                              <>
+                                <ToggleRight className="w-6 h-6 text-[#3BBA93]" />
+                                <span className="text-emerald-700 font-bold">Integration Active</span>
+                              </>
+                            ) : (
+                              <>
+                                <ToggleLeft className="w-6 h-6 text-gray-300" />
+                                <span className="text-gray-400">Integration Disabled</span>
+                              </>
+                            )}
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="pt-4 flex justify-end">
+                      {canEdit('integrations') && (
+                        <Button
+                          type="submit"
+                          disabled={savingConfig}
+                          variant="gradient"
+                          size="sm"
+                          className="rounded-xl text-xs font-bold space-x-1.5"
+                        >
+                          <Save className="w-3.5 h-3.5" />
+                          <span>{savingConfig ? 'Saving...' : 'Save Configuration'}</span>
+                        </Button>
+                      )}
+                    </div>
+                  </form>
+                )}
+              </div>
             )}
 
             {/* TAB 3: INTEGRATION LOGS EXPLORER */}

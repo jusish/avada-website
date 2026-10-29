@@ -26,7 +26,7 @@ router.get('/site-config', async (_req: Request, res: Response): Promise<void> =
 
     const defaultContacts: GeneralContacts = {
       supportEmail: 'info@avadapay.com',
-      supportPhone: '+260 968 332 766',
+      supportPhone: '+971 585 899 472',
       salesEmail: 'sales@avadapay.com',
       officeAddress: '25th floor, SORP Business Centre, Tameem House, Barsha Heights, Dubai (UAE)',
     };
@@ -51,6 +51,7 @@ router.get('/site-config', async (_req: Request, res: Response): Promise<void> =
         currencyCode: c.currencyCode.toUpperCase(),
         telcoPartners: (c.telcoPartners as string[]) || [],
         paymentRails: (c.paymentRails as string[]) || [],
+        notificationSettings: (c.notificationSettings as any) || null,
         createdAt: c.createdAt.toISOString(),
         updatedAt: c.updatedAt.toISOString(),
       })),
@@ -139,6 +140,71 @@ router.get('/policies/:slug', async (req: Request, res: Response): Promise<void>
   }
 });
 
+// GET /api/public/detect-country
+// Detects visitor country based on reverse proxy headers (Cloudflare, Vercel, Nginx)
+// and verifies if it is among currently enabled/active markets in the database.
+router.get('/detect-country', async (req: Request, res: Response): Promise<void> => {
+  try {
+    const rawCountry =
+      (req.headers['cf-ipcountry'] as string) ||
+      (req.headers['x-country-code'] as string) ||
+      (req.headers['x-vercel-ip-country'] as string) ||
+      '';
+
+    const normalizedCode = rawCountry.trim().toUpperCase();
+
+    if (!normalizedCode) {
+      res.json({ success: true, data: null });
+      return;
+    }
+
+    // Special handling for DRC external portal
+    if (normalizedCode === 'CD') {
+      res.json({
+        success: true,
+        data: { code: 'CD', slug: 'drc', name: 'DRC', externalUrl: 'https://avadapay.cd' },
+      });
+      return;
+    }
+
+    // Query database to ensure country exists AND is an active market
+    const matchingCountry = await prisma.country.findFirst({
+      where: {
+        code: { equals: normalizedCode.toLowerCase(), mode: 'insensitive' },
+        active: true,
+      },
+      select: {
+        code: true,
+        slug: true,
+        name: true,
+        active: true,
+      },
+    });
+
+    // If the detected country is not among enabled countries, return null
+    // so the visitor is kept on the global website by default
+    if (!matchingCountry) {
+      res.json({
+        success: true,
+        data: null,
+      });
+      return;
+    }
+
+    res.json({
+      success: true,
+      data: {
+        code: matchingCountry.code.toUpperCase(),
+        slug: matchingCountry.slug,
+        name: matchingCountry.name,
+      },
+    });
+  } catch (err) {
+    console.error('Detect country error:', err);
+    res.json({ success: true, data: null });
+  }
+});
+
 const contactInquirySchema = z.object({
   fullName: z.string().min(2, 'Full name is required'),
   email: z.string().email('Valid email address required'),
@@ -167,27 +233,38 @@ router.post('/contact', async (req: Request, res: Response): Promise<void> => {
     const ipAddress = (req.headers['x-forwarded-for'] as string) || req.socket.remoteAddress || 'unknown';
     const userAgent = req.headers['user-agent'] || 'unknown';
 
-    // Match country in database to retrieve office email and country manager
+    // Match country in database to retrieve office email, manager, and notification settings
     const trimmedCountry = country.trim();
-    const matchingCountry = await prisma.country.findFirst({
-      where: {
-        OR: [
-          { name: { equals: trimmedCountry, mode: 'insensitive' } },
-          { slug: { equals: trimmedCountry.toLowerCase() } },
-          { code: { equals: trimmedCountry.toLowerCase() } },
-          { name: { contains: trimmedCountry, mode: 'insensitive' } },
-        ],
-      },
-      include: {
-        manager: {
-          select: { id: true, name: true, email: true },
+    const [matchingCountry, notifSettingsRecord] = await Promise.all([
+      prisma.country.findFirst({
+        where: {
+          OR: [
+            { name: { equals: trimmedCountry, mode: 'insensitive' } },
+            { slug: { equals: trimmedCountry.toLowerCase() } },
+            { code: { equals: trimmedCountry.toLowerCase() } },
+            { name: { contains: trimmedCountry, mode: 'insensitive' } },
+          ],
         },
-      },
-    });
+        include: {
+          manager: {
+            select: { id: true, name: true, email: true },
+          },
+        },
+      }),
+      prisma.siteSetting.findUnique({
+        where: { key: 'inquiry_notification_settings' },
+      }),
+    ]);
+
+    const globalAdminSettings = (notifSettingsRecord?.value as any) || {
+      globalAdminNotificationMode: 'ALL',
+      globalAdminRecipients: ['winnie.odede@avadapay.com'],
+    };
 
     let routedEmail: string | null = null;
+    let recipientList: string[] = [];
     try {
-      routedEmail = await EmailService.sendInquiryNotification(
+      const emailResult = await EmailService.sendInquiryNotification(
         {
           id: '',
           fullName,
@@ -207,9 +284,14 @@ router.post('/contact', async (req: Request, res: Response): Promise<void> => {
               officeEmail: matchingCountry.officeEmail,
               managerEmail: matchingCountry.manager?.email,
               managerName: matchingCountry.manager?.name,
+              managerId: matchingCountry.managerId,
+              notificationSettings: matchingCountry.notificationSettings as any,
             }
-          : null
+          : null,
+        globalAdminSettings
       );
+      routedEmail = emailResult.primaryRoutedEmail;
+      recipientList = emailResult.allRecipients;
     } catch (emailErr) {
       console.error('[PublicRoutes] Failed to send routed inquiry email:', emailErr);
     }
@@ -223,7 +305,7 @@ router.post('/contact', async (req: Request, res: Response): Promise<void> => {
         roleTitle,
         country,
         countryId: matchingCountry?.id || null,
-        routedEmail: routedEmail || matchingCountry?.officeEmail || null,
+        routedEmail: recipientList.length > 0 ? recipientList.join(', ') : routedEmail || matchingCountry?.officeEmail || null,
         inquiryType,
         message,
         status: 'UNREAD',
