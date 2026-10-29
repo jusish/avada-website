@@ -31,6 +31,7 @@ const countrySchema = z.object({
   officeEmail: z.string().optional().nullable(),
   mapEmbedUrl: z.string().optional().nullable(),
   managerId: z.string().optional().nullable(),
+  notificationSettings: z.any().optional().nullable(),
   active: z.boolean().default(true),
   displayOrder: z.number().int().default(0),
 });
@@ -47,6 +48,9 @@ router.get('/', requirePermission('countries', 'view'), async (_req: Authenticat
         users: {
           select: { id: true, name: true, email: true },
         },
+        _count: {
+          select: { inquiries: true },
+        },
       },
     });
 
@@ -59,6 +63,12 @@ router.get('/', requirePermission('countries', 'view'), async (_req: Authenticat
         telcoPartners: (c.telcoPartners as string[]) || [],
         paymentRails: (c.paymentRails as string[]) || [],
         assignedUserIds: c.users.map((u) => u.id),
+        inquiriesCount: c._count.inquiries,
+        notificationSettings: c.notificationSettings || {
+          notifyOfficeEmail: true,
+          notifyManagerEmail: true,
+          extraRecipients: [],
+        },
         createdAt: c.createdAt.toISOString(),
         updatedAt: c.updatedAt.toISOString(),
       })),
@@ -66,6 +76,55 @@ router.get('/', requirePermission('countries', 'view'), async (_req: Authenticat
   } catch (error) {
     console.error('Fetch admin countries error:', error);
     res.status(500).json({ success: false, error: 'Failed to fetch countries' });
+  }
+});
+
+// GET /api/admin/countries/:id
+router.get('/:id', requirePermission('countries', 'view'), async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+  try {
+    const { id } = req.params;
+    const country = await prisma.country.findUnique({
+      where: { id },
+      include: {
+        manager: {
+          select: { id: true, name: true, email: true },
+        },
+        users: {
+          select: { id: true, name: true, email: true },
+        },
+        _count: {
+          select: { inquiries: true },
+        },
+      },
+    });
+
+    if (!country) {
+      res.status(404).json({ success: false, error: 'Country not found' });
+      return;
+    }
+
+    res.json({
+      success: true,
+      data: {
+        ...country,
+        code: country.code.toUpperCase(),
+        currencyCode: country.currencyCode.toUpperCase(),
+        telcoPartners: (country.telcoPartners as string[]) || [],
+        paymentRails: (country.paymentRails as string[]) || [],
+        assignedUserIds: country.users.map((u) => u.id),
+        inquiriesCount: country._count.inquiries,
+        notificationSettings: country.notificationSettings || {
+          notifyOfficeEmail: true,
+          notifyManagerEmail: true,
+          extraRecipients: [],
+        },
+        createdAt: country.createdAt.toISOString(),
+        updatedAt: country.updatedAt.toISOString(),
+      },
+    });
+  } catch (error) {
+    console.error('Fetch country details error:', error);
+    res.status(500).json({ success: false, error: 'Failed to fetch country details' });
   }
 });
 
@@ -205,7 +264,21 @@ router.put('/:id', requirePermission('countries', 'edit'), async (req: Authentic
 
     res.json({
       success: true,
-      data: updated,
+      data: {
+        ...updated,
+        code: updated.code.toUpperCase(),
+        currencyCode: updated.currencyCode.toUpperCase(),
+        telcoPartners: (updated.telcoPartners as string[]) || [],
+        paymentRails: (updated.paymentRails as string[]) || [],
+        assignedUserIds: updated.users.map((u) => u.id),
+        notificationSettings: updated.notificationSettings || {
+          notifyOfficeEmail: true,
+          notifyManagerEmail: true,
+          extraRecipients: [],
+        },
+        createdAt: updated.createdAt.toISOString(),
+        updatedAt: updated.updatedAt.toISOString(),
+      },
       message: `Country ${updated.name} updated successfully`,
     });
   } catch (error) {

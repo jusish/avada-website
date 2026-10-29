@@ -19,6 +19,7 @@ import { OptimizedImage } from '@/components/ui/OptimizedImage';
 import { SEO } from '@/components/seo/SEO';
 import { useSiteConfig } from '@/context/SiteConfigContext';
 import { resolveMapEmbedUrl } from '@/lib/maps';
+import { GeoDetectionBanner } from '@/components/GeoDetectionBanner';
 
 /* ------------------------------------------------------------------ */
 /* Accordion component                                                 */
@@ -65,7 +66,7 @@ const KenyaHeroVisual: React.FC = () => (
     <div className="flex items-center justify-between border-b border-white/10 pb-4">
       <div className="flex items-center space-x-2.5">
         <CountryFlag country="kenya" className="w-6 h-4" />
-        <span className="text-sm font-bold tracking-wide">Kenya Gateway</span>
+        <span className="text-sm font-bold tracking-wide">Kenya</span>
       </div>
     </div>
 
@@ -198,6 +199,7 @@ export const KenyaPage: React.FC = () => {
 
   return (
     <div className="bg-white text-[#2A292D] font-sans overflow-x-hidden">
+      <GeoDetectionBanner countryName="Kenya" />
       <SEO
         title="Avadapay Kenya | M-Pesa, Card Payments & Carrier Bulk SMS"
         description="Accept M-Pesa, Airtel Money, and card payments in Kenya with Avadapay. Send instant payouts to agents, automate bulk SMS, and scale your Kenyan business."
@@ -235,11 +237,6 @@ export const KenyaPage: React.FC = () => {
               <Button asChild className="h-[3.1rem] px-7 rounded-md bg-[#3BBA93] hover:bg-[#32a481] text-white text-base font-bold shadow-none">
                 <Link to="/contact?country=Kenya">
                   Contact Us
-                </Link>
-              </Button>
-              <Button asChild className="h-[3.1rem] px-7 rounded-md bg-transparent border border-[#3BBA93] text-[#3BBA93] hover:bg-[#3BBA93]/10 text-base font-bold shadow-none">
-                <Link to="/contact?country=Kenya&inquiry=pricing">
-                  Get Kenya Pricing
                 </Link>
               </Button>
             </div>

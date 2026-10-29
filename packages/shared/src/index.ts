@@ -77,6 +77,17 @@ export interface LoginPayload {
 // Dynamic Countries & African Market Hubs
 // ==========================================
 
+export interface CountryNotificationSettings {
+  notifyOfficeEmail: boolean;
+  notifyManagerEmail: boolean;
+  extraRecipients?: string[];
+}
+
+export interface GlobalInquiryNotificationSettings {
+  globalAdminNotificationMode: 'ALL' | 'UNASSIGNED_ONLY' | 'OFF';
+  globalAdminRecipients: string[];
+}
+
 export interface Country {
   id: string;
   code: string; // ISO 2 code (e.g. "ke", "rw", "tz", "ug")
@@ -103,6 +114,7 @@ export interface Country {
   assignedUserIds?: string[];
   active: boolean;
   displayOrder: number;
+  notificationSettings?: CountryNotificationSettings | null;
   createdAt: string;
   updatedAt: string;
 }
@@ -125,6 +137,7 @@ export interface CreateCountryPayload {
   managerId?: string | null;
   active?: boolean;
   displayOrder?: number;
+  notificationSettings?: CountryNotificationSettings | null;
 }
 
 export type UpdateCountryPayload = Partial<CreateCountryPayload>;

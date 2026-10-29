@@ -1,6 +1,7 @@
 import nodemailer, { Transporter } from 'nodemailer';
+import { prisma } from '../prisma';
 
-interface InquiryEmailData {
+export interface InquiryEmailData {
   id: string;
   fullName: string;
   email: string;
@@ -13,12 +14,23 @@ interface InquiryEmailData {
   createdAt?: string | Date;
 }
 
-interface CountryRecipientInfo {
+export interface CountryRecipientInfo {
   name: string;
   code: string;
   officeEmail?: string | null;
   managerEmail?: string | null;
   managerName?: string | null;
+  managerId?: string | null;
+  notificationSettings?: {
+    notifyOfficeEmail?: boolean;
+    notifyManagerEmail?: boolean;
+    extraRecipients?: string[];
+  } | null;
+}
+
+export interface GlobalAdminNotificationConfig {
+  globalAdminNotificationMode?: 'ALL' | 'UNASSIGNED_ONLY' | 'OFF';
+  globalAdminRecipients?: string[];
 }
 
 export interface TeamInvitationData {
@@ -44,17 +56,64 @@ export interface TwoFactorOtpData {
   expiresInMinutes?: number;
 }
 
+export interface SmtpConfigPayload {
+  host: string;
+  port: number;
+  secure: boolean;
+  user: string;
+  pass: string;
+  fromEmail: string;
+  fromName: string;
+  enabled?: boolean;
+}
+
 const APP_URL = process.env.APP_URL || 'https://avadapay.com';
 const LOGO_URL = `${APP_URL}/logo-horizontal.png`;
 
 export class EmailService {
-  private static transporter: Transporter | null = null;
+  /**
+   * Dynamically resolves the active SMTP transport.
+   * Priority:
+   * 1. Dynamic database Integration record (key: 'smtp') configured via CMS.
+   * 2. Environment variables (SMTP_HOST, SMTP_USER, SMTP_PASS, etc.).
+   */
+  public static async getTransporter(): Promise<{ transporter: Transporter | null; fromAddress: string }> {
+    try {
+      const dbIntegration = await prisma.integration.findUnique({
+        where: { key: 'smtp' },
+      });
 
-  private static getTransporter(): Transporter | null {
-    if (this.transporter) {
-      return this.transporter;
+      if (dbIntegration && dbIntegration.enabled) {
+        const cfg = (dbIntegration.config as Record<string, any>) || {};
+        const host = cfg.host ? String(cfg.host).trim() : '';
+        const user = cfg.user ? String(cfg.user).trim() : '';
+        const pass = cfg.pass ? String(cfg.pass).trim() : '';
+        const port = parseInt(String(cfg.port || '587'), 10);
+        const secure = cfg.secure === true || port === 465;
+
+        if (host) {
+          const fromName = cfg.fromName ? String(cfg.fromName).trim() : 'AvadaPay Platform';
+          const fromEmail = cfg.fromEmail ? String(cfg.fromEmail).trim() : user || 'no-reply@avadapay.com';
+          const fromAddress = `"${fromName}" <${fromEmail}>`;
+
+          const transporter = nodemailer.createTransport({
+            host,
+            port,
+            secure,
+            auth: user && pass ? { user, pass } : undefined,
+            tls: {
+              rejectUnauthorized: process.env.NODE_ENV === 'production',
+            },
+          });
+
+          return { transporter, fromAddress };
+        }
+      }
+    } catch (err) {
+      console.warn('[EmailService] Could not check DB for SMTP config, falling back to env:', err);
     }
 
+    // Fallback: Environment variables
     const host = process.env.SMTP_HOST;
     const user = process.env.SMTP_USER;
     const pass = process.env.SMTP_PASS;
@@ -62,10 +121,11 @@ export class EmailService {
     const secure = process.env.SMTP_SECURE === 'true' || port === 465;
 
     if (!host) {
-      return null;
+      return { transporter: null, fromAddress: '"AvadaPay Platform" <no-reply@avadapay.com>' };
     }
 
-    this.transporter = nodemailer.createTransport({
+    const fromAddress = process.env.SMTP_FROM || `"AvadaPay Platform" <${user || 'no-reply@avadapay.com'}>`;
+    const transporter = nodemailer.createTransport({
       host,
       port,
       secure,
@@ -75,30 +135,149 @@ export class EmailService {
       },
     });
 
-    return this.transporter;
+    return { transporter, fromAddress };
   }
 
   /**
-   * Sends an inquiry notification to the country-specific office and manager emails.
-   * Fully branded in AvadaPay charcoal (#2A292D) and emerald (#3BBA93) with the official logo.
+   * Verifies SMTP credentials and optionally dispatches a live test email.
+   */
+  public static async testConnection(
+    config: {
+      host: string;
+      port: number;
+      secure: boolean;
+      user: string;
+      pass: string;
+      fromEmail?: string;
+      fromName?: string;
+    },
+    testRecipient?: string
+  ): Promise<{ success: boolean; message: string; latencyMs: number }> {
+    const startTime = Date.now();
+    try {
+      const transporter = nodemailer.createTransport({
+        host: config.host.trim(),
+        port: Number(config.port),
+        secure: Boolean(config.secure),
+        auth: config.user && config.pass ? { user: config.user.trim(), pass: config.pass.trim() } : undefined,
+        tls: {
+          rejectUnauthorized: process.env.NODE_ENV === 'production',
+        },
+      });
+
+      await transporter.verify();
+
+      if (testRecipient && testRecipient.trim().includes('@')) {
+        const fromName = config.fromName?.trim() || 'AvadaPay Platform';
+        const fromEmail = config.fromEmail?.trim() || config.user.trim() || 'no-reply@avadapay.com';
+
+        await transporter.sendMail({
+          from: `"${fromName}" <${fromEmail}>`,
+          to: testRecipient.trim(),
+          subject: '[AvadaPay CMS] SMTP Integration Test Verification',
+          text: `This is a verification test email from AvadaPay CMS.\n\nYour SMTP integration was verified successfully.\nHost: ${config.host}\nPort: ${config.port}\nTimestamp: ${new Date().toISOString()}`,
+          html: `<div style="font-family:sans-serif;padding:20px;color:#2A292D;">
+            <h2 style="color:#3BBA93;">SMTP Integration Verified</h2>
+            <p>Your AvadaPay CMS transactional email integration is operational.</p>
+            <p><strong>Host:</strong> ${escapeHtml(config.host)}<br>
+            <strong>Port:</strong> ${config.port}<br>
+            <strong>User:</strong> ${escapeHtml(config.user)}<br>
+            <strong>Timestamp:</strong> ${new Date().toUTCString()}</p>
+          </div>`,
+        });
+      }
+
+      const latencyMs = Date.now() - startTime;
+      return {
+        success: true,
+        message: testRecipient
+          ? `Connected successfully! Test email delivered to ${testRecipient}.`
+          : 'SMTP handshake and authentication verified successfully.',
+        latencyMs,
+      };
+    } catch (err: any) {
+      const latencyMs = Date.now() - startTime;
+      return {
+        success: false,
+        message: err?.message || 'Failed to authenticate with SMTP server.',
+        latencyMs,
+      };
+    }
+  }
+
+  /**
+   * Resolves recipients based on multi-tiered preferences:
+   * 1. Country-level preferences (officeEmail toggle, managerEmail toggle, extra recipients).
+   * 2. Global Admin preferences ('ALL', 'UNASSIGNED_ONLY', 'OFF').
+   * Dispatches the branded notification.
    */
   public static async sendInquiryNotification(
     inquiry: InquiryEmailData,
-    countryInfo?: CountryRecipientInfo | null
-  ): Promise<string | null> {
+    countryInfo?: CountryRecipientInfo | null,
+    globalAdminSettings?: GlobalAdminNotificationConfig | null
+  ): Promise<{ primaryRoutedEmail: string | null; allRecipients: string[] }> {
     const recipients: string[] = [];
 
-    if (countryInfo?.officeEmail?.trim()) {
-      recipients.push(countryInfo.officeEmail.trim().toLowerCase());
+    const notifyOffice = countryInfo?.notificationSettings?.notifyOfficeEmail !== false;
+    const notifyManager = countryInfo?.notificationSettings?.notifyManagerEmail !== false;
+    const extraRecipients = countryInfo?.notificationSettings?.extraRecipients || [];
+
+    // 1. Country Office Email
+    if (notifyOffice && countryInfo?.officeEmail?.trim()) {
+      const off = countryInfo.officeEmail.trim().toLowerCase();
+      if (!recipients.includes(off)) {
+        recipients.push(off);
+      }
     }
-    if (countryInfo?.managerEmail?.trim()) {
+
+    // 2. Country Manager / CEO Email
+    if (notifyManager && countryInfo?.managerEmail?.trim()) {
       const mgr = countryInfo.managerEmail.trim().toLowerCase();
       if (!recipients.includes(mgr)) {
         recipients.push(mgr);
       }
     }
 
-    // Fallback email if no country office or manager email exists
+    // 3. Extra country recipients
+    if (Array.isArray(extraRecipients)) {
+      for (const extra of extraRecipients) {
+        if (typeof extra === 'string' && extra.includes('@')) {
+          const norm = extra.trim().toLowerCase();
+          if (!recipients.includes(norm)) {
+            recipients.push(norm);
+          }
+        }
+      }
+    }
+
+    // 4. Global Admin Routing
+    const globalMode = globalAdminSettings?.globalAdminNotificationMode || 'ALL';
+    const globalRecipients = (globalAdminSettings?.globalAdminRecipients && globalAdminSettings.globalAdminRecipients.length > 0)
+      ? globalAdminSettings.globalAdminRecipients
+      : ['winnie.odede@avadapay.com'];
+
+    const hasAssignedManager = Boolean(countryInfo?.managerEmail?.trim() || countryInfo?.managerId);
+
+    if (globalMode === 'ALL') {
+      for (const gAdmin of globalRecipients) {
+        const norm = gAdmin.trim().toLowerCase();
+        if (norm && norm.includes('@') && !recipients.includes(norm)) {
+          recipients.push(norm);
+        }
+      }
+    } else if (globalMode === 'UNASSIGNED_ONLY') {
+      if (!hasAssignedManager) {
+        for (const gAdmin of globalRecipients) {
+          const norm = gAdmin.trim().toLowerCase();
+          if (norm && norm.includes('@') && !recipients.includes(norm)) {
+            recipients.push(norm);
+          }
+        }
+      }
+    }
+    // If 'OFF', global admin does not receive inquiry emails
+
+    // 5. Fallback safety
     const fallbackEmail = process.env.INQUIRY_FALLBACK_EMAIL || 'sales@avadapay.com';
     if (recipients.length === 0) {
       recipients.push(fallbackEmail);
@@ -211,12 +390,11 @@ Manage this inquiry in AvadaPay Admin: https://avadapay.com/admin/inquiries
 </html>
 `.trim();
 
-    const fromAddress = process.env.SMTP_FROM || `"AvadaPay Inquiries" <${process.env.SMTP_USER || 'no-reply@avadapay.com'}>`;
-    const transporter = this.getTransporter();
+    const { transporter, fromAddress } = await this.getTransporter();
 
     if (!transporter) {
       console.log(`[EmailService] (Local/Mock) Notification would be sent to [${recipients.join(', ')}] with subject: "${subject}"`);
-      return primaryRoutedEmail;
+      return { primaryRoutedEmail, allRecipients: recipients };
     }
 
     try {
@@ -233,12 +411,11 @@ Manage this inquiry in AvadaPay Admin: https://avadapay.com/admin/inquiries
       console.error('[EmailService] Failed to send email via SMTP:', err);
     }
 
-    return primaryRoutedEmail;
+    return { primaryRoutedEmail, allRecipients: recipients };
   }
 
   /**
-   * Sends a compact branded team member invitation with the official AvadaPay logo and temporary credentials.
-   * Strictly branded in AvadaPay dark charcoal (#2A292D) and emerald (#3BBA93) with zero blue.
+   * Sends a compact branded team member invitation.
    */
   public static async sendTeamInvitation(data: TeamInvitationData): Promise<boolean> {
     const defaultLoginUrl = `https://avadapay.com/admin/login?email=${encodeURIComponent(data.email)}`;
@@ -355,8 +532,7 @@ Do not share your temporary password with anyone.
 </html>
 `.trim();
 
-    const fromAddress = process.env.SMTP_FROM || `"AvadaPay Platform" <${process.env.SMTP_USER || 'no-reply@avadapay.com'}>`;
-    const transporter = this.getTransporter();
+    const { transporter, fromAddress } = await this.getTransporter();
 
     if (!transporter) {
       console.log(`[EmailService] (Local/Mock) Invitation email would be sent to [${data.email}] with temp pass "${data.temporaryPassword}"`);
@@ -380,8 +556,7 @@ Do not share your temporary password with anyone.
   }
 
   /**
-   * Sends a compact branded password reset email with the official AvadaPay logo and a secure one-time link.
-   * Strictly branded in AvadaPay dark charcoal (#2A292D) and emerald (#3BBA93) with zero blue.
+   * Sends a compact branded password reset email.
    */
   public static async sendPasswordReset(data: PasswordResetData): Promise<boolean> {
     const subject = `Reset Your AvadaPay CMS Password`;
@@ -411,7 +586,7 @@ This link is valid for ${expireMinutes} minutes. If you did not request this, yo
     .card { max-width: 480px; margin: 0 auto; background: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 16px rgba(0,0,0,0.06); border: 1px solid #e5e7eb; }
     .header { background: #2A292D; padding: 22px 24px; text-align: left; }
     .header-logo { display: inline-block; margin-bottom: 6px; }
-    .header-logo img { display: block; width: 145px; max-width: 145px; height: auto; border: 0; outline: none; }
+    .header-logo img { display: block; width: 145px; max-width: 145px; height: auto; border: 0; outline: none; text-decoration: none; }
     .badge { display: inline-block; background: rgba(59,186,147,0.15); border: 1px solid rgba(59,186,147,0.3); color: #3BBA93; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; padding: 3px 8px; border-radius: 9999px; margin-top: 10px; }
     .title { margin: 6px 0 0 0; font-size: 18px; font-weight: 700; color: #ffffff; line-height: 1.3; }
     .body { padding: 24px; }
@@ -460,8 +635,7 @@ This link is valid for ${expireMinutes} minutes. If you did not request this, yo
 </html>
 `.trim();
 
-    const fromAddress = process.env.SMTP_FROM || `"AvadaPay Security" <${process.env.SMTP_USER || 'no-reply@avadapay.com'}>`;
-    const transporter = this.getTransporter();
+    const { transporter, fromAddress } = await this.getTransporter();
 
     if (!transporter) {
       console.log(`[EmailService] (Local/Mock) Password reset email would be sent to [${data.email}] with URL: "${data.resetUrl}"`);
@@ -485,8 +659,7 @@ This link is valid for ${expireMinutes} minutes. If you did not request this, yo
   }
 
   /**
-   * Sends a two-factor authentication (2FA) verification code email with the official AvadaPay logo.
-   * Strictly branded in AvadaPay dark charcoal (#2A292D) and emerald (#3BBA93) with zero blue.
+   * Sends a two-factor authentication (2FA) verification code email.
    */
   public static async sendTwoFactorOtp(data: TwoFactorOtpData): Promise<boolean> {
     const subject = `[AvadaPay] Your Verification Code: ${data.otpCode}`;
@@ -515,7 +688,7 @@ Do not share this code with anyone. AvadaPay staff will never ask for your verif
     .card { max-width: 480px; margin: 0 auto; background: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 16px rgba(0,0,0,0.06); border: 1px solid #e5e7eb; }
     .header { background: #2A292D; padding: 22px 24px; text-align: left; }
     .header-logo { display: inline-block; margin-bottom: 6px; }
-    .header-logo img { display: block; width: 145px; max-width: 145px; height: auto; border: 0; outline: none; }
+    .header-logo img { display: block; width: 145px; max-width: 145px; height: auto; border: 0; outline: none; text-decoration: none; }
     .badge { display: inline-block; background: rgba(59,186,147,0.15); border: 1px solid rgba(59,186,147,0.3); color: #3BBA93; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; padding: 3px 8px; border-radius: 9999px; margin-top: 10px; }
     .title { margin: 6px 0 0 0; font-size: 18px; font-weight: 700; color: #ffffff; line-height: 1.3; }
     .body { padding: 24px; }
@@ -561,8 +734,7 @@ Do not share this code with anyone. AvadaPay staff will never ask for your verif
 </html>
 `.trim();
 
-    const fromAddress = process.env.SMTP_FROM || `"AvadaPay Security" <${process.env.SMTP_USER || 'no-reply@avadapay.com'}>`;
-    const transporter = this.getTransporter();
+    const { transporter, fromAddress } = await this.getTransporter();
 
     if (!transporter) {
       console.log(`[EmailService] (Local/Mock) 2FA OTP code would be sent to [${data.email}] with code "${data.otpCode}"`);

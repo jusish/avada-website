@@ -209,7 +209,6 @@ export const PosPage: React.FC = () => {
         }
         description="Turn any Android phone into a payment terminal with SoftPOS, deploy enterprise-grade POS devices, or integrate payment acceptance into your existing systems, all on one dashboard with AvadaPay POS."
         actions={[
-          { label: 'Contact Us', to: '/contact?inquiry=pos', variant: 'outline' },
           { label: 'Request a POS Demo', to: '/contact?inquiry=pos_demo', variant: 'solid' },
         ]}
         media={

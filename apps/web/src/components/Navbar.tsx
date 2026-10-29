@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { ChevronDown, Menu, X, ExternalLink } from 'lucide-react';
+import { ChevronDown, Menu, X, ExternalLink, Globe } from 'lucide-react';
 import { CountryFlag } from '@/components/CountryFlag';
 
 export interface CountryInfo {
@@ -59,6 +59,7 @@ export const Navbar: React.FC = () => {
   const handleCountrySelect = (c: CountryInfo) => {
     if (c.disabled) return;
     setCountryDropdownOpen(false);
+    localStorage.setItem('avada_country_preference', c.code);
     if (c.path.startsWith('http')) {
       window.open(c.path, '_blank', 'noopener,noreferrer');
     } else {
@@ -137,6 +138,23 @@ export const Navbar: React.FC = () => {
 
             {countryDropdownOpen && (
               <div className="absolute right-0 mt-2 w-56 rounded-xl bg-white shadow-2xl border border-gray-100 py-1.5 z-50 animate-in fade-in-0 zoom-in-95">
+                <button
+                  type="button"
+                  onClick={() => {
+                    localStorage.setItem('avada_country_preference', 'global');
+                    setCountryDropdownOpen(false);
+                    navigate('/?ref=global');
+                  }}
+                  className="w-full flex items-center justify-between px-3.5 py-2.5 text-xs text-left hover:bg-gray-50 transition-colors text-gray-700 font-semibold border-b border-gray-100"
+                >
+                  <span className="flex items-center space-x-2.5">
+                    <Globe className="w-4 h-4 text-[#3BBA93]" />
+                    <span>Global (All Markets)</span>
+                  </span>
+                  {location.pathname === '/' && (
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#3BBA93]" />
+                  )}
+                </button>
                 {activeCountries.map((c) => {
                   if (c.disabled) {
                     return (

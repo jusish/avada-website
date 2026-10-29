@@ -400,7 +400,7 @@ export const PaymentProcessingPage: React.FC = () => (
       description="Mobile money, cards, payment links, and bank rails, across 17+ African markets, with one API, one dashboard, and one settlement flow."
       actions={[
         { label: 'Talk to Sales', to: '/contact?inquiry=payments', variant: 'solid' },
-        { label: 'Explore API Docs', to: '/docs', variant: 'outline' },
+        { label: 'API Documentation', to: 'https://docs.avadapay.tech/', variant: 'outline' },
       ]}
       media={<PaymentProcessingHeroVisual />}
     />

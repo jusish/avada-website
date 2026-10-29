@@ -207,7 +207,10 @@ export const BulkSmsPage: React.FC = () => {
           </>
         }
         description="Send OTPs, transaction alerts, reminders, and marketing campaigns across every major mobile network in Africa, through one platform, one API, one set of delivery reports with AvadaPay"
-        actions={[{ label: 'Contact Us', to: '/contact?inquiry=sms', variant: 'solid' }]}
+        actions={[
+          { label: 'Talk to Sales', to: '/contact?inquiry=sms', variant: 'solid' },
+          { label: 'Bulk SMS API Docs', to: 'https://msg.unipesa.tech/docs/api.html', variant: 'outline' },
+        ]}
         media={
           <div className="w-full h-full bg-[#1E1D20] p-6 flex flex-col justify-between">
             <div className="flex items-center justify-between border-b border-white/10 pb-4">

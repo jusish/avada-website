@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
-import { GeneralContacts, SocialLink, FooterConfig } from '@avada/shared';
+import { GeneralContacts, SocialLink, FooterConfig, GlobalInquiryNotificationSettings } from '@avada/shared';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import {
@@ -26,14 +26,26 @@ import {
   ToggleRight,
   Cpu,
   ArrowRight,
+  Bell,
+  Shield,
+  X,
+  MailPlus,
 } from 'lucide-react';
 
 export const AdminSettingsPage: React.FC = () => {
-  const { token, canEdit } = useAuth();
+  const { token, canEdit, isSuperAdmin } = useAuth();
   const [savingContacts, setSavingContacts] = useState(false);
   const [savingSocials, setSavingSocials] = useState(false);
   const [savingFooter, setSavingFooter] = useState(false);
+  const [savingInquirySettings, setSavingInquirySettings] = useState(false);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
+
+  // Inquiry Email Notification Settings
+  const [inquirySettings, setInquirySettings] = useState<GlobalInquiryNotificationSettings>({
+    globalAdminNotificationMode: 'ALL',
+    globalAdminRecipients: ['winnie.odede@avadapay.com'],
+  });
+  const [newAdminEmail, setNewAdminEmail] = useState('');
 
   // General Contacts State
   const [contacts, setContacts] = useState<GeneralContacts>({
@@ -65,6 +77,9 @@ export const AdminSettingsPage: React.FC = () => {
           if (data.data.general_contacts) setContacts(data.data.general_contacts);
           if (data.data.footer_config) setFooter(data.data.footer_config);
           if (Array.isArray(data.data.social_links)) setSocials(data.data.social_links);
+          if (data.data.inquiry_notification_settings) {
+            setInquirySettings(data.data.inquiry_notification_settings);
+          }
         }
       } catch (err) {
         console.error('Failed to load settings:', err);
@@ -175,6 +190,56 @@ export const AdminSettingsPage: React.FC = () => {
     setSocials((prev) =>
       prev.map((item, idx) => (idx === index ? { ...item, [field]: value } : item))
     );
+  };
+
+  // Save Inquiry Notification Settings
+  const handleSaveInquirySettings = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!token || !canEdit('settings')) return;
+    setSavingInquirySettings(true);
+    try {
+      const res = await fetch('/api/admin/settings/inquiry_notification_settings', {
+        method: 'PUT',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ value: inquirySettings }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        showSuccess('Global inquiry notification preferences saved.');
+      } else {
+        alert(data.error || 'Failed to update notification settings.');
+      }
+    } catch (err) {
+      console.error('Failed to save inquiry notification settings:', err);
+    } finally {
+      setSavingInquirySettings(false);
+    }
+  };
+
+  const handleAddAdminEmail = () => {
+    const trimmed = newAdminEmail.trim().toLowerCase();
+    if (!trimmed || !trimmed.includes('@')) return;
+    if (inquirySettings.globalAdminRecipients.includes(trimmed)) return;
+    setInquirySettings((prev) => ({
+      ...prev,
+      globalAdminRecipients: [...prev.globalAdminRecipients, trimmed],
+    }));
+    setNewAdminEmail('');
+  };
+
+  const handleRemoveAdminEmail = (emailToRemove: string) => {
+    if (inquirySettings.globalAdminRecipients.length <= 1) {
+      if (!window.confirm('Removing the last global admin recipient means no one at global level will receive email alerts. Proceed?')) {
+        return;
+      }
+    }
+    setInquirySettings((prev) => ({
+      ...prev,
+      globalAdminRecipients: prev.globalAdminRecipients.filter((e: string) => e !== emailToRemove),
+    }));
   };
 
   return (
@@ -349,6 +414,245 @@ export const AdminSettingsPage: React.FC = () => {
           </CardContent>
         </Card>
       </div>
+
+      {/* Card 2.5: Global Inquiry Notification Preferences (Apple Design Inset Group) */}
+      <Card className="bg-white border-gray-200/90 shadow-sm rounded-2xl overflow-hidden">
+        <CardHeader className="bg-gray-50/80 border-b border-gray-100 p-5 sm:p-6">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div>
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 rounded-xl bg-emerald-50 border border-emerald-200/80 text-[#3BBA93] flex items-center justify-center">
+                  <Bell className="w-4 h-4" />
+                </div>
+                <div>
+                  <CardTitle className="text-sm font-bold text-[#2A292D]">
+                    Global Admin Inquiry Notification Routing
+                  </CardTitle>
+                  <p className="text-[11px] text-gray-500 mt-0.5">
+                    Controls whether Global Admin (Winnie) receives email notifications for all incoming inquiries, or only for regional markets that do not have an assigned Country Manager.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold bg-[#2A292D] text-white tracking-wide">
+                <Shield className="w-3 h-3 text-[#3BBA93]" />
+                <span>Super Admin Only</span>
+              </span>
+            </div>
+          </div>
+        </CardHeader>
+
+        <CardContent className="p-5 sm:p-6 space-y-6">
+          <form onSubmit={handleSaveInquirySettings} className="space-y-6">
+            {/* Routing Mode Picker */}
+            <div>
+              <label className="block text-xs font-bold text-gray-800 tracking-tight mb-2">
+                Global Admin Notification Routing Policy
+              </label>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                {/* Mode 1: ALL */}
+                <div
+                  onClick={() =>
+                    setInquirySettings((prev) => ({ ...prev, globalAdminNotificationMode: 'ALL' }))
+                  }
+                  className={`p-4 rounded-xl border transition-all cursor-pointer flex flex-col justify-between ${
+                    inquirySettings.globalAdminNotificationMode === 'ALL'
+                      ? 'bg-emerald-50/40 border-[#3BBA93] ring-2 ring-[#3BBA93]/10 shadow-xs'
+                      : 'bg-gray-50/50 border-gray-200/90 hover:border-gray-300'
+                  }`}
+                >
+                  <div>
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-xs font-bold text-[#2A292D]">
+                        All Inquiries
+                      </span>
+                      <div
+                        className={`w-4 h-4 rounded-full border flex items-center justify-center ${
+                          inquirySettings.globalAdminNotificationMode === 'ALL'
+                            ? 'border-[#3BBA93] bg-[#3BBA93]'
+                            : 'border-gray-300'
+                        }`}
+                      >
+                        {inquirySettings.globalAdminNotificationMode === 'ALL' && (
+                          <div className="w-1.5 h-1.5 rounded-full bg-white" />
+                        )}
+                      </div>
+                    </div>
+                    <p className="text-[11px] text-gray-500 leading-relaxed">
+                      Global Admin is notified by email whenever any inquiry is submitted across any country.
+                    </p>
+                  </div>
+                  <span className="text-[10px] font-semibold text-emerald-700 mt-3 pt-2 border-t border-emerald-100/60 block">
+                    Recommended for central oversight
+                  </span>
+                </div>
+
+                {/* Mode 2: UNASSIGNED_ONLY */}
+                <div
+                  onClick={() =>
+                    setInquirySettings((prev) => ({ ...prev, globalAdminNotificationMode: 'UNASSIGNED_ONLY' }))
+                  }
+                  className={`p-4 rounded-xl border transition-all cursor-pointer flex flex-col justify-between ${
+                    inquirySettings.globalAdminNotificationMode === 'UNASSIGNED_ONLY'
+                      ? 'bg-emerald-50/40 border-[#3BBA93] ring-2 ring-[#3BBA93]/10 shadow-xs'
+                      : 'bg-gray-50/50 border-gray-200/90 hover:border-gray-300'
+                  }`}
+                >
+                  <div>
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-xs font-bold text-[#2A292D]">
+                        Unassigned Markets Only
+                      </span>
+                      <div
+                        className={`w-4 h-4 rounded-full border flex items-center justify-center ${
+                          inquirySettings.globalAdminNotificationMode === 'UNASSIGNED_ONLY'
+                            ? 'border-[#3BBA93] bg-[#3BBA93]'
+                            : 'border-gray-300'
+                        }`}
+                      >
+                        {inquirySettings.globalAdminNotificationMode === 'UNASSIGNED_ONLY' && (
+                          <div className="w-1.5 h-1.5 rounded-full bg-white" />
+                        )}
+                      </div>
+                    </div>
+                    <p className="text-[11px] text-gray-500 leading-relaxed">
+                      Global Admin only receives email alerts for countries without an assigned manager. Delegated managers receive their country's alerts directly.
+                    </p>
+                  </div>
+                  <span className="text-[10px] font-semibold text-gray-600 mt-3 pt-2 border-t border-gray-200/60 block">
+                    Decentralized delegation
+                  </span>
+                </div>
+
+                {/* Mode 3: OFF */}
+                <div
+                  onClick={() =>
+                    setInquirySettings((prev) => ({ ...prev, globalAdminNotificationMode: 'OFF' }))
+                  }
+                  className={`p-4 rounded-xl border transition-all cursor-pointer flex flex-col justify-between ${
+                    inquirySettings.globalAdminNotificationMode === 'OFF'
+                      ? 'bg-emerald-50/40 border-[#3BBA93] ring-2 ring-[#3BBA93]/10 shadow-xs'
+                      : 'bg-gray-50/50 border-gray-200/90 hover:border-gray-300'
+                  }`}
+                >
+                  <div>
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-xs font-bold text-[#2A292D]">
+                        CMS Inbox Only
+                      </span>
+                      <div
+                        className={`w-4 h-4 rounded-full border flex items-center justify-center ${
+                          inquirySettings.globalAdminNotificationMode === 'OFF'
+                            ? 'border-[#3BBA93] bg-[#3BBA93]'
+                            : 'border-gray-300'
+                        }`}
+                      >
+                        {inquirySettings.globalAdminNotificationMode === 'OFF' && (
+                          <div className="w-1.5 h-1.5 rounded-full bg-white" />
+                        )}
+                      </div>
+                    </div>
+                    <p className="text-[11px] text-gray-500 leading-relaxed">
+                      Global Admin is never sent email notifications. All inquiries remain fully visible and actionable in the CMS Inquiries list.
+                    </p>
+                  </div>
+                  <span className="text-[10px] font-semibold text-gray-400 mt-3 pt-2 border-t border-gray-200/60 block">
+                    Quiet in-app mode
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* Global Admin Email Recipients */}
+            <div className="p-4 rounded-xl bg-gray-50/70 border border-gray-200/70 space-y-3">
+              <label className="block text-xs font-bold text-gray-800">
+                Global Administrator Notification Recipients
+              </label>
+              <p className="text-[11px] text-gray-500">
+                These addresses receive copies of inquiries according to the policy above. Current primary administrator is Winnie Odede.
+              </p>
+
+              <div className="flex flex-wrap gap-2 pt-1">
+                {inquirySettings.globalAdminRecipients.map((email: string) => (
+                  <span
+                    key={email}
+                    className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-white border border-gray-200 text-xs font-semibold text-gray-800 shadow-xs"
+                  >
+                    <Mail className="w-3.5 h-3.5 text-[#3BBA93]" />
+                    <span>{email}</span>
+                    {canEdit('settings') && isSuperAdmin && (
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveAdminEmail(email)}
+                        className="text-gray-400 hover:text-red-500 transition-colors ml-1"
+                        title="Remove recipient"
+                      >
+                        <X className="w-3 h-3" />
+                      </button>
+                    )}
+                  </span>
+                ))}
+              </div>
+
+              {canEdit('settings') && isSuperAdmin && (
+                <div className="flex gap-2 pt-2 max-w-md">
+                  <input
+                    type="email"
+                    value={newAdminEmail}
+                    onChange={(e) => setNewAdminEmail(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        e.preventDefault();
+                        handleAddAdminEmail();
+                      }
+                    }}
+                    placeholder="Add administrator email (e.g. winnie.odede@avadapay.com)..."
+                    className="flex-1 p-2 bg-white border border-gray-200 rounded-xl text-xs focus:ring-2 focus:ring-[#3BBA93] text-[#2A292D]"
+                  />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={handleAddAdminEmail}
+                    className="rounded-xl text-xs font-bold border-gray-200 space-x-1"
+                  >
+                    <MailPlus className="w-3.5 h-3.5 text-[#3BBA93]" />
+                    <span>Add</span>
+                  </Button>
+                </div>
+              )}
+            </div>
+
+            {/* Bottom Actions & SMTP Relay Link */}
+            <div className="pt-2 flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-t border-gray-100">
+              <Link
+                to="/admin/integrations?open=smtp"
+                className="inline-flex items-center gap-2 text-xs font-bold text-gray-600 hover:text-[#3BBA93] transition-colors"
+              >
+                <Cpu className="w-3.5 h-3.5 text-[#3BBA93]" />
+                <span>Configure Outbound Mail Relay (SMTP) Credentials in CMS</span>
+                <ArrowRight className="w-3 h-3" />
+              </Link>
+
+              {canEdit('settings') && isSuperAdmin && (
+                <Button
+                  type="submit"
+                  disabled={savingInquirySettings}
+                  variant="gradient"
+                  size="sm"
+                  className="rounded-xl text-xs font-bold space-x-1.5"
+                >
+                  <Save className="w-3.5 h-3.5" />
+                  <span>{savingInquirySettings ? 'Saving...' : 'Save Notification Preferences'}</span>
+                </Button>
+              )}
+            </div>
+          </form>
+        </CardContent>
+      </Card>
 
       {/* Card 3: Social Media Channels & Window Target Controls */}
       <Card className="bg-white border-gray-200/80 shadow-sm rounded-xl overflow-hidden">

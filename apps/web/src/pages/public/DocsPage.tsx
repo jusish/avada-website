@@ -11,6 +11,9 @@ import {
   KeyRound,
   Webhook,
   Zap,
+  ExternalLink,
+  CreditCard,
+  MessageSquare,
 } from 'lucide-react';
 
 const SAMPLE_COLLECTION_REQUEST = `{
@@ -103,6 +106,81 @@ export const DocsPage: React.FC = () => {
               </Link>
             </Button>
           </div>
+        </div>
+      </section>
+
+      {/* Official External API Documentation Portals */}
+      <section className="py-8 px-4 max-w-5xl mx-auto -mt-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+          {/* 1. Payments API Docs */}
+          <a
+            href="https://docs.avadapay.tech/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="group block p-6 rounded-2xl bg-white border border-gray-200/90 shadow-sm hover:shadow-md hover:border-[#3BBA93]/60 transition-all"
+          >
+            <div className="flex items-start justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 rounded-xl bg-emerald-50 border border-emerald-100 flex items-center justify-center text-[#3BBA93] group-hover:scale-105 transition-transform">
+                  <CreditCard className="w-6 h-6" />
+                </div>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <h3 className="font-bold text-base text-[#2A292D] group-hover:text-[#3BBA93] transition-colors">
+                      Payment Gateway API
+                    </h3>
+                    <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 font-semibold border border-emerald-200">
+                      REST &amp; Webhooks
+                    </span>
+                  </div>
+                  <p className="text-xs text-gray-500 mt-1 font-mono">docs.avadapay.tech</p>
+                </div>
+              </div>
+              <ExternalLink className="w-4 h-4 text-gray-400 group-hover:text-[#3BBA93] transition-colors" />
+            </div>
+            <p className="text-xs text-gray-600 mt-4 leading-relaxed font-medium">
+              Complete OpenAPI interactive specifications for STK Push collections, bank payouts, card tokenization, and cryptographically signed callbacks.
+            </p>
+            <div className="mt-4 pt-3 border-t border-gray-100 flex items-center justify-between text-xs font-bold text-[#3BBA93]">
+              <span>Explore Payments Reference</span>
+              <span>&rarr;</span>
+            </div>
+          </a>
+
+          {/* 2. Bulk SMS API Docs */}
+          <a
+            href="https://msg.unipesa.tech/docs/api.html"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="group block p-6 rounded-2xl bg-white border border-gray-200/90 shadow-sm hover:shadow-md hover:border-[#3BBA93]/60 transition-all"
+          >
+            <div className="flex items-start justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 rounded-xl bg-blue-50 border border-blue-100 flex items-center justify-center text-blue-600 group-hover:scale-105 transition-transform">
+                  <MessageSquare className="w-6 h-6" />
+                </div>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <h3 className="font-bold text-base text-[#2A292D] group-hover:text-[#3BBA93] transition-colors">
+                      Bulk SMS &amp; Messaging API
+                    </h3>
+                    <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 font-semibold border border-blue-200">
+                      Direct Carriers
+                    </span>
+                  </div>
+                  <p className="text-xs text-gray-500 mt-1 font-mono">msg.unipesa.tech/docs</p>
+                </div>
+              </div>
+              <ExternalLink className="w-4 h-4 text-gray-400 group-hover:text-[#3BBA93] transition-colors" />
+            </div>
+            <p className="text-xs text-gray-600 mt-4 leading-relaxed font-medium">
+              High-throughput transactional SMS dispatch documentation, Sender ID registration guides, OTP delivery parameters, and live status reports.
+            </p>
+            <div className="mt-4 pt-3 border-t border-gray-100 flex items-center justify-between text-xs font-bold text-[#3BBA93]">
+              <span>Explore Messaging Reference</span>
+              <span>&rarr;</span>
+            </div>
+          </a>
         </div>
       </section>
 

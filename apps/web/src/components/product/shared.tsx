@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ChevronUp } from 'lucide-react';
+import { ChevronUp, ExternalLink } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 
@@ -65,21 +65,32 @@ export const ProductHero: React.FC<ProductHeroProps> = ({
           {description}
         </p>
         <div className="mt-8 flex flex-wrap gap-4">
-          {actions.map((a) => (
-            <Button
-              key={a.label}
-              asChild
-              className={
-                a.variant === 'solid'
-                  ? 'h-[3.1rem] px-6 rounded-md bg-[#3BBA93] hover:bg-[#32a481] text-white text-base font-bold shadow-none transition-transform hover:-translate-y-0.5'
-                  : 'h-[3.1rem] px-6 rounded-md bg-transparent border border-[#3BBA93] text-[#3BBA93] hover:bg-[#3BBA93] hover:text-white text-base font-bold shadow-none transition-all hover:-translate-y-0.5'
-              }
-            >
-              <Link to={a.to}>
-                {a.label}
-              </Link>
-            </Button>
-          ))}
+          {actions.map((a) => {
+            const isExternal = a.to.startsWith('http');
+            const buttonClass =
+              a.variant === 'solid'
+                ? 'h-[3.1rem] px-6 rounded-md bg-[#3BBA93] hover:bg-[#32a481] text-white text-base font-bold shadow-none transition-transform hover:-translate-y-0.5'
+                : 'h-[3.1rem] px-6 rounded-md bg-transparent border border-[#3BBA93] text-[#3BBA93] hover:bg-[#3BBA93] hover:text-white text-base font-bold shadow-none transition-all hover:-translate-y-0.5';
+
+            if (isExternal) {
+              return (
+                <Button key={a.label} asChild className={buttonClass}>
+                  <a href={a.to} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5">
+                    <span>{a.label}</span>
+                    <ExternalLink className="w-4 h-4 opacity-80" />
+                  </a>
+                </Button>
+              );
+            }
+
+            return (
+              <Button key={a.label} asChild className={buttonClass}>
+                <Link to={a.to}>
+                  {a.label}
+                </Link>
+              </Button>
+            );
+          })}
         </div>
       </motion.div>
 

@@ -1,19 +1,14 @@
 import React, { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
-import { Country, User } from '@avada/shared';
+import { Country } from '@avada/shared';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import {
-  Dialog,
-  DialogContent,
-  DialogTitle,
-  DialogDescription,
-} from '@/components/ui/dialog';
+import { CountryFlag } from '@/components/CountryFlag';
 import {
   Globe2,
   Plus,
-  Edit2,
   Trash2,
   ToggleLeft,
   ToggleRight,
@@ -22,42 +17,20 @@ import {
   Radio,
   CreditCard,
   Search,
-  Save,
   Phone,
   Mail,
-  Sparkles,
   Lock,
   UserCheck,
+  ChevronRight,
+  Bell,
+  Settings,
 } from 'lucide-react';
-import { resolveMapEmbedUrl, getMapExternalLink } from '@/lib/maps';
 
 export const AdminCountriesPage: React.FC = () => {
   const { token, canEdit, isSuperAdmin, canManageCountry } = useAuth();
   const [countries, setCountries] = useState<Country[]>([]);
-  const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
-
-  // Modal State
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingCountry, setEditingCountry] = useState<Country | null>(null);
-  const [form, setForm] = useState({
-    name: '',
-    slug: '',
-    code: '',
-    currencyCode: '',
-    headline: '',
-    description: '',
-    active: true,
-    telcoPartners: '',
-    paymentRails: '',
-    officeAddress: '',
-    officePhone: '',
-    officeEmail: '',
-    mapEmbedUrl: '',
-    managerId: '',
-  });
-  const [saving, setSaving] = useState(false);
 
   // Fetch
   const fetchCountries = async () => {
@@ -78,154 +51,14 @@ export const AdminCountriesPage: React.FC = () => {
     }
   };
 
-  const fetchUsers = async () => {
-    if (!token) return;
-    try {
-      const res = await fetch('/api/admin/users', {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      const data = await res.json();
-      if (data.success && Array.isArray(data.data)) {
-        setUsers(data.data);
-      }
-    } catch (err) {
-      console.error('Failed to load users:', err);
-    }
-  };
-
   useEffect(() => {
     fetchCountries();
-    fetchUsers();
   }, [token]);
 
-  // Open Create
-  const handleOpenCreate = () => {
-    setEditingCountry(null);
-    setForm({
-      name: '',
-      slug: '',
-      code: '',
-      currencyCode: 'USD',
-      headline: 'Next-Gen Financial Infrastructure',
-      description: 'AvadaPay provides direct mobile money aggregation, smart POS terminals, and developer payment APIs.',
-      active: true,
-      telcoPartners: 'MTN Mobile Money, Airtel Money',
-      paymentRails: 'Mobile Money, Visa, Mastercard, Bank Payouts',
-      officeAddress: '',
-      officePhone: '+260 968 332 766',
-      officeEmail: '',
-      mapEmbedUrl: '',
-      managerId: '',
-    });
-    setIsModalOpen(true);
-  };
-
-  // Open Edit
-  const handleOpenEdit = (c: Country) => {
-    setEditingCountry(c);
-    setForm({
-      name: c.name,
-      slug: c.slug,
-      code: c.code.toUpperCase(),
-      currencyCode: c.currencyCode.toUpperCase(),
-      headline: c.headline || 'Payment Infrastructure',
-      description: c.description || '',
-      active: c.active,
-      telcoPartners: Array.isArray(c.telcoPartners) ? c.telcoPartners.join(', ') : '',
-      paymentRails: Array.isArray(c.paymentRails) ? c.paymentRails.join(', ') : '',
-      officeAddress: c.officeAddress || '',
-      officePhone: c.officePhone || '',
-      officeEmail: c.officeEmail || '',
-      mapEmbedUrl: c.mapEmbedUrl || '',
-      managerId: c.managerId || '',
-    });
-    setIsModalOpen(true);
-  };
-
-  // Auto-slugify & code generator
-  const handleNameChange = (val: string) => {
-    if (!editingCountry) {
-      const generatedSlug = val
-        .toLowerCase()
-        .replace(/[^a-z0-9]+/g, '-')
-        .replace(/^-+|-+$/g, '');
-      const code = val.slice(0, 2).toUpperCase();
-      setForm((prev) => ({
-        ...prev,
-        name: val,
-        slug: generatedSlug,
-        code: prev.code || code,
-        headline: `Modern Payment Solutions in ${val}`,
-        description: `AvadaPay powers high-volume merchant processing, telco mobile money, and automated payouts in ${val}.`,
-      }));
-    } else {
-      setForm((prev) => ({ ...prev, name: val }));
-    }
-  };
-
-  // Save (Create or Update)
-  const handleSave = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!token || !canEdit('countries')) return;
-    setSaving(true);
-    try {
-      const resolvedMap = resolveMapEmbedUrl(
-        form.mapEmbedUrl,
-        form.officeAddress || (form.name ? `${form.name} Office` : '')
-      );
-
-      const payload = {
-        name: form.name,
-        slug: form.slug,
-        code: form.code.toUpperCase(),
-        currencyCode: form.currencyCode.toUpperCase(),
-        headline: form.headline,
-        description: form.description,
-        active: form.active,
-        officeAddress: form.officeAddress.trim() || null,
-        officePhone: form.officePhone.trim() || null,
-        officeEmail: form.officeEmail.trim() || null,
-        mapEmbedUrl: resolvedMap || null,
-        managerId: form.managerId ? form.managerId : null,
-        telcoPartners: form.telcoPartners
-          .split(',')
-          .map((s) => s.trim())
-          .filter(Boolean),
-        paymentRails: form.paymentRails
-          .split(',')
-          .map((s) => s.trim())
-          .filter(Boolean),
-      };
-
-      const url = editingCountry
-        ? `/api/admin/countries/${editingCountry.id}`
-        : '/api/admin/countries';
-      const method = editingCountry ? 'PUT' : 'POST';
-
-      const res = await fetch(url, {
-        method,
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(payload),
-      });
-      const json = await res.json();
-      if (json.success) {
-        setIsModalOpen(false);
-        fetchCountries();
-      } else {
-        alert(json.error || 'Failed to save country');
-      }
-    } catch (err) {
-      console.error('Save error:', err);
-    } finally {
-      setSaving(false);
-    }
-  };
-
   // Toggle active
-  const handleToggle = async (id: string) => {
+  const handleToggle = async (id: string, e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
     if (!token || !canEdit('countries')) return;
     try {
       const res = await fetch(`/api/admin/countries/${id}/toggle`, {
@@ -244,7 +77,9 @@ export const AdminCountriesPage: React.FC = () => {
   };
 
   // Delete
-  const handleDelete = async (id: string, name: string) => {
+  const handleDelete = async (id: string, name: string, e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
     if (!token || !canEdit('countries')) return;
     if (!window.confirm(`Are you sure you want to delete "${name}"? This removes its dedicated live landing page.`)) return;
     try {
@@ -273,11 +108,6 @@ export const AdminCountriesPage: React.FC = () => {
       (c.officePhone && c.officePhone.toLowerCase().includes(search.toLowerCase()))
   );
 
-  const previewMapUrl = resolveMapEmbedUrl(
-    form.mapEmbedUrl,
-    form.officeAddress || (form.name ? `${form.name} Office` : '')
-  );
-
   return (
     <div className="space-y-6">
       {/* Page Header */}
@@ -288,21 +118,22 @@ export const AdminCountriesPage: React.FC = () => {
             <span>Regional Presence</span>
           </h1>
           <p className="text-xs text-gray-500 mt-1">
-            Define, update, and manage national payment markets, carrier integrations, and regional office locations across Africa and our UAE headquarters.
+            Define, update, and manage national payment markets, carrier integrations, inquiry notification routing, and regional office locations across Africa and our UAE headquarters.
           </p>
         </div>
 
         <div className="flex items-center gap-2">
           {isSuperAdmin && canEdit('countries') && (
-            <Button
-              variant="gradient"
-              size="sm"
-              onClick={handleOpenCreate}
-              className="space-x-1.5 rounded-xl font-bold text-xs"
-            >
-              <Plus className="w-4 h-4" />
-              <span>Add Regional Presence</span>
-            </Button>
+            <Link to="/admin/content/countries/new">
+              <Button
+                variant="gradient"
+                size="sm"
+                className="space-x-1.5 rounded-xl font-bold text-xs"
+              >
+                <Plus className="w-4 h-4" />
+                <span>Add Regional Presence</span>
+              </Button>
+            </Link>
           )}
         </div>
       </div>
@@ -341,13 +172,13 @@ export const AdminCountriesPage: React.FC = () => {
           <div className="col-span-full py-16 text-center text-gray-400 bg-white rounded-xl border border-gray-100">
             <Globe2 className="w-10 h-10 mx-auto text-gray-300 mb-2" />
             <p className="font-bold text-gray-600">No countries found</p>
-            <p className="text-xs text-gray-400 mt-1">Try another search or click Add New Country</p>
+            <p className="text-xs text-gray-400 mt-1">Try another search or click Add Regional Presence</p>
           </div>
         ) : (
           filtered.map((country) => (
             <Card
               key={country.id}
-              className={`bg-white border transition-all rounded-xl overflow-hidden flex flex-col justify-between ${
+              className={`bg-white border transition-all rounded-xl overflow-hidden flex flex-col justify-between hover:border-gray-300 ${
                 country.active ? 'border-gray-200/90 shadow-sm hover:shadow-md' : 'border-gray-200/50 opacity-75'
               }`}
             >
@@ -355,15 +186,15 @@ export const AdminCountriesPage: React.FC = () => {
                 {/* Card Top */}
                 <div className="p-5 pb-3 border-b border-gray-100 flex items-start justify-between">
                   <div className="flex items-center gap-3">
-                    <div className="w-11 h-11 rounded-xl bg-emerald-50 border border-emerald-200/80 text-emerald-800 flex items-center justify-center font-black text-sm tracking-wider font-mono shadow-xs">
-                      {country.code.toUpperCase()}
+                    <div className="w-11 h-11 rounded-xl bg-gray-50 border border-gray-200/80 flex items-center justify-center overflow-hidden shadow-xs">
+                      <CountryFlag country={country.code} className="w-6 h-4" />
                     </div>
                     <div>
                       <h3 className="font-bold text-base text-[#2A292D] flex items-center gap-1.5">
                         <span>{country.name}</span>
                       </h3>
                       <div className="text-[11px] text-gray-400 font-mono mt-0.5">
-                        /{country.slug} • {country.currencyCode.toUpperCase()} • {country.officePhone || ''}
+                        /{country.slug} • {country.code.toUpperCase()} • {country.currencyCode.toUpperCase()}
                       </div>
                     </div>
                   </div>
@@ -387,7 +218,7 @@ export const AdminCountriesPage: React.FC = () => {
                       <MapPin className="w-3 h-3 text-[#3BBA93]" />
                       <span>Head Office</span>
                     </span>
-                    <p className="text-gray-700 font-medium leading-relaxed">
+                    <p className="text-gray-700 font-medium leading-relaxed line-clamp-2">
                       {country.officeAddress || 'No regional physical office configured'}
                     </p>
                   </div>
@@ -411,11 +242,18 @@ export const AdminCountriesPage: React.FC = () => {
                   )}
 
                   {/* Designated Country Manager */}
-                  {country.manager && (
+                  {country.manager ? (
                     <div className="flex items-center gap-1.5 p-2 rounded-lg bg-emerald-50/70 border border-emerald-100 text-gray-700">
                       <UserCheck className="w-3.5 h-3.5 text-[#3BBA93] shrink-0" />
                       <span className="text-[11px] truncate">
-                        Manager: <strong className="font-semibold text-[#2A292D]">{country.manager.name}</strong> ({country.manager.email})
+                        Manager: <strong className="font-semibold text-[#2A292D]">{country.manager.name}</strong>
+                      </span>
+                    </div>
+                  ) : (
+                    <div className="flex items-center gap-1.5 p-2 rounded-lg bg-amber-50/70 border border-amber-200/60 text-amber-800">
+                      <Bell className="w-3.5 h-3.5 text-amber-600 shrink-0" />
+                      <span className="text-[11px] truncate">
+                        No manager assigned (Global Admin receives inquiries)
                       </span>
                     </div>
                   )}
@@ -424,11 +262,11 @@ export const AdminCountriesPage: React.FC = () => {
                   <div>
                     <span className="text-[11px] text-gray-500 font-semibold tracking-wide flex items-center gap-1 mb-1.5">
                       <Radio className="w-3 h-3 text-[#3BBA93]" />
-                      <span>Telco & Network Partners</span>
+                      <span>Telco & Carrier Partners</span>
                     </span>
                     <div className="flex flex-wrap gap-1">
                       {Array.isArray(country.telcoPartners) && country.telcoPartners.length > 0 ? (
-                        country.telcoPartners.map((p, idx) => (
+                        country.telcoPartners.slice(0, 3).map((p, idx) => (
                           <span
                             key={idx}
                             className="px-2 py-0.5 rounded-lg bg-gray-100 text-gray-700 text-[10px] font-semibold"
@@ -438,6 +276,11 @@ export const AdminCountriesPage: React.FC = () => {
                         ))
                       ) : (
                         <span className="text-gray-400 italic text-[11px]">Direct Mobile Rails</span>
+                      )}
+                      {Array.isArray(country.telcoPartners) && country.telcoPartners.length > 3 && (
+                        <span className="px-1.5 py-0.5 rounded-lg bg-gray-100 text-gray-500 text-[10px] font-medium">
+                          +{country.telcoPartners.length - 3} more
+                        </span>
                       )}
                     </div>
                   </div>
@@ -450,7 +293,7 @@ export const AdminCountriesPage: React.FC = () => {
                     </span>
                     <div className="flex flex-wrap gap-1">
                       {Array.isArray(country.paymentRails) && country.paymentRails.length > 0 ? (
-                        country.paymentRails.map((r, idx) => (
+                        country.paymentRails.slice(0, 3).map((r, idx) => (
                           <span
                             key={idx}
                             className="px-2 py-0.5 rounded-lg bg-emerald-50 text-emerald-800 text-[10px] font-semibold border border-emerald-100"
@@ -461,59 +304,75 @@ export const AdminCountriesPage: React.FC = () => {
                       ) : (
                         <span className="text-gray-400 italic text-[11px]">Cards & MoMo</span>
                       )}
+                      {Array.isArray(country.paymentRails) && country.paymentRails.length > 3 && (
+                        <span className="px-1.5 py-0.5 rounded-lg bg-emerald-50 text-emerald-700 text-[10px] font-medium">
+                          +{country.paymentRails.length - 3} more
+                        </span>
+                      )}
                     </div>
                   </div>
                 </div>
               </div>
 
               {/* Card Footer Actions */}
-              <div className="p-4 bg-gray-50/80 border-t border-gray-100 flex items-center justify-between">
-                <a
-                  href={`/${country.slug}`}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="inline-flex items-center gap-1 text-[11px] font-bold text-[#3BBA93] hover:text-[#2A292D] transition-colors"
-                >
-                  <span>View Public Page</span>
-                  <ExternalLink className="w-3 h-3" />
-                </a>
+              <div className="p-4 bg-gray-50/80 border-t border-gray-100 flex items-center justify-between gap-2">
+                <div className="flex items-center gap-2">
+                  <a
+                    href={`/${country.slug}`}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="inline-flex items-center gap-1 text-[11px] font-bold text-gray-500 hover:text-[#2A292D] transition-colors"
+                  >
+                    <span>Live Page</span>
+                    <ExternalLink className="w-3 h-3 text-gray-400" />
+                  </a>
 
-                <div className="flex items-center gap-1">
+                  {canEdit('countries') && canManageCountry(country.id) && (
+                    <button
+                      onClick={(e) => handleToggle(country.id, e)}
+                      title={country.active ? 'Disable market' : 'Enable market'}
+                      className="p-1 rounded-md hover:bg-gray-200/70 text-gray-500 transition-colors"
+                    >
+                      {country.active ? (
+                        <ToggleRight className="w-5 h-5 text-[#3BBA93]" />
+                      ) : (
+                        <ToggleLeft className="w-5 h-5 text-gray-300" />
+                      )}
+                    </button>
+                  )}
+                </div>
+
+                <div className="flex items-center gap-1.5">
                   {canEdit('countries') && canManageCountry(country.id) ? (
                     <>
-                      <button
-                        onClick={() => handleToggle(country.id)}
-                        title={country.active ? 'Disable' : 'Enable'}
-                        className="p-1.5 rounded-lg hover:bg-gray-200/70 text-gray-500 transition-colors"
+                      <Link
+                        to={`/admin/content/countries/${country.id}`}
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#2A292D] hover:bg-black text-white font-semibold text-xs transition-all shadow-xs"
                       >
-                        {country.active ? (
-                          <ToggleRight className="w-5 h-5 text-[#3BBA93]" />
-                        ) : (
-                          <ToggleLeft className="w-5 h-5 text-gray-300" />
-                        )}
-                      </button>
-                      <button
-                        onClick={() => handleOpenEdit(country)}
-                        title="Edit Country"
-                        className="p-1.5 rounded-lg hover:bg-gray-200/70 text-gray-600 transition-colors"
-                      >
-                        <Edit2 className="w-3.5 h-3.5" />
-                      </button>
+                        <Settings className="w-3.5 h-3.5 text-[#3BBA93]" />
+                        <span>Details & Preferences</span>
+                        <ChevronRight className="w-3.5 h-3.5 text-gray-400" />
+                      </Link>
+
                       {isSuperAdmin && (
                         <button
-                          onClick={() => handleDelete(country.id, country.name)}
+                          onClick={(e) => handleDelete(country.id, country.name, e)}
                           title="Delete Country"
-                          className="p-1.5 rounded-lg hover:bg-red-50 text-gray-400 hover:text-red-600 transition-colors"
+                          className="p-1.5 rounded-xl hover:bg-red-50 text-gray-400 hover:text-red-600 transition-colors"
                         >
                           <Trash2 className="w-3.5 h-3.5" />
                         </button>
                       )}
                     </>
                   ) : (
-                    <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-gray-400 bg-gray-100 px-2 py-1 rounded-md">
+                    <Link
+                      to={`/admin/content/countries/${country.id}`}
+                      className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-600 font-medium text-xs transition-colors"
+                    >
                       <Lock className="w-3 h-3 text-gray-400" />
-                      <span>Read-only</span>
-                    </span>
+                      <span>View Details</span>
+                      <ChevronRight className="w-3 h-3 text-gray-400" />
+                    </Link>
                   )}
                 </div>
               </div>
@@ -521,270 +380,6 @@ export const AdminCountriesPage: React.FC = () => {
           ))
         )}
       </div>
-
-      {/* Modal: Create or Edit Country */}
-      <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-        <DialogContent className="max-w-xl max-h-[90vh] overflow-y-auto p-0 rounded-xl border border-gray-100">
-          <div className="p-5 bg-[#2A292D] text-white">
-            <span className="text-xs font-semibold tracking-wider text-[#3BBA93]">
-              {editingCountry ? 'Edit African Market' : 'Add New Market'}
-            </span>
-            <DialogTitle className="text-lg font-bold text-white mt-1">
-              {editingCountry ? editingCountry.name : 'Configure African Country'}
-            </DialogTitle>
-            <DialogDescription className="text-xs text-gray-400 mt-0.5">
-              Configure market regional office, currency, telco rails, and map embeddings.
-            </DialogDescription>
-          </div>
-
-          <form onSubmit={handleSave} className="p-6 space-y-4 text-xs">
-            <div className="grid grid-cols-2 gap-3">
-              <div>
-                <label className="block text-xs font-bold text-gray-700 mb-1">Country Name *</label>
-                <input
-                  type="text"
-                  required
-                  value={form.name}
-                  onChange={(e) => handleNameChange(e.target.value)}
-                  placeholder="e.g. Uganda"
-                  className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#3BBA93] focus:bg-white text-[#2A292D]"
-                />
-              </div>
-              <div>
-                <label className="block text-xs font-bold text-gray-700 mb-1">URL Slug *</label>
-                <input
-                  type="text"
-                  required
-                  value={form.slug}
-                  onChange={(e) => setForm({ ...form, slug: e.target.value })}
-                  placeholder="e.g. uganda"
-                  className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-xl font-mono text-xs focus:ring-2 focus:ring-[#3BBA93] focus:bg-white text-[#2A292D]"
-                />
-              </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-3">
-              <div>
-                <label className="block text-xs font-bold text-gray-700 mb-1">ISO Code (2-4 letters) *</label>
-                <input
-                  type="text"
-                  required
-                  maxLength={4}
-                  value={form.code}
-                  onChange={(e) => setForm({ ...form, code: e.target.value.toUpperCase() })}
-                  placeholder="UG"
-                  className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-xl font-bold text-center text-[#2A292D]"
-                />
-              </div>
-              <div>
-                <label className="block text-xs font-bold text-gray-700 mb-1">Currency Code *</label>
-                <input
-                  type="text"
-                  required
-                  maxLength={4}
-                  value={form.currencyCode}
-                  onChange={(e) => setForm({ ...form, currencyCode: e.target.value.toUpperCase() })}
-                  placeholder="UGX"
-                  className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-xl font-bold text-center text-[#2A292D]"
-                />
-              </div>
-            </div>
-
-            <div>
-              <label className="block text-xs font-bold text-gray-700 mb-1">Regional Office Address</label>
-              <input
-                type="text"
-                value={form.officeAddress}
-                onChange={(e) => setForm({ ...form, officeAddress: e.target.value })}
-                placeholder="e.g. Plot 14, Jinja Road, Kampala, Uganda"
-                className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#3BBA93] focus:bg-white text-[#2A292D]"
-              />
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <div>
-                <label className="block text-xs font-bold text-gray-700 mb-1">Office Contact Phone</label>
-                <input
-                  type="text"
-                  value={form.officePhone}
-                  onChange={(e) => setForm({ ...form, officePhone: e.target.value })}
-                  placeholder="+256 700 000 000"
-                  className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#3BBA93] focus:bg-white text-[#2A292D]"
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-bold text-gray-700 mb-1">Office Support Email</label>
-                <input
-                  type="email"
-                  value={form.officeEmail}
-                  onChange={(e) => setForm({ ...form, officeEmail: e.target.value })}
-                  placeholder="e.g. rwanda@avadapay.com"
-                  className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#3BBA93] focus:bg-white text-[#2A292D]"
-                />
-              </div>
-            </div>
-
-            {isSuperAdmin && (
-              <div>
-                <label className="block text-xs font-bold text-gray-700 mb-1">
-                  Designated Country Manager / CEO
-                </label>
-                <select
-                  value={form.managerId}
-                  onChange={(e) => setForm({ ...form, managerId: e.target.value })}
-                  className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#3BBA93] focus:bg-white text-[#2A292D]"
-                >
-                  <option value="">-- No Designated Manager --</option>
-                  {users.map((u) => (
-                    <option key={u.id} value={u.id}>
-                      {u.name} ({u.email})
-                    </option>
-                  ))}
-                </select>
-                <span className="text-[10px] text-gray-400 mt-1 block">
-                  The designated manager will receive incoming inquiries and have exclusive editing rights for this country.
-                </span>
-              </div>
-            )}
-
-            {/* Google Maps Location & Instant Live Preview */}
-            <div className="space-y-2 pt-1">
-              <div className="flex items-center justify-between">
-                <label className="block text-xs font-bold text-gray-700">
-                  Office Location Map
-                </label>
-                {form.officeAddress && (
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setForm((prev) => ({
-                        ...prev,
-                        mapEmbedUrl: prev.officeAddress,
-                      }));
-                    }}
-                    className="inline-flex items-center gap-1 text-[11px] font-bold text-[#3BBA93] hover:text-[#2d9676] transition-colors"
-                  >
-                    <Sparkles className="w-3 h-3" />
-                    <span>Auto-fill from Address</span>
-                  </button>
-                )}
-              </div>
-              <input
-                type="text"
-                value={form.mapEmbedUrl}
-                onChange={(e) => {
-                  const val = e.target.value;
-                  // If user pasted an iframe snippet, automatically extract src
-                  if (val.includes('<iframe') && val.includes('src=')) {
-                    const match = val.match(/src=["']([^"']+)["']/i);
-                    setForm({ ...form, mapEmbedUrl: match ? match[1] : val });
-                  } else {
-                    setForm({ ...form, mapEmbedUrl: val });
-                  }
-                }}
-                placeholder="Enter building, street address, Google Maps link, or iframe..."
-                className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-xl font-mono text-[11px] focus:ring-2 focus:ring-[#3BBA93] focus:bg-white text-[#2A292D]"
-              />
-              <span className="text-[10px] text-gray-500 block leading-tight">
-                💡 <strong>Quick Location:</strong> You can type any building or street name (e.g. <em>&quot;Kigali Heights, Kigali&quot;</em>), paste a Google Maps link, or click <strong>Auto-fill from Address</strong>. No need to extract iframe code!
-              </span>
-
-              {/* Real-time Interactive Map Preview */}
-              {previewMapUrl ? (
-                <div className="mt-2 space-y-1">
-                  <div className="w-full h-44 rounded-xl overflow-hidden border border-gray-200 bg-gray-100 shadow-inner">
-                    <iframe
-                      title="Office Map Live Preview"
-                      src={previewMapUrl}
-                      className="w-full h-full border-0"
-                      loading="lazy"
-                    />
-                  </div>
-                  <div className="flex justify-between items-center text-[10px] text-gray-500 px-1 pt-0.5">
-                    <span className="text-emerald-600 font-semibold flex items-center gap-1">
-                      ✓ Interactive Map Preview active
-                    </span>
-                    <a
-                      href={getMapExternalLink(previewMapUrl)}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="hover:underline text-[#3BBA93] font-semibold flex items-center gap-0.5"
-                    >
-                      <span>Open in Google Maps</span>
-                      <ExternalLink className="w-2.5 h-2.5" />
-                    </a>
-                  </div>
-                </div>
-              ) : (
-                <div className="w-full py-4 px-3 rounded-xl bg-gray-50 border border-dashed border-gray-200 text-center text-[11px] text-gray-400">
-                  Enter an address or location above to see a live map preview here.
-                </div>
-              )}
-            </div>
-
-            <div>
-              <label className="block text-xs font-bold text-gray-700 mb-1">
-                Telco & Mobile Money Partners (comma-separated)
-              </label>
-              <input
-                type="text"
-                value={form.telcoPartners}
-                onChange={(e) => setForm({ ...form, telcoPartners: e.target.value })}
-                placeholder="MTN Mobile Money, Airtel Money"
-                className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#3BBA93] focus:bg-white text-[#2A292D]"
-              />
-            </div>
-
-            <div>
-              <label className="block text-xs font-bold text-gray-700 mb-1">
-                Supported Payment Rails (comma-separated)
-              </label>
-              <input
-                type="text"
-                value={form.paymentRails}
-                onChange={(e) => setForm({ ...form, paymentRails: e.target.value })}
-                placeholder="Mobile Money, Visa, Mastercard, Automated Bank Payouts"
-                className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#3BBA93] focus:bg-white text-[#2A292D]"
-              />
-            </div>
-
-            <div className="pt-2">
-              <label className="inline-flex items-center gap-2 cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={form.active}
-                  onChange={(e) => setForm({ ...form, active: e.target.checked })}
-                  className="rounded text-[#3BBA93] focus:ring-[#3BBA93] w-4 h-4"
-                />
-                <span className="text-xs font-bold text-gray-700">
-                  Publish country to Live Website (Navbar, Contact, and Hub)
-                </span>
-              </label>
-            </div>
-
-            <div className="pt-4 flex items-center justify-end gap-2 border-t border-gray-100">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => setIsModalOpen(false)}
-                className="rounded-xl border-gray-200 text-xs font-bold"
-              >
-                Cancel
-              </Button>
-              <Button
-                type="submit"
-                disabled={saving}
-                variant="gradient"
-                className="rounded-xl text-xs font-bold space-x-1.5"
-              >
-                <Save className="w-3.5 h-3.5" />
-                <span>{saving ? 'Saving...' : 'Save Market'}</span>
-              </Button>
-            </div>
-          </form>
-        </DialogContent>
-      </Dialog>
     </div>
   );
 };

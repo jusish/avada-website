@@ -15,6 +15,7 @@ import { OptimizedImage } from '@/components/ui/OptimizedImage';
 import { SEO } from '@/components/seo/SEO';
 import { useSiteConfig } from '@/context/SiteConfigContext';
 import { resolveMapEmbedUrl } from '@/lib/maps';
+import { GeoDetectionBanner } from '@/components/GeoDetectionBanner';
 
 /* ------------------------------------------------------------------ */
 /* Hero Visual Component                                               */
@@ -25,7 +26,7 @@ const RwandaHeroVisual: React.FC = () => (
     <div className="flex items-center justify-between border-b border-white/10 pb-4">
       <div className="flex items-center space-x-2.5">
         <CountryFlag country="rwanda" className="w-6 h-4" />
-        <span className="text-sm font-bold tracking-wide">Rwanda Gateway</span>
+        <span className="text-sm font-bold tracking-wide">Rwanda</span>
       </div>
       <span className="inline-flex items-center gap-1.5 text-[11px] font-semibold text-[#3BBA93] bg-[#3BBA93]/15 px-2.5 py-0.5 rounded-full">
         <span className="w-1.5 h-1.5 rounded-full bg-[#3BBA93] animate-pulse" />
@@ -187,6 +188,7 @@ export const RwandaPage: React.FC = () => {
 
   return (
     <div className="bg-white text-[#2A292D] font-sans overflow-x-hidden">
+      <GeoDetectionBanner countryName="Rwanda" />
       <SEO
         title="Avadapay Rwanda | National Payments & Mobile Money Gateway"
         description="Accept MTN Mobile Money, Airtel Money, and card payments in Rwanda with Avadapay. Local presence at BHC Building, Kacyiru, Kigali with bank-grade reconciliation."
@@ -224,11 +226,6 @@ export const RwandaPage: React.FC = () => {
               <Button asChild className="h-[3.1rem] px-7 rounded-md bg-[#3BBA93] hover:bg-[#32a481] text-white text-base font-bold shadow-none">
                 <Link to="/contact?country=Rwanda">
                   Contact Us
-                </Link>
-              </Button>
-              <Button asChild className="h-[3.1rem] px-7 rounded-md bg-transparent border border-[#3BBA93] text-[#3BBA93] hover:bg-[#3BBA93]/10 text-base font-bold shadow-none">
-                <Link to="/contact?country=Rwanda&inquiry=pricing">
-                  Get Rwanda Pricing
                 </Link>
               </Button>
             </div>

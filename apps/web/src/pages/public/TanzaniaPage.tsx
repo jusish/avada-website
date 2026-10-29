@@ -15,6 +15,7 @@ import { OptimizedImage } from '@/components/ui/OptimizedImage';
 import { SEO } from '@/components/seo/SEO';
 import { useSiteConfig } from '@/context/SiteConfigContext';
 import { resolveMapEmbedUrl } from '@/lib/maps';
+import { GeoDetectionBanner } from '@/components/GeoDetectionBanner';
 
 /* ------------------------------------------------------------------ */
 /* Hero Visual Component                                               */
@@ -25,12 +26,8 @@ const TanzaniaHeroVisual: React.FC = () => (
     <div className="flex items-center justify-between border-b border-white/10 pb-4">
       <div className="flex items-center space-x-2.5">
         <CountryFlag country="tanzania" className="w-6 h-4" />
-        <span className="text-sm font-bold tracking-wide">Tanzania Aggregator</span>
+        <span className="text-sm font-bold tracking-wide">Tanzania</span>
       </div>
-      <span className="inline-flex items-center gap-1.5 text-[11px] font-semibold text-[#3BBA93] bg-[#3BBA93]/15 px-2.5 py-0.5 rounded-full">
-        <span className="w-1.5 h-1.5 rounded-full bg-[#3BBA93] animate-pulse" />
-        BOT & TCRA Live
-      </span>
     </div>
 
     {/* Live Stream Simulation */}
@@ -169,6 +166,7 @@ export const TanzaniaPage: React.FC = () => {
 
   return (
     <div className="bg-white text-[#2A292D] font-sans overflow-x-hidden">
+      <GeoDetectionBanner countryName="Tanzania" />
       <SEO
         title="Avadapay Tanzania | M-Pesa, Tigo Pesa, Airtel Money & Halopesa"
         description="Unified mobile money and card payment gateway for Tanzanian businesses. Direct collections via M-Pesa, Tigo Pesa, Airtel Money, and Halopesa with local office in Dar es Salaam."
@@ -244,11 +242,6 @@ export const TanzaniaPage: React.FC = () => {
               <Button asChild className="h-[3.1rem] px-7 rounded-md bg-[#3BBA93] hover:bg-[#32a481] text-white text-base font-bold shadow-none">
                 <Link to="/contact?country=Tanzania">
                   {language === 'sw' ? 'Wasiliana Nasi' : 'Contact Us'}
-                </Link>
-              </Button>
-              <Button asChild className="h-[3.1rem] px-7 rounded-md bg-transparent border border-[#3BBA93] text-[#3BBA93] hover:bg-[#3BBA93]/10 text-base font-bold shadow-none">
-                <Link to="/contact?country=Tanzania&inquiry=pricing">
-                  {language === 'sw' ? 'Bei za Tanzania' : 'Get Tanzania Pricing'}
                 </Link>
               </Button>
             </div>
