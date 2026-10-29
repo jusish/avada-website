@@ -19,7 +19,6 @@ import { OptimizedImage } from '@/components/ui/OptimizedImage';
 import { SEO } from '@/components/seo/SEO';
 import { useSiteConfig } from '@/context/SiteConfigContext';
 import { resolveMapEmbedUrl } from '@/lib/maps';
-import { GeoDetectionBanner } from '@/components/GeoDetectionBanner';
 
 /* ------------------------------------------------------------------ */
 /* Accordion component                                                 */
@@ -199,7 +198,6 @@ export const KenyaPage: React.FC = () => {
 
   return (
     <div className="bg-white text-[#2A292D] font-sans overflow-x-hidden">
-      <GeoDetectionBanner countryName="Kenya" />
       <SEO
         title="Avadapay Kenya | M-Pesa, Card Payments & Carrier Bulk SMS"
         description="Accept M-Pesa, Airtel Money, and card payments in Kenya with Avadapay. Send instant payouts to agents, automate bulk SMS, and scale your Kenyan business."

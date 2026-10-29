@@ -15,7 +15,6 @@ import { OptimizedImage } from '@/components/ui/OptimizedImage';
 import { SEO } from '@/components/seo/SEO';
 import { useSiteConfig } from '@/context/SiteConfigContext';
 import { resolveMapEmbedUrl } from '@/lib/maps';
-import { GeoDetectionBanner } from '@/components/GeoDetectionBanner';
 
 /* ------------------------------------------------------------------ */
 /* Hero Visual Component                                               */
@@ -166,7 +165,6 @@ export const TanzaniaPage: React.FC = () => {
 
   return (
     <div className="bg-white text-[#2A292D] font-sans overflow-x-hidden">
-      <GeoDetectionBanner countryName="Tanzania" />
       <SEO
         title="Avadapay Tanzania | M-Pesa, Tigo Pesa, Airtel Money & Halopesa"
         description="Unified mobile money and card payment gateway for Tanzanian businesses. Direct collections via M-Pesa, Tigo Pesa, Airtel Money, and Halopesa with local office in Dar es Salaam."

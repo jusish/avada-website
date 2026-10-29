@@ -142,6 +142,7 @@ router.get('/policies/:slug', async (req: Request, res: Response): Promise<void>
 
 // GET /api/public/detect-country
 // Detects visitor country based on reverse proxy headers (Cloudflare, Vercel, Nginx)
+// and verifies if it is among currently enabled/active markets in the database.
 router.get('/detect-country', async (req: Request, res: Response): Promise<void> => {
   try {
     const rawCountry =
@@ -152,18 +153,51 @@ router.get('/detect-country', async (req: Request, res: Response): Promise<void>
 
     const normalizedCode = rawCountry.trim().toUpperCase();
 
-    const countryMap: Record<string, { code: string; slug: string; name: string; externalUrl?: string }> = {
-      KE: { code: 'KE', slug: 'kenya', name: 'Kenya' },
-      TZ: { code: 'TZ', slug: 'tanzania', name: 'Tanzania' },
-      RW: { code: 'RW', slug: 'rwanda', name: 'Rwanda' },
-      CD: { code: 'CD', slug: 'drc', name: 'DRC', externalUrl: 'https://avadapay.cd' },
-    };
+    if (!normalizedCode) {
+      res.json({ success: true, data: null });
+      return;
+    }
 
-    const match = countryMap[normalizedCode] || null;
+    // Special handling for DRC external portal
+    if (normalizedCode === 'CD') {
+      res.json({
+        success: true,
+        data: { code: 'CD', slug: 'drc', name: 'DRC', externalUrl: 'https://avadapay.cd' },
+      });
+      return;
+    }
+
+    // Query database to ensure country exists AND is an active market
+    const matchingCountry = await prisma.country.findFirst({
+      where: {
+        code: { equals: normalizedCode.toLowerCase(), mode: 'insensitive' },
+        active: true,
+      },
+      select: {
+        code: true,
+        slug: true,
+        name: true,
+        active: true,
+      },
+    });
+
+    // If the detected country is not among enabled countries, return null
+    // so the visitor is kept on the global website by default
+    if (!matchingCountry) {
+      res.json({
+        success: true,
+        data: null,
+      });
+      return;
+    }
 
     res.json({
       success: true,
-      data: match,
+      data: {
+        code: matchingCountry.code.toUpperCase(),
+        slug: matchingCountry.slug,
+        name: matchingCountry.name,
+      },
     });
   } catch (err) {
     console.error('Detect country error:', err);

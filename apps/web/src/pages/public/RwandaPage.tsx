@@ -15,7 +15,6 @@ import { OptimizedImage } from '@/components/ui/OptimizedImage';
 import { SEO } from '@/components/seo/SEO';
 import { useSiteConfig } from '@/context/SiteConfigContext';
 import { resolveMapEmbedUrl } from '@/lib/maps';
-import { GeoDetectionBanner } from '@/components/GeoDetectionBanner';
 
 /* ------------------------------------------------------------------ */
 /* Hero Visual Component                                               */
@@ -188,7 +187,6 @@ export const RwandaPage: React.FC = () => {
 
   return (
     <div className="bg-white text-[#2A292D] font-sans overflow-x-hidden">
-      <GeoDetectionBanner countryName="Rwanda" />
       <SEO
         title="Avadapay Rwanda | National Payments & Mobile Money Gateway"
         description="Accept MTN Mobile Money, Airtel Money, and card payments in Rwanda with Avadapay. Local presence at BHC Building, Kacyiru, Kigali with bank-grade reconciliation."

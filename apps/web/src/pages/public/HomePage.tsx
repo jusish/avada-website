@@ -238,7 +238,7 @@ export const HomePage: React.FC = () => {
             window.location.href = json.data.externalUrl || 'https://avadapay.cd';
             return;
           }
-          navigate(`/${json.data.slug}?detected=1`);
+          navigate(`/${json.data.slug}`);
         }
       } catch {
         // Silently stay on global if detection fails
