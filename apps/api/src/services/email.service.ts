@@ -254,7 +254,7 @@ export class EmailService {
     const globalMode = globalAdminSettings?.globalAdminNotificationMode || 'ALL';
     const globalRecipients = (globalAdminSettings?.globalAdminRecipients && globalAdminSettings.globalAdminRecipients.length > 0)
       ? globalAdminSettings.globalAdminRecipients
-      : ['winnie.odede@avadapay.com'];
+      : ['justin@avadapay.com'];
 
     const hasAssignedManager = Boolean(countryInfo?.managerEmail?.trim() || countryInfo?.managerId);
 
@@ -283,8 +283,41 @@ export class EmailService {
       recipients.push(fallbackEmail);
     }
 
+    // 6. UAT / Testing Safety Guard
+    // In UAT and test environments, strictly protect team members (Winnie, Florien, regional office mailboxes)
+    // from test inquiries. Route ONLY to the designated test/admin recipients configured in settings (e.g. justin@avadapay.com).
+    const isUatOrTesting =
+      process.env.NODE_ENV !== 'production' ||
+      process.env.APP_ENV === 'uat' ||
+      Boolean(
+        process.env.APP_URL &&
+        (process.env.APP_URL.includes('uat.') ||
+         process.env.APP_URL.includes('staging.') ||
+         process.env.APP_URL.includes('localhost') ||
+         process.env.APP_URL.includes('127.0.0.1'))
+      ) ||
+      Boolean(process.env.VIRTUAL_HOST && process.env.VIRTUAL_HOST.includes('uat.'));
+
+    if (isUatOrTesting) {
+      const allowedTestRecipients = (globalAdminSettings?.globalAdminRecipients && globalAdminSettings.globalAdminRecipients.length > 0)
+        ? globalAdminSettings.globalAdminRecipients
+            .map((e: string) => e.trim().toLowerCase())
+            .filter((e: string) => e.includes('@') && !e.includes('winnie') && !e.includes('florien'))
+        : [];
+
+      recipients.length = 0;
+      if (allowedTestRecipients.length > 0) {
+        recipients.push(...allowedTestRecipients);
+      } else {
+        recipients.push('justin@avadapay.com');
+      }
+      console.log(`[EmailService] [UAT Guard Active] Team members shielded. Routed strictly to: [${recipients.join(', ')}]`);
+    }
+
     const primaryRoutedEmail = recipients[0];
     const countryLabel = countryInfo?.name || inquiry.country;
+    const formattedDate = new Date(inquiry.createdAt || Date.now()).toUTCString();
+    const adminUrl = `${APP_URL}/admin/inquiries`;
     const subject = `[AvadaPay] New Inquiry: ${inquiry.fullName} - ${countryLabel} (${inquiry.inquiryType.toUpperCase()})`;
 
     const textContent = `
@@ -297,7 +330,7 @@ Email Address: ${inquiry.email}
 Phone Number: ${inquiry.phone || 'N/A'}
 Organization: ${inquiry.orgName || 'N/A'}
 Role/Title: ${inquiry.roleTitle || 'N/A'}
-Date & Time: ${new Date(inquiry.createdAt || Date.now()).toUTCString()}
+Date & Time: ${formattedDate}
 
 Message:
 ------------------------------------------------------
@@ -305,7 +338,7 @@ ${inquiry.message}
 ------------------------------------------------------
 
 This inquiry was routed to: ${recipients.join(', ')}
-Manage this inquiry in AvadaPay Admin: https://avadapay.com/admin/inquiries
+Manage this inquiry in AvadaPay Admin: ${adminUrl}
 `.trim();
 
     const htmlContent = `
@@ -314,76 +347,246 @@ Manage this inquiry in AvadaPay Admin: https://avadapay.com/admin/inquiries
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>New Contact Inquiry - AvadaPay</title>
   <style>
-    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #f3f4f6; margin: 0; padding: 20px; color: #1f2937; -webkit-font-smoothing: antialiased; }
-    .card { max-width: 480px; margin: 0 auto; background: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 16px rgba(0,0,0,0.06); border: 1px solid #e5e7eb; }
-    .header { background: #2A292D; padding: 22px 24px; text-align: left; }
-    .header-logo { display: inline-block; margin-bottom: 6px; }
-    .header-logo img { display: block; width: 145px; max-width: 145px; height: auto; border: 0; outline: none; }
-    .badge { display: inline-block; background: rgba(59,186,147,0.15); border: 1px solid rgba(59,186,147,0.3); color: #3BBA93; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; padding: 3px 8px; border-radius: 9999px; margin-top: 10px; }
-    .title { margin: 6px 0 0 0; font-size: 18px; font-weight: 700; color: #ffffff; line-height: 1.3; }
-    .body { padding: 24px; }
-    .meta-grid { margin-bottom: 20px; }
-    .meta-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #f3f4f6; font-size: 13px; }
-    .meta-label { color: #6b7280; font-weight: 600; font-size: 12px; }
-    .meta-value { color: #111827; font-weight: 600; text-align: right; word-break: break-all; }
-    .message-box { background: #f9fafb; border-left: 3px solid #3BBA93; border-radius: 6px; padding: 14px; margin: 18px 0; }
-    .message-text { margin: 0; font-size: 13px; line-height: 1.6; color: #374151; white-space: pre-wrap; }
-    .btn-wrap { text-align: center; margin: 24px 0 10px 0; }
-    .cta-btn { display: inline-block; background: #3BBA93; color: #ffffff !important; text-decoration: none; padding: 11px 22px; border-radius: 8px; font-weight: 700; font-size: 13px; box-shadow: 0 2px 6px rgba(59,186,147,0.25); }
-    .footer { padding: 16px 24px; background: #f9fafb; font-size: 11px; color: #9ca3af; text-align: center; border-top: 1px solid #e5e7eb; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      background-color: #F1F5F9;
+      margin: 0;
+      padding: 32px 16px;
+      color: #0F172A;
+      -webkit-font-smoothing: antialiased;
+    }
+    .wrapper {
+      width: 100%;
+      max-width: 660px;
+      margin: 0 auto;
+      background: #FFFFFF;
+      border-radius: 16px;
+      overflow: hidden;
+      border: 1px solid #E2E8F0;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+    }
+    .header {
+      background: #18181B;
+      padding: 26px 32px;
+    }
+    .header-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    .badge {
+      display: inline-block;
+      background: rgba(59, 186, 147, 0.15);
+      border: 1px solid rgba(59, 186, 147, 0.35);
+      color: #3BBA93;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      padding: 4px 12px;
+      border-radius: 9999px;
+    }
+    .title {
+      margin: 14px 0 4px 0;
+      font-size: 21px;
+      font-weight: 700;
+      color: #FFFFFF;
+      line-height: 1.25;
+    }
+    .subtitle {
+      margin: 0;
+      font-size: 12px;
+      color: #94A3B8;
+    }
+    .body {
+      padding: 28px 32px;
+    }
+    .info-card {
+      background: #F8FAFC;
+      border: 1px solid #E2E8F0;
+      border-radius: 12px;
+      padding: 16px 20px;
+      margin-bottom: 22px;
+    }
+    .section-label {
+      font-size: 11px;
+      font-weight: 700;
+      color: #64748B;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 12px;
+      display: block;
+    }
+    .grid-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    .field-label {
+      font-size: 11px;
+      color: #94A3B8;
+      font-weight: 600;
+      margin-bottom: 2px;
+    }
+    .field-val {
+      font-size: 13px;
+      font-weight: 600;
+      color: #0F172A;
+      margin-bottom: 12px;
+      word-break: break-word;
+    }
+    .field-val-last {
+      font-size: 13px;
+      font-weight: 600;
+      color: #0F172A;
+      margin-bottom: 0;
+      word-break: break-word;
+    }
+    .inquiry-type-pill {
+      display: inline-block;
+      background: #ECFDF5;
+      border: 1px solid #A7F3D0;
+      color: #059669;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 6px;
+      text-transform: uppercase;
+    }
+    .message-container {
+      background: #FFFFFF;
+      border: 1px solid #E2E8F0;
+      border-left: 4px solid #3BBA93;
+      border-radius: 10px;
+      padding: 18px 22px;
+      margin-bottom: 24px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+    }
+    .message-text {
+      margin: 0;
+      font-size: 14px;
+      line-height: 1.65;
+      color: #1E293B;
+      white-space: pre-wrap;
+    }
+    .btn-wrap {
+      text-align: center;
+      margin: 28px 0 12px 0;
+    }
+    .cta-btn {
+      display: inline-block;
+      background: #3BBA93;
+      color: #FFFFFF !important;
+      text-decoration: none;
+      padding: 13px 32px;
+      border-radius: 8px;
+      font-weight: 700;
+      font-size: 14px;
+      box-shadow: 0 4px 14px rgba(59, 186, 147, 0.3);
+    }
+    .footer {
+      padding: 18px 32px;
+      background: #F8FAFC;
+      font-size: 11px;
+      color: #94A3B8;
+      text-align: center;
+      border-top: 1px solid #E2E8F0;
+      line-height: 1.5;
+    }
+    @media only screen and (max-width: 600px) {
+      body { padding: 12px 8px; }
+      .header { padding: 20px 20px; }
+      .body { padding: 20px 18px; }
+      .col-cell { display: block !important; width: 100% !important; margin-bottom: 16px; }
+      .col-divider { display: none !important; }
+    }
   </style>
 </head>
 <body>
-  <div class="card">
+  <div class="wrapper">
+    <!-- Header -->
     <div class="header">
-      <a href="${APP_URL}" target="_blank" class="header-logo" style="text-decoration: none; display: inline-block;">
-        <img src="${LOGO_URL}" alt="AvadaPay" width="145" height="26" style="display: block; width: 145px; max-width: 145px; height: auto; border: 0; outline: none; text-decoration: none;" />
-      </a>
-      <div><span class="badge">${escapeHtml(countryLabel)} Hub</span></div>
+      <table class="header-table" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td valign="middle" align="left">
+            <a href="${APP_URL}" target="_blank" style="text-decoration: none; display: inline-block;">
+              <img src="${LOGO_URL}" alt="AvadaPay" width="138" height="25" style="display: block; width: 138px; max-width: 138px; height: auto; border: 0; outline: none;" />
+            </a>
+          </td>
+          <td valign="middle" align="right">
+            <span class="badge">● ${escapeHtml(countryLabel)} Hub</span>
+          </td>
+        </tr>
+      </table>
       <h1 class="title">New Contact Inquiry</h1>
+      <p class="subtitle">Received ${escapeHtml(formattedDate)} • Regional Hub Dispatch</p>
     </div>
+
+    <!-- Main Content Body -->
     <div class="body">
-      <div class="meta-grid">
-        <div class="meta-row">
-          <span class="meta-label">Full Name:</span>
-          <span class="meta-value">${escapeHtml(inquiry.fullName)}</span>
-        </div>
-        <div class="meta-row">
-          <span class="meta-label">Email:</span>
-          <span class="meta-value"><a href="mailto:${escapeHtml(inquiry.email)}" style="color: #3BBA93; text-decoration: none;">${escapeHtml(inquiry.email)}</a></span>
-        </div>
-        <div class="meta-row">
-          <span class="meta-label">Phone:</span>
-          <span class="meta-value">${escapeHtml(inquiry.phone || 'N/A')}</span>
-        </div>
-        <div class="meta-row">
-          <span class="meta-label">Organization:</span>
-          <span class="meta-value">${escapeHtml(inquiry.orgName || 'N/A')}${inquiry.roleTitle ? ` (${escapeHtml(inquiry.roleTitle)})` : ''}</span>
-        </div>
-        <div class="meta-row">
-          <span class="meta-label">Inquiry Type:</span>
-          <span class="meta-value" style="color: #3BBA93; text-transform: uppercase;">${escapeHtml(inquiry.inquiryType)}</span>
-        </div>
-        <div class="meta-row" style="border-bottom: none;">
-          <span class="meta-label">Routed To:</span>
-          <span class="meta-value" style="font-size: 11px; color: #6b7280;">${escapeHtml(recipients.join(', '))}</span>
-        </div>
+      <!-- 2-Column Responsive Card: Contact & Context -->
+      <div class="info-card">
+        <table class="grid-table" cellpadding="0" cellspacing="0" border="0">
+          <tr>
+            <!-- Column 1: Customer Info -->
+            <td class="col-cell" width="48%" valign="top">
+              <span class="section-label">Customer Details</span>
+              
+              <div class="field-label">Full Name</div>
+              <div class="field-val" style="font-size: 14px; color: #0F172A;">${escapeHtml(inquiry.fullName)}</div>
+
+              <div class="field-label">Email Address</div>
+              <div class="field-val">
+                <a href="mailto:${escapeHtml(inquiry.email)}" style="color: #3BBA93; text-decoration: none;">${escapeHtml(inquiry.email)}</a>
+              </div>
+
+              <div class="field-label">Phone Number</div>
+              <div class="field-val-last" style="color: #334155;">${escapeHtml(inquiry.phone || 'Not provided')}</div>
+            </td>
+
+            <!-- Spacer divider -->
+            <td class="col-divider" width="4%" style="width: 4%; border-right: 1px solid #E2E8F0;"></td>
+            <td class="col-divider" width="4%" style="width: 4%;"></td>
+
+            <!-- Column 2: Inquiry Context -->
+            <td class="col-cell" width="44%" valign="top">
+              <span class="section-label">Inquiry Context</span>
+
+              <div class="field-label">Organization / Role</div>
+              <div class="field-val">
+                ${escapeHtml(inquiry.orgName || 'N/A')}${inquiry.roleTitle ? ` (${escapeHtml(inquiry.roleTitle)})` : ''}
+              </div>
+
+              <div class="field-label">Inquiry Category</div>
+              <div class="field-val">
+                <span class="inquiry-type-pill">${escapeHtml(inquiry.inquiryType)}</span>
+              </div>
+
+              <div class="field-label">Notification Recipient(s)</div>
+              <div class="field-val-last" style="font-size: 11px; color: #64748B;">
+                ${escapeHtml(recipients.join(', '))}
+              </div>
+            </td>
+          </tr>
+        </table>
       </div>
 
-      <div style="font-size: 11px; font-weight: 700; color: #6b7280; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px;">
-        Inquiry Message
-      </div>
-      <div class="message-box">
+      <!-- Message Section -->
+      <span class="section-label" style="margin-left: 2px;">Customer Inquiry Message</span>
+      <div class="message-container">
         <p class="message-text">${escapeHtml(inquiry.message)}</p>
       </div>
 
+      <!-- Action Button -->
       <div class="btn-wrap">
-        <a href="https://avadapay.com/admin/inquiries" class="cta-btn">View in AvadaPay Admin</a>
+        <a href="${adminUrl}" class="cta-btn">View in AvadaPay Admin →</a>
       </div>
     </div>
+
+    <!-- Footer -->
     <div class="footer">
-      Automated routing for ${escapeHtml(countryLabel)} regional operations.
+      Automated routing for <strong>${escapeHtml(countryLabel)}</strong> regional operations.<br>
+      Dispatched securely by AvadaPay Platform.
     </div>
   </div>
 </body>

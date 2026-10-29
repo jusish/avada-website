@@ -253,13 +253,13 @@ export const TanzaniaPage: React.FC = () => {
       </section>
 
       {/* 2 — ONE PLATFORM FOR ALL YOUR PAYMENT NEEDS */}
-      <section className="py-16 sm:py-20 px-4 max-w-7xl mx-auto">
-        <div className="text-center max-w-3xl mx-auto mb-10 sm:mb-12">
+      <section className="pt-10 sm:pt-14 pb-10 sm:pb-12 px-4 max-w-7xl mx-auto">
+        <div className="text-center max-w-3xl mx-auto mb-6 sm:mb-8">
           <h2 className="font-extrabold tracking-tight leading-[1.15] text-3xl sm:text-4xl md:text-[44px] text-[#2A292D]">
             <span className="text-[#3BBA93]">One Platform</span> for all your <br />
             payment needs
           </h2>
-          <p className="mt-6 text-base sm:text-lg font-semibold leading-relaxed text-[#2A292D]/85">
+          <p className="mt-4 text-base sm:text-lg font-semibold leading-relaxed text-[#2A292D]/85">
             Most African mobile money markets are dominated by one operator. Tanzania has four: Tigo
             Pesa, Vodacom M-Pesa, Airtel Money and Halopesa. Your customers will pay through whichever
             one they already use, and your business needs to accept all of them without four
@@ -268,23 +268,39 @@ export const TanzaniaPage: React.FC = () => {
           </p>
         </div>
 
-        {/* Coastal Tanzania Image Banner */}
-        <FadeIn className="w-full max-w-5xl mx-auto overflow-hidden rounded-2xl border border-gray-100 shadow-xl">
+        {/* Coastal Tanzania Image Banner with Apple-design depth, ambient overlay and live market badge */}
+        <FadeIn className="relative w-full max-w-5xl mx-auto h-[200px] sm:h-[260px] md:h-[300px] overflow-hidden rounded-2xl sm:rounded-3xl border border-gray-200/80 shadow-[0_12px_36px_rgba(0,0,0,0.08)] group">
           <OptimizedImage
             src="/media/tanzania-coast.jpg"
             alt="Dar es Salaam coastal cityscape with blue ocean"
             priority={true}
-            className="w-full h-auto object-cover max-h-[500px]"
+            containerClassName="h-full w-full"
+            className="w-full h-full object-cover object-center transition-transform duration-700 ease-out group-hover:scale-[1.02]"
           />
+          {/* Subtle ambient gradient overlay for cinematic contrast */}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent pointer-events-none" />
+
+          {/* Micro badges: frosted glass with Apple-style blur */}
+          <div className="absolute bottom-3.5 left-3.5 sm:bottom-4 sm:left-5 z-10 flex items-center gap-2 px-3 py-1.5 sm:px-3.5 sm:py-1.5 rounded-full bg-black/45 backdrop-blur-md border border-white/20 text-white text-xs sm:text-sm font-medium shadow-sm">
+            <span className="relative flex h-2 w-2">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#3BBA93] opacity-75" />
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-[#3BBA93]" />
+            </span>
+            <span>Dar es Salaam & Coastal Hub</span>
+          </div>
+
+          <div className="hidden sm:flex absolute bottom-4 right-5 z-10 items-center gap-1.5 px-3 py-1.5 rounded-full bg-black/40 backdrop-blur-md border border-white/15 text-white/90 text-xs font-medium">
+            <span>4-Telco Aggregated Network</span>
+          </div>
         </FadeIn>
       </section>
 
       {/* 3 — 4 TELCOS ROW & 3 NUMBERED CARDS */}
-      <section className="py-14 sm:py-18 px-4 max-w-7xl mx-auto">
+      <section className="pt-6 sm:pt-8 pb-14 sm:pb-18 px-4 max-w-7xl mx-auto">
         <FadeIn className="text-center max-w-3xl mx-auto mb-10 sm:mb-12">
           <h2 className="font-extrabold tracking-tight leading-[1.15] text-3xl sm:text-4xl md:text-[44px] text-[#2A292D]">
-            <span className="text-[#3BBA93]">One Platform</span> for all your <br />
-            payment needs
+            All 4 mobile money networks, <br />
+            <span className="text-[#3BBA93]">one unified integration</span>
           </h2>
         </FadeIn>
 
