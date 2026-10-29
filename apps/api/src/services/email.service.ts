@@ -323,7 +323,7 @@ export class EmailService {
     const textContent = `
 NEW INQUIRY RECEIVED FOR ${countryLabel.toUpperCase()}
 ======================================================
-Country Hub: ${countryLabel}
+Country: ${countryLabel}
 Inquiry Type: ${inquiry.inquiryType}
 Full Name: ${inquiry.fullName}
 Email Address: ${inquiry.email}
@@ -514,12 +514,12 @@ Manage this inquiry in AvadaPay Admin: ${adminUrl}
             </a>
           </td>
           <td valign="middle" align="right">
-            <span class="badge">● ${escapeHtml(countryLabel)} Hub</span>
+            <span class="badge">● ${escapeHtml(countryLabel)}</span>
           </td>
         </tr>
       </table>
       <h1 class="title">New Contact Inquiry</h1>
-      <p class="subtitle">Received ${escapeHtml(formattedDate)} • Regional Hub Dispatch</p>
+      <p class="subtitle">Received ${escapeHtml(formattedDate)} • Regional Operations</p>
     </div>
 
     <!-- Main Content Body -->

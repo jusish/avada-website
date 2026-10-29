@@ -26,7 +26,7 @@ router.get('/site-config', async (_req: Request, res: Response): Promise<void> =
 
     const defaultContacts: GeneralContacts = {
       supportEmail: 'info@avadapay.com',
-      supportPhone: '+260 968 332 766',
+      supportPhone: '+971 585 899 472',
       salesEmail: 'sales@avadapay.com',
       officeAddress: '25th floor, SORP Business Centre, Tameem House, Barsha Heights, Dubai (UAE)',
     };

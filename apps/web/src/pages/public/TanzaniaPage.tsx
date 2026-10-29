@@ -268,7 +268,7 @@ export const TanzaniaPage: React.FC = () => {
           </p>
         </div>
 
-        {/* Coastal Tanzania Image Banner with Apple-design depth, ambient overlay and live market badge */}
+        {/* Coastal Tanzania Image Banner */}
         <FadeIn className="relative w-full max-w-5xl mx-auto h-[200px] sm:h-[260px] md:h-[300px] overflow-hidden rounded-2xl sm:rounded-3xl border border-gray-200/80 shadow-[0_12px_36px_rgba(0,0,0,0.08)] group">
           <OptimizedImage
             src="/media/tanzania-coast.jpg"
@@ -277,21 +277,6 @@ export const TanzaniaPage: React.FC = () => {
             containerClassName="h-full w-full"
             className="w-full h-full object-cover object-center transition-transform duration-700 ease-out group-hover:scale-[1.02]"
           />
-          {/* Subtle ambient gradient overlay for cinematic contrast */}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent pointer-events-none" />
-
-          {/* Micro badges: frosted glass with Apple-style blur */}
-          <div className="absolute bottom-3.5 left-3.5 sm:bottom-4 sm:left-5 z-10 flex items-center gap-2 px-3 py-1.5 sm:px-3.5 sm:py-1.5 rounded-full bg-black/45 backdrop-blur-md border border-white/20 text-white text-xs sm:text-sm font-medium shadow-sm">
-            <span className="relative flex h-2 w-2">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#3BBA93] opacity-75" />
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-[#3BBA93]" />
-            </span>
-            <span>Dar es Salaam & Coastal Hub</span>
-          </div>
-
-          <div className="hidden sm:flex absolute bottom-4 right-5 z-10 items-center gap-1.5 px-3 py-1.5 rounded-full bg-black/40 backdrop-blur-md border border-white/15 text-white/90 text-xs font-medium">
-            <span>4-Telco Aggregated Network</span>
-          </div>
         </FadeIn>
       </section>
 
@@ -416,7 +401,7 @@ export const TanzaniaPage: React.FC = () => {
                 Live Transaction Monitor
               </span>
               <span className="bg-[#3BBA93]/20 text-[#3BBA93] text-xs font-bold px-2.5 py-0.5 rounded-full">
-                Dar es Salaam Hub
+                Tanzania
               </span>
             </div>
             <div className="flex items-center space-x-2 text-xs text-gray-400 font-semibold">

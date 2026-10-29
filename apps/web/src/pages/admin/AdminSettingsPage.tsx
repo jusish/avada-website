@@ -303,7 +303,7 @@ export const AdminSettingsPage: React.FC = () => {
                   required
                   value={contacts.supportPhone}
                   onChange={(e) => setContacts({ ...contacts, supportPhone: e.target.value })}
-                  placeholder="+260 968 332 766"
+                  placeholder="+971 585 899 472"
                   className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#3BBA93] focus:bg-white text-[#2A292D]"
                 />
               </div>
