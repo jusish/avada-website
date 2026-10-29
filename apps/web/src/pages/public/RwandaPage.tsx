@@ -197,7 +197,8 @@ export const RwandaPage: React.FC = () => {
           "name": "Avadapay Rwanda",
           "image": "https://avadapay.com/og-image.png",
           "url": "https://avadapay.com/rwanda",
-          "telephone": "+250 788 000 000",
+          "telephone": "+250 796 510 061",
+          "email": "avada.rwanda@avadapay.com",
           "address": {
             "@type": "PostalAddress",
             "streetAddress": "BHC Building, KG 7 Ave Kacyiru, Gasabo",

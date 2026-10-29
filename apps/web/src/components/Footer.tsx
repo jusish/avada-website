@@ -100,39 +100,49 @@ interface CountryContact {
 const BUILTIN_COUNTRY_CONTACTS: Record<string, CountryContact> = {
   rwanda: {
     title: 'Contact Us',
-    email: 'rwanda@avadapay.com',
-    phone: '+250 788 123 456',
+    email: 'avada.rwanda@avadapay.com',
+    phone: '+250 796 510 061',
     address: 'BHC Building, KG 7 Ave Kacyiru, Gasabo, Kigali, Rwanda',
   },
   rw: {
     title: 'Contact Us',
-    email: 'rwanda@avadapay.com',
-    phone: '+250 788 123 456',
+    email: 'avada.rwanda@avadapay.com',
+    phone: '+250 796 510 061',
     address: 'BHC Building, KG 7 Ave Kacyiru, Gasabo, Kigali, Rwanda',
   },
   kenya: {
     title: 'Contact Us',
-    email: 'kenya@avadapay.com',
-    phone: '+254 700 987 654',
+    email: 'office.kenya@avadapay.com',
+    phone: '+254 722 301 924',
     address: '8th Floor Westpark Towers, Westlands, Nairobi, Kenya',
   },
   ke: {
     title: 'Contact Us',
-    email: 'kenya@avadapay.com',
-    phone: '+254 700 987 654',
+    email: 'office.kenya@avadapay.com',
+    phone: '+254 722 301 924',
     address: '8th Floor Westpark Towers, Westlands, Nairobi, Kenya',
   },
   tanzania: {
     title: 'Contact Us',
-    email: 'tanzania@avadapay.com',
-    phone: '+255 754 321 098',
-    address: 'Dar es Salaam, Tanzania',
+    email: 'info@avadapay.com',
+    address: 'Ali Hassan Mwinyi Rd, Victoria Place, Dar es Salaam, Tanzania',
   },
   tz: {
     title: 'Contact Us',
-    email: 'tanzania@avadapay.com',
-    phone: '+255 754 321 098',
-    address: 'Dar es Salaam, Tanzania',
+    email: 'info@avadapay.com',
+    address: 'Ali Hassan Mwinyi Rd, Victoria Place, Dar es Salaam, Tanzania',
+  },
+  drc: {
+    title: 'Contact Us',
+    email: 'office.drc@avadapay.com',
+    phone: '+243 900 010 110',
+    address: 'SILIKIN VILLAGE, Local A012, Bâtiment Phase 3, Kinshasa, DRC',
+  },
+  cd: {
+    title: 'Contact Us',
+    email: 'office.drc@avadapay.com',
+    phone: '+243 900 010 110',
+    address: 'SILIKIN VILLAGE, Local A012, Bâtiment Phase 3, Kinshasa, DRC',
   },
 };
 
@@ -172,9 +182,9 @@ export const Footer: React.FC = () => {
     const builtin = BUILTIN_COUNTRY_CONTACTS[cleanPath];
     contactColumn = {
       title: 'Contact Us',
-      email: matchedCountry.officeEmail || builtin?.email || undefined,
-      phone: matchedCountry.officePhone || builtin?.phone || undefined,
-      address: matchedCountry.officeAddress || builtin?.address || undefined,
+      email: matchedCountry.officeEmail?.trim() || builtin?.email || undefined,
+      phone: matchedCountry.officePhone?.trim() || undefined,
+      address: matchedCountry.officeAddress?.trim() || builtin?.address || undefined,
     };
   } else if (cleanPath in BUILTIN_COUNTRY_CONTACTS) {
     contactColumn = BUILTIN_COUNTRY_CONTACTS[cleanPath];

@@ -208,7 +208,8 @@ export const KenyaPage: React.FC = () => {
           "name": "Avadapay Kenya",
           "image": "https://avadapay.com/og-image.png",
           "url": "https://avadapay.com/kenya",
-          "telephone": "+254 20 000 0000",
+          "telephone": "+254 722 301 924",
+          "email": "office.kenya@avadapay.com",
           "address": {
             "@type": "PostalAddress",
             "streetAddress": "Westlands Commercial Center",

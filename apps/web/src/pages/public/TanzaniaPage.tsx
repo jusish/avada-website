@@ -175,10 +175,10 @@ export const TanzaniaPage: React.FC = () => {
           "name": "Avadapay Tanzania",
           "image": "https://avadapay.com/og-image.png",
           "url": "https://avadapay.com/tanzania",
-          "telephone": "+255 22 000 0000",
+          "email": "info@avadapay.com",
           "address": {
             "@type": "PostalAddress",
-            "streetAddress": "Victoria Commercial Center, New Bagamoyo Road",
+            "streetAddress": "Ali Hassan Mwinyi Rd, Victoria Place",
             "addressLocality": "Dar es Salaam",
             "addressCountry": "TZ"
           },

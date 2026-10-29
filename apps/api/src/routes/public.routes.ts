@@ -142,14 +142,48 @@ router.get('/policies/:slug', async (req: Request, res: Response): Promise<void>
 
 // GET /api/public/detect-country
 // Detects visitor country based on reverse proxy headers (Cloudflare, Vercel, Nginx)
-// and verifies if it is among currently enabled/active markets in the database.
+// or falls back to IP geolocation lookup, and verifies if it is among currently enabled/active markets.
 router.get('/detect-country', async (req: Request, res: Response): Promise<void> => {
   try {
-    const rawCountry =
+    let rawCountry =
       (req.headers['cf-ipcountry'] as string) ||
       (req.headers['x-country-code'] as string) ||
       (req.headers['x-vercel-ip-country'] as string) ||
       '';
+
+    if (!rawCountry) {
+      // Resolve client IP from reverse proxy headers
+      const forwarded = (req.headers['x-forwarded-for'] as string) || '';
+      const clientIp = (forwarded.split(',')[0] || req.socket.remoteAddress || '').trim().replace(/^::ffff:/, '');
+
+      // Check if IP is public (not private / loopback / Docker)
+      const isPrivate =
+        !clientIp ||
+        clientIp === '::1' ||
+        clientIp.startsWith('127.') ||
+        clientIp.startsWith('10.') ||
+        clientIp.startsWith('192.168.') ||
+        /^172\.(1[6-9]|2[0-9]|3[0-1])\./.test(clientIp);
+
+      if (!isPrivate) {
+        try {
+          const controller = new AbortController();
+          const timeout = setTimeout(() => controller.abort(), 1500);
+          const geoRes = await fetch(`http://ip-api.com/json/${clientIp}?fields=status,countryCode`, {
+            signal: controller.signal,
+          });
+          clearTimeout(timeout);
+          if (geoRes.ok) {
+            const geoData = (await geoRes.json()) as { status?: string; countryCode?: string };
+            if (geoData.status === 'success' && geoData.countryCode) {
+              rawCountry = geoData.countryCode;
+            }
+          }
+        } catch {
+          // If IP geo lookup times out, continue
+        }
+      }
+    }
 
     const normalizedCode = rawCountry.trim().toUpperCase();
 

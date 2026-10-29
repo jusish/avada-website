@@ -231,7 +231,7 @@ async function main() {
       paymentRails: ['Mobile Money (Collections & Payouts)', 'Cards (Visa, Mastercard)', 'Bulk SMS'],
       pricingSummary: 'Competitive collection and payout fees with local currency settlement.',
       officeAddress: 'Cotonou, Littoral, Benin',
-      officePhone: '+229 01 00 00 00',
+      officePhone: null,
       officeEmail: 'benin@avadapay.com',
       mapEmbedUrl: 'https://maps.google.com/maps?q=Cotonou,%20Benin&t=&z=15&ie=UTF8&iwloc=&output=embed',
       active: true,
